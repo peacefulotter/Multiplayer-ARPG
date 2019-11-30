@@ -1,5 +1,8 @@
 /.idea
 /records
+/out
+LICENSE
+README.md
 .classpath
 .project
 *.iml
