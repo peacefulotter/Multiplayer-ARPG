@@ -1,6 +1,7 @@
 /.idea
 /records
 /out
+/bin
 LICENSE
 README.md
 .classpath
