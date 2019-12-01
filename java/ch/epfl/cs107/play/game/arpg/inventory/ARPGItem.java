@@ -1,39 +1,74 @@
 package ch.epfl.cs107.play.game.arpg.inventory;
 
-import ch.epfl.cs107.play.game.actor.Actor;
-import ch.epfl.cs107.play.game.actor.Entity;
+
+import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.AreaEntity;
+import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
-import ch.epfl.cs107.play.game.rpg.inventory.Inventory;
+import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
-import ch.epfl.cs107.play.math.Positionable;
-import ch.epfl.cs107.play.math.Vector;
+import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Canvas;
+import java.util.List;
 
-public enum ARPGItem implements InventoryItem
+public class ARPGItem extends AreaEntity
 {
-    ARROW( "Arrow", "zelda/arrow.icon",1f, 10 ),
-    BOMB( "Bomb", "zelda/bomb", 1f, 10 ),
-    BOW( "Bow", "zelda/bow.icon", 1f, 10 ),
-    CASTLEKEY( "CastleKey", "zelda/key", 0.1f, 10 ),
-    STAFF( "Magic Wand", "zelda/staff_water.icon", 2f, 10 ),
-    SWORD( "Sword", "zelda/sword.icon", 1f, 10 );
-
-    private String name;
-    private String spriteName;
-    private float weight;
-    private int price;
     private Sprite sprite;
+    private ARPGItems item;
+    private List<DiscreteCoordinates> currentCells;
 
-    ARPGItem( String name, String spriteName, float weight, int price )
+    protected ARPGItem( ARPGItems item, Area area, Orientation orientation, DiscreteCoordinates coords )
     {
-        //sprite = new Sprite( spriteName, 2f, 2f, parent );
-        this.spriteName = spriteName;
-        this.weight = weight;
-        this.price = price;
+        super( area, orientation, coords );
+        currentCells.add( coords );
+        sprite = new Sprite( item.spriteName, 1f, 1f, this  );
+        this.item = item;
     }
 
+
+    public void giveItem( InventoryItem item )
+    {
+
+    }
+
+    public void dropItem( InventoryItem item )
+    {
+
+    }
+
+    @Override
     public void draw( Canvas canvas )
     {
-        sprite.draw( canvas );
+
+    }
+
+    @Override
+    public List<DiscreteCoordinates> getCurrentCells()
+    {
+        return currentCells;
+    }
+
+    @Override
+    public boolean takeCellSpace()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isCellInteractable()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean isViewInteractable()
+    {
+        return false;
+    }
+
+    @Override
+    public void acceptInteraction( AreaInteractionVisitor v )
+    {
+
     }
 }

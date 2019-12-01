@@ -11,6 +11,8 @@ import ch.epfl.cs107.play.io.XMLTexts;
 import ch.epfl.cs107.play.window.Window;
 import ch.epfl.cs107.play.window.swing.SwingWindow;
 
+import java.awt.*;
+
 /**
  * Main entry point.
  */
@@ -33,8 +35,10 @@ public class Play {
        
         final Game game = new ARPG();
 
+        // get the screen size so that the window is matching the display
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		// Use Swing display
-		final Window window = new SwingWindow(game.getTitle(), fileSystem, 550, 550);
+		final Window window = new SwingWindow(game.getTitle(), fileSystem, screenSize.width, screenSize.height);
 		
 		//Recorder recorder = new Recorder(window); 
 		//RecordReplayer replayer = new RecordReplayer(window); // not used in this project

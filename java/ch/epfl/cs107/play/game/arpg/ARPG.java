@@ -2,6 +2,7 @@ package ch.epfl.cs107.play.game.arpg;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.arpg.actor.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.area.Ferme;
@@ -21,8 +22,8 @@ public class ARPG extends RPG
         return "ZeldIC";
     }
 
-    public final static float CAMERA_SCALE_FACTOR = 13.f;
-    public final static float STEP = 0.05f;
+    //public final static float CAMERA_SCALE_FACTOR = 13.f;
+    //public final static float STEP = 0.05f;
 
     private ARPGPlayer player;
 
@@ -52,7 +53,7 @@ public class ARPG extends RPG
         {
             createAreas();
             Area area = setCurrentArea( "zelda/Ferme", true );
-            player = new ARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6,10) );
+            player = new ARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6,10), new ARPGInventory( 5f )  );
             initPlayer( player );
             return true;
         }
@@ -70,10 +71,6 @@ public class ARPG extends RPG
             player.enterArea( newArea, currentDoor.getOtherSideCoordinates() );
         }
         super.update(deltaTime);
-    }
-
-    public Grass getGrassesArea( DiscreteCoordinates coords ) {
-        return null;
     }
 
     @Override

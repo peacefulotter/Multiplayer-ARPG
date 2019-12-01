@@ -8,6 +8,9 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGItems;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Bomb;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
@@ -16,6 +19,7 @@ import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
+import ch.epfl.cs107.play.window.Mouse;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,11 +29,14 @@ public class ARPGPlayer extends Player {
     /// Animation duration in frame number
     private final static int ANIMATION_DURATION = 8;
     private final ARPGPlayerHandler handler;
+
     private float hp;
-    private TextGraphics message;
     private Animation[] animations;
-    private int currentAnimation=2;
-    private boolean wantsIntercation= false;
+    private int currentAnimation = 2;
+    private boolean wantsInteraction = false;
+
+    private ARPGItem currentItem;
+    private ARPGInventory inventory;
 
     /**
      * Default Player constructor
@@ -38,10 +45,8 @@ public class ARPGPlayer extends Player {
      * @param orientation (Orientation): Initial player orientation, not null
      * @param coordinates (Coordinates): Initial position, not null
      */
-    public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
+    public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, ARPGInventory inventory ) {
         super(area, orientation, coordinates);
-
-
         handler = new ARPGPlayerHandler();
         hp = 3;
         Sprite[][] sprites = RPGSprite.extractSprites("zelda/player",
@@ -49,37 +54,66 @@ public class ARPGPlayer extends Player {
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
                         Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
         animations= RPGSprite.createAnimations(ANIMATION_DURATION/2, sprites);
-        System.out.println(sprites[0][0].getDepth());
+
+        this.inventory = inventory;
+        this.inventory.addItemToInventory( ARPGItems.BOMB );
+        this.inventory.addItemToInventory( ARPGItems.BOMB );
     }
 
     public void update(float deltaTime) {
         Keyboard keyboard = getOwnerArea().getKeyboard();
+        Mouse mouse = getOwnerArea().getMouse();
+
         // register movement
         moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
         moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
         moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
         moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
+
         // display animation if player is moving
-        if(isDisplacementOccurs()){
+        if( isDisplacementOccurs() )
+        {
             animations[currentAnimation].update(deltaTime);
         }
         // cut the grass in front of the player
         if ( keyboard.get( Keyboard.E ).isDown() )
         {
-            wantsIntercation=true;
-            //getOwnerArea().getGrassesArea( getFieldOfViewCells().get( 0 ) );
-            System.out.println( getFieldOfViewCells().toArray()[0] );
-        }else{
-            wantsIntercation=false;
+            wantsInteraction = true;
+        }
+        // display inventory or hide it
+        else if ( keyboard.get( Keyboard.I ).isDown() )
+        {
+            System.out.println("Inventory");
+            inventory.toggleDisplay();
+        }
+        // take the next item in inventory
+        else if ( keyboard.get( Keyboard.TAB ).isDown() )
+        {
+            System.out.println("next item");
+            takeNextItem();
+        }
+        else if ( mouse.getLeftButton().isDown() )
+        {
+            // triggers item behavior
+            System.out.println("left mouse pressed");
+        }
+
+        else {
+            wantsInteraction = false;
         }
 
         super.update(deltaTime);
     }
 
+    private void takeNextItem()
+    {
+        currentItem = (ARPGItem)inventory.getNextItem();
+        System.out.println("player got the next item");
+    }
+
     @Override
     public void draw(Canvas canvas) {
         animations[currentAnimation].draw(canvas);
-        //message.draw(canvas);
     }
 
     /**
@@ -125,7 +159,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public boolean wantsViewInteraction() {
-        return wantsIntercation;
+        return wantsInteraction;
     }
 
 
@@ -171,7 +205,6 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith( Grass grass )
         {
-            System.out.println("lol");
             grass.cutGrass();
         }
     }

@@ -14,7 +14,6 @@ import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -58,7 +57,6 @@ public class Grass extends AreaEntity {
     }
 
     protected void cutGrass() {
-        System.out.println("cut");
         isCut = true;
     }
 

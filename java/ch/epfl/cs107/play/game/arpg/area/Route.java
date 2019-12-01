@@ -31,8 +31,7 @@ public class Route extends ARPGArea
                 Orientation.DOWN,
                 new DiscreteCoordinates(9, 0 ),
                 new DiscreteCoordinates( 10, 0 ) ) );
-        // create grass
-        grasses = new Grass[ 10 * 5 ];
+
         for ( int i = 0; i <= 2; i++ )
         {
             for ( int j = 0; j <= 5; j++ )
@@ -43,7 +42,6 @@ public class Route extends ARPGArea
                         new DiscreteCoordinates( i+5, j+6 )
                 );
                 registerActor( newGrass );
-                grasses[ 11 * i + j ] = newGrass;
             }
         }
     }

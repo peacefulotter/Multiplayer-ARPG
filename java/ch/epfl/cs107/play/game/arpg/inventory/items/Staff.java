@@ -1,14 +1,17 @@
 package ch.epfl.cs107.play.game.arpg.inventory.items;
 
+import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
-import ch.epfl.cs107.play.math.Vector;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGItems;
+import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
-public class Staff
+public class Staff extends ARPGItem
 {
 
-    public Staff( String name, float weight, int price, Vector vect )
+    public Staff( Area area, DiscreteCoordinates coords )
     {
-        //super( name, weight, price, "zelda/staff_water.icon" );
+        super( ARPGItems.STAFF, area, Orientation.DOWN, coords );
     }
 
 }
