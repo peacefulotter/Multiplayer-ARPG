@@ -54,7 +54,7 @@ public class ARPG extends RPG
         {
             createAreas();
             Area area = setCurrentArea( "zelda/Ferme", true );
-            player = new ARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6,10), new ARPGInventory( 5f )  );
+            player = new ARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6,10) );
             initPlayer( player );
             return true;
         }

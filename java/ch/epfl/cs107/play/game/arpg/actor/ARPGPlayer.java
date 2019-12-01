@@ -1,7 +1,7 @@
 package ch.epfl.cs107.play.game.arpg.actor;
 
-import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Animation;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -9,19 +9,15 @@ import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
-import ch.epfl.cs107.play.game.arpg.inventory.ARPGItems;
-import ch.epfl.cs107.play.game.arpg.inventory.items.Bomb;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Mouse;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +31,8 @@ public class ARPGPlayer extends Player {
     private int currentAnimation = 2;
     private boolean wantsInteraction = false;
 
-    private ARPGItems currentItem;
+
+    private ARPGItem currentItem;
     private ARPGInventory inventory;
 
     /**
@@ -45,7 +42,7 @@ public class ARPGPlayer extends Player {
      * @param orientation (Orientation): Initial player orientation, not null
      * @param coordinates (Coordinates): Initial position, not null
      */
-    public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, ARPGInventory inventory ) {
+    public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
         super(area, orientation, coordinates);
         handler = new ARPGPlayerHandler();
         hp = 3;
@@ -55,9 +52,8 @@ public class ARPGPlayer extends Player {
                         Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
         animations= RPGSprite.createAnimations(ANIMATION_DURATION/2, sprites);
 
-        this.inventory = inventory;
-        this.inventory.addItemToInventory( ARPGItems.BOMB );
-        this.inventory.addItemToInventory( ARPGItems.BOMB );
+        inventory = new ARPGInventory(this, 100, 10);
+        inventory.addItemToInventory( ARPGItem.BOMB, 3);
     }
 
     public void update(float deltaTime) {
@@ -97,7 +93,12 @@ public class ARPGPlayer extends Player {
             // triggers item behavior
             System.out.println("left mouse pressed");
         }
-
+        else if(keyboard.get(Keyboard.SPACE).isPressed()){
+            if(inventory.getCurrentItem() == ARPGItem.BOMB){
+               getOwnerArea().registerActor(new Bomb(getOwnerArea(),Orientation.DOWN,getCurrentMainCellCoordinates()));
+               inventory.removeItemFromInventory(ARPGItem.BOMB);
+            }
+        }
         else {
             wantsInteraction = false;
         }
@@ -107,7 +108,7 @@ public class ARPGPlayer extends Player {
 
     private void takeNextItem()
     {
-        currentItem = (ARPGItems)inventory.getNextItem();
+        currentItem = (ARPGItem)inventory.getNextItem(1);
         System.out.println("player got the next item");
     }
 

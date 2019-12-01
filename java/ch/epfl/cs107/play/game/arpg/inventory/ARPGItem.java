@@ -1,74 +1,53 @@
 package ch.epfl.cs107.play.game.arpg.inventory;
 
+import ch.epfl.cs107.play.game.Inventory.InventoryItem;
 
-import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.AreaEntity;
-import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.areagame.actor.Sprite;
-import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
-import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.window.Canvas;
-import java.util.List;
-
-public class ARPGItem extends AreaEntity
+public enum ARPGItem implements InventoryItem
 {
-    private Sprite sprite;
-    private ARPGItems item;
-    private List<DiscreteCoordinates> currentCells;
+    ARROW( "Arrow", "zelda/arrow.icon",1f, 10, false),
+    BOMB( "Bomb", "zelda/bomb", 1f, 10, true),
+    BOW( "Bow", "zelda/bow.icon", 1f, 10,true ),
+    CASTLE_KEY( "CastleKey", "zelda/key", 0.1f, 10, false),
+    STAFF( "Magic Wand", "zelda/staff_water.icon", 2f, 10, true),
+    SWORD( "Sword", "zelda/sword.icon", 1f, 10, true);
 
-    protected ARPGItem( ARPGItems item, Area area, Orientation orientation, DiscreteCoordinates coords )
+    protected String name;
+    protected String spriteName;
+    protected float weight;
+    protected int price;
+    private boolean equipable;
+
+    ARPGItem(String name, String spriteName, float weight, int price, boolean equipable)
     {
-        super( area, orientation, coords );
-        currentCells.add( coords );
-        sprite = new Sprite( item.spriteName, 1f, 1f, this  );
-        this.item = item;
-    }
-
-
-    public void giveItem( InventoryItem item )
-    {
-
-    }
-
-    public void dropItem( InventoryItem item )
-    {
-
-    }
-
-    @Override
-    public void draw( Canvas canvas )
-    {
-
+        this.name = name;
+        this.spriteName = spriteName;
+        this.weight = weight;
+        this.price = price;
+        this.equipable=equipable;
     }
 
     @Override
-    public List<DiscreteCoordinates> getCurrentCells()
+    public String getName()
     {
-        return currentCells;
+        return name;
     }
 
     @Override
-    public boolean takeCellSpace()
+    public float getWeight()
     {
-        return false;
+        return weight;
     }
 
     @Override
-    public boolean isCellInteractable()
+    public float getPrice()
     {
-        return true;
+        return price;
+    }
+    public String getSpriteName(){
+        return spriteName;
     }
 
-    @Override
-    public boolean isViewInteractable()
-    {
-        return false;
-    }
-
-    @Override
-    public void acceptInteraction( AreaInteractionVisitor v )
-    {
-
+    public boolean isEquipable() {
+        return equipable;
     }
 }
