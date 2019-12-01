@@ -114,6 +114,7 @@ public class ARPGPlayer extends Player {
     @Override
     public void draw(Canvas canvas) {
         animations[currentAnimation].draw(canvas);
+        //message.draw(canvas);
     }
 
     /**

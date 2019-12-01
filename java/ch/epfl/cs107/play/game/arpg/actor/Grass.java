@@ -26,22 +26,20 @@ public class Grass extends AreaEntity {
             1, 1,
             this, new RegionOfInterest(0, 0, 16, 16), new Vector(0, 0), 1f, grassDepth
     );
-
-    private Sprite[][] grassSprites = new Sprite[4][1];
-    private Animation[] grassAnimation;
+    private Animation grassAnimation;
     private int currentAnimationIndex = 0;
 
     public Grass(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area, orientation, position);
         currentCells = new ArrayList<>();
         currentCells.add(position);
+        Sprite[] animationSprites = new Sprite[4];
 
         for (int i = 0; i < 4; i++) {
-            grassSprites[i][0] = new Sprite("zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest(i * 16, 0, 16, 16), Vector.ZERO, 1f, grassDepth);
+            animationSprites[i] = new Sprite("zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest(i * 16, 0, 16, 16), Vector.ZERO, 1f, grassDepth);
         }
 
-        // crée un tableau de 4 animation
-        grassAnimation = RPGSprite.createAnimations(6, grassSprites);
+        grassAnimation = new Animation(6, animationSprites, false);
     }
 
     @Override
@@ -49,11 +47,17 @@ public class Grass extends AreaEntity {
         if (!isCut) {
             sprite.draw(canvas);
         } else {
-            grassAnimation[currentAnimationIndex].draw(canvas);
+            grassAnimation.draw(canvas);
         }
-        if (grassAnimation[grassAnimation.length - 1].isCompleted()) {
+        if (grassAnimation.isCompleted()) {
             getOwnerArea().unregisterActor(this);
         }
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        if(isCut)
+            grassAnimation.update(deltaTime);
     }
 
     protected void cutGrass() {
