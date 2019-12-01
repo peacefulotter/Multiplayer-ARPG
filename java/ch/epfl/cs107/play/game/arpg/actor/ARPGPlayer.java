@@ -35,7 +35,7 @@ public class ARPGPlayer extends Player {
     private int currentAnimation = 2;
     private boolean wantsInteraction = false;
 
-    private ARPGItem currentItem;
+    private ARPGItems currentItem;
     private ARPGInventory inventory;
 
     /**
@@ -76,23 +76,23 @@ public class ARPGPlayer extends Player {
             animations[currentAnimation].update(deltaTime);
         }
         // cut the grass in front of the player
-        if ( keyboard.get( Keyboard.E ).isDown() )
+        if ( keyboard.get( Keyboard.E ).isPressed() )
         {
             wantsInteraction = true;
         }
         // display inventory or hide it
-        else if ( keyboard.get( Keyboard.I ).isDown() )
+        else if ( keyboard.get( Keyboard.I ).isPressed() )
         {
             System.out.println("Inventory");
             inventory.toggleDisplay();
         }
         // take the next item in inventory
-        else if ( keyboard.get( Keyboard.TAB ).isDown() )
+        else if ( keyboard.get( Keyboard.TAB ).isPressed() )
         {
             System.out.println("next item");
             takeNextItem();
         }
-        else if ( mouse.getLeftButton().isDown() )
+        else if ( mouse.getLeftButton().isPressed() )
         {
             // triggers item behavior
             System.out.println("left mouse pressed");
@@ -107,7 +107,7 @@ public class ARPGPlayer extends Player {
 
     private void takeNextItem()
     {
-        currentItem = (ARPGItem)inventory.getNextItem();
+        currentItem = (ARPGItems)inventory.getNextItem();
         System.out.println("player got the next item");
     }
 

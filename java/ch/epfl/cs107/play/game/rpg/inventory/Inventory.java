@@ -64,6 +64,9 @@ public class Inventory
     public InventoryItem getNextItem()
     {
         currentIndex++;
+        if ( currentIndex == inventory.size() ) {
+            currentIndex = 0;
+        }
         return inventory.get( currentIndex );
     }
 
