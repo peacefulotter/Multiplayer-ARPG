@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.game.arpg.area;
 import ch.epfl.cs107.play.game.areagame.actor.Background;
 import ch.epfl.cs107.play.game.areagame.actor.Foreground;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.signal.logic.Logic;
@@ -38,6 +39,7 @@ public class Ferme extends ARPGArea
                 Orientation.DOWN,
                 new DiscreteCoordinates(13, 0 ),
                 new DiscreteCoordinates( 14, 0 ) ) );
+        registerActor(new Bomb(this, Orientation.DOWN, new DiscreteCoordinates(10,10)));
     }
 
     @Override

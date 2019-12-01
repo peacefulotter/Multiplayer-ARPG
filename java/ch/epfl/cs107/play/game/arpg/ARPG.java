@@ -36,6 +36,7 @@ public class ARPG extends RPG
             new DiscreteCoordinates(5,15)
     };*/
 
+
     /**
      * Add all the areas
      */

@@ -67,8 +67,6 @@ public class ARPGPlayer extends Player {
         if ( keyboard.get( Keyboard.E ).isDown() )
         {
             wantsIntercation=true;
-            //getOwnerArea().getGrassesArea( getFieldOfViewCells().get( 0 ) );
-            System.out.println( getFieldOfViewCells().toArray()[0] );
         }else{
             wantsIntercation=false;
         }
@@ -171,7 +169,6 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith( Grass grass )
         {
-            System.out.println("lol");
             grass.cutGrass();
         }
     }
