@@ -18,88 +18,74 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class Grass extends AreaEntity
-{
-    private boolean isCut = false;
+public class Grass extends AreaEntity {
     private final List<DiscreteCoordinates> currentCells;
+    private boolean isCut = false;
+    private float grassDepth = -100f;
     private final Sprite sprite = new Sprite(
             "zelda/grass",
             1, 1,
-            this, new RegionOfInterest( 0, 0, 16, 16 )
+            this, new RegionOfInterest(0, 0, 16, 16), new Vector(0, 0), 1f, grassDepth
     );
 
-    private Sprite[][] grassSprites = new Sprite[ 4 ][ 1 ];
+    private Sprite[][] grassSprites = new Sprite[4][1];
     private Animation[] grassAnimation;
     private int currentAnimationIndex = 0;
 
-    public Grass( Area area, Orientation orientation, DiscreteCoordinates position )
-    {
-        super( area, orientation, position );
+    public Grass(Area area, Orientation orientation, DiscreteCoordinates position) {
+        super(area, orientation, position);
         currentCells = new ArrayList<>();
-        currentCells.add( position );
+        currentCells.add(position);
 
-        for ( int i = 0; i < 4; i++ )
-        {
-            grassSprites[ i ][ 0 ] = new Sprite( "zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest( i*16, 0, 16, 16 ), Vector.ZERO,  1f, 1f );
+        for (int i = 0; i < 4; i++) {
+            grassSprites[i][0] = new Sprite("zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest(i * 16, 0, 16, 16), Vector.ZERO, 1f, grassDepth);
         }
 
         // crée un tableau de 4 animation
-        grassAnimation = RPGSprite.createAnimations(6, grassSprites );
-        System.out.println( Arrays.toString( grassAnimation ) );
+        grassAnimation = RPGSprite.createAnimations(6, grassSprites);
     }
 
     @Override
-    public void draw( Canvas canvas )
-    {
-        System.out.println(isCut);
-        if ( !isCut )
-        {
-            sprite.draw( canvas );
+    public void draw(Canvas canvas) {
+        if (!isCut) {
+            sprite.draw(canvas);
+        } else {
+            grassAnimation[currentAnimationIndex].draw(canvas);
         }
-        else
-        {
-            grassAnimation[ currentAnimationIndex ].draw( canvas );
-        }
-        if ( grassAnimation[grassAnimation.length-1].isCompleted())
-        {
-            getOwnerArea().unregisterActor( this );
+        if (grassAnimation[grassAnimation.length - 1].isCompleted()) {
+            getOwnerArea().unregisterActor(this);
         }
     }
 
-    protected void cutGrass()
-    {
+    protected void cutGrass() {
         System.out.println("cut");
         isCut = true;
     }
 
 
     @Override
-    public List<DiscreteCoordinates> getCurrentCells()
-    {
+    public List<DiscreteCoordinates> getCurrentCells() {
         return currentCells;
     }
 
     @Override
-    public boolean takeCellSpace()
-    {
+    public boolean takeCellSpace() {
         return isCut;
     }
 
     @Override
-    public boolean isCellInteractable()
-    {
+    public boolean isCellInteractable() {
         return true;
     }
 
     @Override
-    public boolean isViewInteractable()
-    {
+    public boolean isViewInteractable() {
         return true;
     }
 
     @Override
-    public void acceptInteraction( AreaInteractionVisitor v )
-    {
-        ((RPGInteractionVisitor)v).interactWith(this);
+    public void acceptInteraction(AreaInteractionVisitor v) {
+        ((RPGInteractionVisitor) v).interactWith(this);
     }
+
 }

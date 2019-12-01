@@ -29,6 +29,7 @@ public class ARPGPlayer extends Player {
     private TextGraphics message;
     private Animation[] animations;
     private int currentAnimation=2;
+    private boolean wantsIntercation= false;
 
     /**
      * Default Player constructor
@@ -39,14 +40,16 @@ public class ARPGPlayer extends Player {
      */
     public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
         super(area, orientation, coordinates);
+
+
         handler = new ARPGPlayerHandler();
         hp = 3;
-
         Sprite[][] sprites = RPGSprite.extractSprites("zelda/player",
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
-                        Orientation.RIGHT, Orientation.UP, Orientation.LEFT} );
+                        Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
         animations= RPGSprite.createAnimations(ANIMATION_DURATION/2, sprites);
+        System.out.println(sprites[0][0].getDepth());
     }
 
     public void update(float deltaTime) {
@@ -63,10 +66,11 @@ public class ARPGPlayer extends Player {
         // cut the grass in front of the player
         if ( keyboard.get( Keyboard.E ).isDown() )
         {
-            System.out.println( Arrays.toString( getCurrentCells().toArray() ) );
+            wantsIntercation=true;
             //getOwnerArea().getGrassesArea( getFieldOfViewCells().get( 0 ) );
-
             System.out.println( getFieldOfViewCells().toArray()[0] );
+        }else{
+            wantsIntercation=false;
         }
 
         super.update(deltaTime);
@@ -121,7 +125,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public boolean wantsViewInteraction() {
-        return false;
+        return wantsIntercation;
     }
 
 
