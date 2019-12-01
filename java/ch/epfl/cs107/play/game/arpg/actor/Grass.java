@@ -36,7 +36,7 @@ public class Grass extends AreaEntity {
         Sprite[] animationSprites = new Sprite[4];
 
         for (int i = 0; i < 4; i++) {
-            animationSprites[i] = new Sprite("zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest(i * 16, 0, 16, 16), Vector.ZERO, 1f, grassDepth);
+            animationSprites[i] = new Sprite("zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, grassDepth);
         }
 
         grassAnimation = new Animation(6, animationSprites, false);
@@ -46,10 +46,9 @@ public class Grass extends AreaEntity {
     public void draw(Canvas canvas) {
         if (!isCut) {
             sprite.draw(canvas);
-        } else {
+        } else if(!grassAnimation.isCompleted()){
             grassAnimation.draw(canvas);
-        }
-        if (grassAnimation.isCompleted()) {
+        } else {
             getOwnerArea().unregisterActor(this);
         }
     }
