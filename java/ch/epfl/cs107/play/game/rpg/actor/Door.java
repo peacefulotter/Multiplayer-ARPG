@@ -149,7 +149,8 @@ public class Door extends AreaEntity {
     }
 
     @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
+    public void acceptInteraction( AreaInteractionVisitor v )
+    {
         ((RPGInteractionVisitor)v).interactWith(this);
     }
 }

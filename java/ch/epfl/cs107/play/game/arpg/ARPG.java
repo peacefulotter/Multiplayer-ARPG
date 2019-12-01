@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.game.arpg;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.ARPGPlayer;
+import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.area.Ferme;
 import ch.epfl.cs107.play.game.arpg.area.Route;
 import ch.epfl.cs107.play.game.arpg.area.Village;
@@ -65,10 +66,14 @@ public class ARPG extends RPG
         {
             player.leaveArea();
             Door currentDoor = player.passedDoor();
-            Area newArea = setCurrentArea( currentDoor.getDestination(), false );
+            Area newArea = setCurrentArea( currentDoor.getDestination(), true );
             player.enterArea( newArea, currentDoor.getOtherSideCoordinates() );
         }
         super.update(deltaTime);
+    }
+
+    public Grass getGrassesArea( DiscreteCoordinates coords ) {
+        return null;
     }
 
     @Override

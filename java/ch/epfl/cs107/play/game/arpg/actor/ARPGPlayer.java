@@ -12,10 +12,12 @@ import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,25 +39,36 @@ public class ARPGPlayer extends Player {
      */
     public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
         super(area, orientation, coordinates);
+        handler = new ARPGPlayerHandler();
+        hp = 3;
+
         Sprite[][] sprites = RPGSprite.extractSprites("zelda/player",
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
-                        Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
+                        Orientation.RIGHT, Orientation.UP, Orientation.LEFT} );
         animations= RPGSprite.createAnimations(ANIMATION_DURATION/2, sprites);
-
-        hp = 10;
-        handler = new ARPGPlayerHandler();
     }
 
     public void update(float deltaTime) {
         Keyboard keyboard = getOwnerArea().getKeyboard();
+        // register movement
         moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
         moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
         moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
         moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
+        // display animation if player is moving
         if(isDisplacementOccurs()){
             animations[currentAnimation].update(deltaTime);
         }
+        // cut the grass in front of the player
+        if ( keyboard.get( Keyboard.E ).isDown() )
+        {
+            System.out.println( Arrays.toString( getCurrentCells().toArray() ) );
+            //getOwnerArea().getGrassesArea( getFieldOfViewCells().get( 0 ) );
+
+            System.out.println( getFieldOfViewCells().toArray()[0] );
+        }
+
         super.update(deltaTime);
     }
 
@@ -111,10 +124,6 @@ public class ARPGPlayer extends Player {
         return false;
     }
 
-    @Override
-    public void interactWith(Interactable other) {
-        other.acceptInteraction(handler);
-    }
 
     @Override
     public boolean takeCellSpace() {
@@ -131,19 +140,35 @@ public class ARPGPlayer extends Player {
         return false;
     }
 
+
     @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
+    public void acceptInteraction( AreaInteractionVisitor v )
+    {
         System.out.println(v.toString());
         // to do
     }
 
-    class ARPGPlayerHandler implements ARPGInteractionVisitor {
+    @Override
+    public void interactWith( Interactable other )
+    {
+        other.acceptInteraction( handler );
+    }
+
+    class ARPGPlayerHandler implements ARPGInteractionVisitor
+    {
         @Override
-        public void interactWith(Door door) {
+        public void interactWith( Door door )
+        {
             if ( door.isOpen() )
             {
                 setIsPassingADoor( door );
             }
+        }
+        @Override
+        public void interactWith( Grass grass )
+        {
+            System.out.println("lol");
+            grass.cutGrass();
         }
     }
 }

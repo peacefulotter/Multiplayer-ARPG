@@ -3,8 +3,10 @@ package ch.epfl.cs107.play.game.arpg.area;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
 import ch.epfl.cs107.play.game.arpg.ARPGBehavior;
+import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.tutos.Tuto1;
 import ch.epfl.cs107.play.io.FileSystem;
+import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Image;
 import ch.epfl.cs107.play.window.Window;
 
@@ -12,6 +14,7 @@ public abstract class ARPGArea extends Area
 {
     private Window window;
     private ARPGBehavior behavior;
+    protected Grass[] grasses;
 
     /**
      * Create the area by adding all its actors
@@ -53,4 +56,15 @@ public abstract class ARPGArea extends Area
         return Tuto1.CAMERA_SCALE_FACTOR;
     }
 
+    public Grass getGrass( DiscreteCoordinates coords )
+    {
+        for ( Grass g : grasses )
+        {
+            if ( g.getCurrentCells().contains( coords ) )
+            {
+                return g;
+            }
+        }
+        return null;
+    }
 }
