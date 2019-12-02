@@ -29,6 +29,7 @@ public class ARPGPlayer extends Player {
     private final ARPGPlayerHandler handler;
 
     private float hp;
+    private int maxHP = 3;
     private Animation[] animations;
     private int currentAnimation = 2;
     private boolean wantsInteraction = false;
@@ -49,15 +50,15 @@ public class ARPGPlayer extends Player {
     public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
         super(area, orientation, coordinates);
         handler = new ARPGPlayerHandler();
-        hp = 3;
+        hp = maxHP;
         Sprite[][] sprites = RPGSprite.extractSprites("zelda/player",
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
                         Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
-        animations= RPGSprite.createAnimations(ANIMATION_DURATION/2, sprites);
+        animations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
 
-        inventory = new ARPGInventory(this, 100, 10);
-        inventory.addItemToInventory( ARPGItem.BOMB, 3);
+        inventory = new ARPGInventory(this, 100, 10, 1234);
+        inventory.addItemToInventory(ARPGItem.BOMB, 3);
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
     }
@@ -73,46 +74,47 @@ public class ARPGPlayer extends Player {
         moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
 
         // display animation if player is moving
-        if( isDisplacementOccurs() )
-        {
+        if (isDisplacementOccurs()) {
             animations[currentAnimation].update(deltaTime);
         }
         wantsInteraction = false;
-        for(PlayerInput input : PlayerInput.values()){
-            if(keyboard.get(input.getKeyCode()).isPressed()) reactToInput(input);
+        for (PlayerInput input : PlayerInput.values()) {
+            if (keyboard.get(input.getKeyCode()).isPressed()) reactToInput(input);
         }
         super.update(deltaTime);
     }
-    private void reactToInput(PlayerInput input){
-       switch (input){
-           case INTERACT: wantsInteraction=true;
-           case SHOW_INV: inventory.toggleDisplay();
-           case NEXT_ITEM: takeNextItem();
-           case USE_ITEM: useItem();
-       }
+
+    private void reactToInput(PlayerInput input) {
+        switch (input) {
+            case INTERACT:
+                wantsInteraction = true;
+                break;
+            case SHOW_INV:
+                inventory.toggleDisplay();
+                break;
+            case NEXT_ITEM:
+                takeNextItem();
+                break;
+            case USE_ITEM:
+                useItem();
+                break;
+        }
     }
-    private void useItem(){
-        if(inventory.getCurrentItem() == ARPGItem.BOMB){
-            getOwnerArea().registerActor(new Bomb(getOwnerArea(),Orientation.DOWN,getCurrentMainCellCoordinates()));
+
+    private void useItem() {
+        if (inventory.getCurrentItem() == ARPGItem.BOMB) {
+            getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, getCurrentMainCellCoordinates()));
             inventory.removeItemFromInventory(ARPGItem.BOMB);
         }
     }
 
-    private void takeNextItem()
-    {
-        currentItem = (ARPGItem)inventory.getNextItem(1);
+    private void takeNextItem() {
+        currentItem = (ARPGItem) inventory.getNextItem(1);
         playerGUI.setItemSprite(currentItem);
-        System.out.println("player got the next item");
     }
-    public ARPGItem getEquippedItem(){
-        return (ARPGItem)inventory.getCurrentItem();
-    }
-    @Override
-    public void draw(Canvas canvas) {
-        if(playerGUI == null) playerGUI= new ARPGPlayerStatusGUI(canvas,this);
-        playerGUI.draw(canvas);
-        animations[currentAnimation].draw(canvas);
-        //message.draw(canvas);
+
+    public ARPGItem getEquippedItem() {
+        return (ARPGItem) inventory.getCurrentItem();
     }
 
     /**
@@ -127,15 +129,19 @@ public class ARPGPlayer extends Player {
                 move(ANIMATION_DURATION);
             } else {
                 boolean orientationSuccessful = orientate(orientation);
-                if(orientationSuccessful){
-                    switch(orientation){
-                        case UP: currentAnimation=0;
+                if (orientationSuccessful) {
+                    switch (orientation) {
+                        case UP:
+                            currentAnimation = 0;
                             break;
-                        case DOWN: currentAnimation=2;
+                        case DOWN:
+                            currentAnimation = 2;
                             break;
-                        case LEFT:  currentAnimation=3;
+                        case LEFT:
+                            currentAnimation = 3;
                             break;
-                        case RIGHT: currentAnimation=1;
+                        case RIGHT:
+                            currentAnimation = 1;
                             break;
                     }
                     animations[currentAnimation].reset();
@@ -143,6 +149,18 @@ public class ARPGPlayer extends Player {
 
             }
         }
+    }
+
+    public int getMoney() {
+        return inventory.getMoney();
+    }
+
+    public int getMaxHP() {
+        return maxHP;
+    }
+
+    public float getHp() {
+        return hp;
     }
 
     @Override
@@ -183,31 +201,34 @@ public class ARPGPlayer extends Player {
 
 
     @Override
-    public void acceptInteraction( AreaInteractionVisitor v )
-    {
+    public void acceptInteraction(AreaInteractionVisitor v) {
         System.out.println(v.toString());
         // to do
     }
 
     @Override
-    public void interactWith( Interactable other )
-    {
-        other.acceptInteraction( handler );
+    public void interactWith(Interactable other) {
+        other.acceptInteraction(handler);
     }
 
-    class ARPGPlayerHandler implements ARPGInteractionVisitor
-    {
+    @Override
+    public void draw(Canvas canvas) {
+        if (playerGUI == null) playerGUI = new ARPGPlayerStatusGUI(canvas, this);
+        playerGUI.draw(canvas);
+        animations[currentAnimation].draw(canvas);
+        //message.draw(canvas);
+    }
+
+    class ARPGPlayerHandler implements ARPGInteractionVisitor {
         @Override
-        public void interactWith( Door door )
-        {
-            if ( door.isOpen() )
-            {
-                setIsPassingADoor( door );
+        public void interactWith(Door door) {
+            if (door.isOpen()) {
+                setIsPassingADoor(door);
             }
         }
+
         @Override
-        public void interactWith( Grass grass )
-        {
+        public void interactWith(Grass grass) {
             grass.cutGrass();
         }
     }

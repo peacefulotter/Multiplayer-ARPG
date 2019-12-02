@@ -9,7 +9,7 @@ public enum PlayerInput {
     NEXT_ITEM(Keyboard.TAB),
     USE_ITEM(Keyboard.SPACE);
     private int keyCode;
-    private PlayerInput(int keyCode){
+    PlayerInput(int keyCode){
         this.keyCode=keyCode;
     }
 

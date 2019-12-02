@@ -21,15 +21,20 @@ import java.util.List;
 public class ARPGInventory extends Inventory implements Actor {
     private int playerFortune = 0;
     private int playerMoney = 0;
+
     private Sprite sprite;
     private boolean isDisplaying = false;
+
     private AreaEntity holder;
+    private int coins;
     private InventoryItem[] itemOrder;
+
     private int inventorySize;
     private Integer itemOrderIndex;
 
-    public ARPGInventory(AreaEntity holder, float maxWeight, int inventorySize) {
+    public ARPGInventory(AreaEntity holder, float maxWeight, int inventorySize, int initialCoins) {
         super(maxWeight);
+        playerMoney=initialCoins;
         this.holder = holder;
         sprite = new Sprite("zelda/inventory.background", 7f, 10f, this);
         itemOrder= new InventoryItem[inventorySize];
@@ -59,7 +64,6 @@ public class ARPGInventory extends Inventory implements Actor {
     }
 
     public void toggleDisplay() {
-        System.out.println("toggle");
         isDisplaying = !isDisplaying;
     }
 
