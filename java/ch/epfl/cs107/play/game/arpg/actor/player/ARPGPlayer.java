@@ -6,7 +6,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.actor.ARPGInventory;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
@@ -19,9 +19,7 @@ import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Mouse;
-import ch.epfl.cs107.play.window.swing.SwingWindow;
 
-import java.awt.event.MouseWheelEvent;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,9 +29,11 @@ public class ARPGPlayer extends Player {
     private final ARPGPlayerHandler handler;
 
     private float hp;
+    private int maxHP = 3;
     private Animation[] animations;
     private int currentAnimation = 2;
     private boolean wantsInteraction = false;
+
 
     private ARPGItem currentItem;
     private ARPGInventory inventory;
@@ -50,15 +50,17 @@ public class ARPGPlayer extends Player {
     public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
         super(area, orientation, coordinates);
         handler = new ARPGPlayerHandler();
-        hp = 3;
+        hp = maxHP;
         Sprite[][] sprites = RPGSprite.extractSprites("zelda/player",
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
                         Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
-        animations= RPGSprite.createAnimations(ANIMATION_DURATION/2, sprites);
+        animations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
 
-        inventory = new ARPGInventory(this, 100, 10);
-        inventory.addItemToInventory( ARPGItem.BOMB, 3);
+        inventory = new ARPGInventory(this, 100, 10, 1234);
+        inventory.addItemToInventory(ARPGItem.BOMB, 3);
+        inventory.addItemToInventory(ARPGItem.SWORD);
+        inventory.addItemToInventory(ARPGItem.BOW);
     }
 
     public void update(float deltaTime) {
@@ -78,50 +80,46 @@ public class ARPGPlayer extends Player {
         {
             animations[currentAnimation].update(deltaTime);
         }
-        // cut the grass in front of the player
-        if ( keyboard.get( Keyboard.E ).isPressed() )
-        {
-            wantsInteraction = true;
+        wantsInteraction = false;
+        for (PlayerInput input : PlayerInput.values()) {
+            if (keyboard.get(input.getKeyCode()).isPressed()) reactToInput(input);
         }
-        // display inventory or hide it
-        else if ( keyboard.get( Keyboard.I ).isPressed() )
-        {
-            System.out.println("Inventory");
-            inventory.toggleDisplay();
-        }
-        // take the next/previous item in inventory
-        else if ( mouseWheelInput != 0 )
+        if ( mouseWheelInput != 0 )
         {
             System.out.println("changing item : " + mouseWheelInput);
             takeNextItem( mouseWheelInput );
         }
-        else if ( mouse.getLeftButton().isPressed() )
-        {
-            // triggers item behavior
-            System.out.println("left mouse pressed");
-        }
-        else if(keyboard.get(Keyboard.SPACE).isPressed()){
-            if(inventory.getCurrentItem() == ARPGItem.BOMB){
-               getOwnerArea().registerActor(new Bomb(getOwnerArea(),Orientation.DOWN,getFieldOfViewCells().get(0)));
-               inventory.removeItemFromInventory(ARPGItem.BOMB);
-            }
-        }
-        else {
-            wantsInteraction = false;
-        }
-
         super.update(deltaTime);
     }
 
-    private void takeNextItem( int direction )
-    {
-        currentItem = (ARPGItem)inventory.getNextItem(direction);
-        playerGUI.setItemSprite(currentItem);
-        System.out.println("player got the next item");
+    private void reactToInput(PlayerInput input) {
+        switch (input) {
+            case INTERACT:
+                wantsInteraction = true;
+                break;
+            case SHOW_INV:
+                inventory.toggleDisplay();
+                break;
+            case USE_ITEM:
+                useItem();
+                break;
+        }
     }
 
-    public ARPGItem getEquippedItem(){
-        return (ARPGItem)inventory.getCurrentItem();
+    private void useItem() {
+        if (inventory.getCurrentItem() == ARPGItem.BOMB) {
+            getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, getCurrentMainCellCoordinates()));
+            inventory.removeItemFromInventory(ARPGItem.BOMB);
+        }
+    }
+
+    private void takeNextItem( int direction ) {
+        currentItem = (ARPGItem) inventory.getNextItem( direction );
+        playerGUI.setItemSprite(currentItem);
+    }
+
+    public ARPGItem getEquippedItem() {
+        return (ARPGItem) inventory.getCurrentItem();
     }
 
     @Override
@@ -144,15 +142,19 @@ public class ARPGPlayer extends Player {
                 move(ANIMATION_DURATION);
             } else {
                 boolean orientationSuccessful = orientate(orientation);
-                if(orientationSuccessful){
-                    switch(orientation){
-                        case UP: currentAnimation=0;
+                if (orientationSuccessful) {
+                    switch (orientation) {
+                        case UP:
+                            currentAnimation = 0;
                             break;
-                        case DOWN: currentAnimation=2;
+                        case DOWN:
+                            currentAnimation = 2;
                             break;
-                        case LEFT:  currentAnimation=3;
+                        case LEFT:
+                            currentAnimation = 3;
                             break;
-                        case RIGHT: currentAnimation=1;
+                        case RIGHT:
+                            currentAnimation = 1;
                             break;
                     }
                     animations[currentAnimation].reset();
@@ -160,6 +162,18 @@ public class ARPGPlayer extends Player {
 
             }
         }
+    }
+
+    public int getMoney() {
+        return inventory.getMoney();
+    }
+
+    public int getMaxHP() {
+        return maxHP;
+    }
+
+    public float getHp() {
+        return hp;
     }
 
     @Override
@@ -200,8 +214,7 @@ public class ARPGPlayer extends Player {
 
 
     @Override
-    public void acceptInteraction( AreaInteractionVisitor v )
-    {
+    public void acceptInteraction(AreaInteractionVisitor v) {
         System.out.println(v.toString());
         // to do
     }
@@ -222,6 +235,7 @@ public class ARPGPlayer extends Player {
                 setIsPassingADoor( door );
             }
         }
+
         @Override
         public void interactWith( Grass grass )
         {
