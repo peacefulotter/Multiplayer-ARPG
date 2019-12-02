@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Bomb extends AreaEntity implements Interactor {
 
-    private Sprite bombSprite;
+    private Sprite[] bombSprite;
     private int bombRadius=3;
     private float fuseTime;
     private Animation animation;
@@ -24,7 +24,9 @@ public class Bomb extends AreaEntity implements Interactor {
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area,orientation,position);
         fuseTime=3f;
-        bombSprite= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16),Vector.ZERO,1f,-10f);
+        bombSprite = new Sprite[2];
+        bombSprite[0]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(0,0,16,16),Vector.ZERO,1f,-10f);
+        bombSprite[1]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16),Vector.ZERO,1f,-10f);
         Sprite[] animationSprites= new Sprite[7];
         for(int i=0; i<7;i++){
             animationSprites[i] = new Sprite("zelda/explosion", bombRadius,bombRadius,this, new RegionOfInterest(i*32,0,32,32), new Vector(-bombRadius/2,-bombRadius/2));
@@ -35,7 +37,11 @@ public class Bomb extends AreaEntity implements Interactor {
     @Override
     public void draw(Canvas canvas) {
         if(fuseTime>0){
-            bombSprite.draw(canvas);
+            if(Math.cos(20/(fuseTime))>0){
+                bombSprite[0].draw(canvas);
+            }else{
+                bombSprite[1].draw(canvas);
+            }
         }
         else if(!animation.isCompleted())
             animation.draw(canvas);

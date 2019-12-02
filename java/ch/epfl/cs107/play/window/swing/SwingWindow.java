@@ -26,8 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
  * Swing implementation of window context.
@@ -191,8 +190,10 @@ public final class SwingWindow extends Node implements Window {
 		// Show frame
 		frame.pack();
 		frame.setSize(width, height);
-		frame.setResizable(false);
+		frame.setResizable(true);
 		frame.setVisible(true);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
 	}
 
 	@Override

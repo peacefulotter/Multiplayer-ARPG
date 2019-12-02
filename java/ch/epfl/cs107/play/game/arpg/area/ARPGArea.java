@@ -15,6 +15,7 @@ public abstract class ARPGArea extends Area
     private Window window;
     private ARPGBehavior behavior;
     protected Grass[] grasses;
+    private static final int ScaleFactor=10;
 
     /**
      * Create the area by adding all its actors
@@ -53,7 +54,7 @@ public abstract class ARPGArea extends Area
 
     @Override
     public final float getCameraScaleFactor() {
-        return Tuto1.CAMERA_SCALE_FACTOR;
+        return ScaleFactor;
     }
 
     public Grass getGrass( DiscreteCoordinates coords )

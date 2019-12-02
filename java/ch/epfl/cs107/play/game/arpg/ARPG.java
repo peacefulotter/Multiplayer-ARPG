@@ -2,9 +2,7 @@ package ch.epfl.cs107.play.game.arpg;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.arpg.actor.ARPGInventory;
-import ch.epfl.cs107.play.game.arpg.actor.ARPGPlayer;
-import ch.epfl.cs107.play.game.arpg.actor.Grass;
+import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.area.Ferme;
 import ch.epfl.cs107.play.game.arpg.area.Route;
 import ch.epfl.cs107.play.game.arpg.area.Village;

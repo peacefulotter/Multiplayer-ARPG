@@ -59,7 +59,7 @@ public class Grass extends AreaEntity {
             grassAnimation.update(deltaTime);
     }
 
-    protected void cutGrass() {
+    public void cutGrass() {
         isCut = true;
     }
 
