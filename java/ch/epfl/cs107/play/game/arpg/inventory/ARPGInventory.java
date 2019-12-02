@@ -1,4 +1,4 @@
-package ch.epfl.cs107.play.game.arpg.actor;
+package ch.epfl.cs107.play.game.arpg.inventory;
 
 import ch.epfl.cs107.play.game.Inventory.InventoryItem;
 import ch.epfl.cs107.play.game.actor.Actor;
@@ -90,9 +90,11 @@ public class ARPGInventory extends Inventory implements Actor {
         if(added && !existedBefore){
             addedToOrder=false;
             for(int i=0; i< inventorySize;i++){
-                itemOrder[i]=item;
-                addedToOrder=true;
-                break;
+                if(itemOrder[i]==null){
+                    itemOrder[i]=item;
+                    addedToOrder=true;
+                    break;
+                }
             }
         }
         if(added && !addedToOrder){
@@ -115,6 +117,7 @@ public class ARPGInventory extends Inventory implements Actor {
                for(int i=0; i<inventorySize;i++){
                    if(item==itemOrder[i]){
                        itemOrder[i]=null;
+                       getNextItem(1);
                    }
                }
             }
@@ -124,8 +127,13 @@ public class ARPGInventory extends Inventory implements Actor {
 
     public InventoryItem getNextItem(int direction){
         itemOrderIndex+=direction;
-        if(itemOrderIndex>=inventorySize){
-            itemOrderIndex=0;
+        for(int i=0; i<inventorySize;i++){
+            int searhIndex= itemOrderIndex+i;
+            if(searhIndex>=inventorySize) searhIndex-=inventorySize;
+            if(itemOrder[searhIndex]!=null){
+                itemOrderIndex=searhIndex;
+                break;
+            }
         }
 
         return itemOrder[itemOrderIndex];

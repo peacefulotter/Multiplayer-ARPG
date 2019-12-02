@@ -6,7 +6,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.actor.ARPGInventory;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
@@ -58,6 +58,8 @@ public class ARPGPlayer extends Player {
 
         inventory = new ARPGInventory(this, 100, 10);
         inventory.addItemToInventory( ARPGItem.BOMB, 3);
+        inventory.addItemToInventory(ARPGItem.SWORD);
+        inventory.addItemToInventory(ARPGItem.BOW);
     }
 
     public void update(float deltaTime) {
@@ -75,39 +77,25 @@ public class ARPGPlayer extends Player {
         {
             animations[currentAnimation].update(deltaTime);
         }
-        // cut the grass in front of the player
-        if ( keyboard.get( Keyboard.E ).isPressed() )
-        {
-            wantsInteraction = true;
+        wantsInteraction = false;
+        for(PlayerInput input : PlayerInput.values()){
+            if(keyboard.get(input.getKeyCode()).isPressed()) reactToInput(input);
         }
-        // display inventory or hide it
-        else if ( keyboard.get( Keyboard.I ).isPressed() )
-        {
-            System.out.println("Inventory");
-            inventory.toggleDisplay();
-        }
-        // take the next item in inventory
-        else if ( keyboard.get( Keyboard.TAB ).isPressed() )
-        {
-            System.out.println("next item");
-            takeNextItem();
-        }
-        else if ( mouse.getLeftButton().isPressed() )
-        {
-            // triggers item behavior
-            System.out.println("left mouse pressed");
-        }
-        else if(keyboard.get(Keyboard.SPACE).isPressed()){
-            if(inventory.getCurrentItem() == ARPGItem.BOMB){
-               getOwnerArea().registerActor(new Bomb(getOwnerArea(),Orientation.DOWN,getCurrentMainCellCoordinates()));
-               inventory.removeItemFromInventory(ARPGItem.BOMB);
-            }
-        }
-        else {
-            wantsInteraction = false;
-        }
-
         super.update(deltaTime);
+    }
+    private void reactToInput(PlayerInput input){
+       switch (input){
+           case INTERACT: wantsInteraction=true;
+           case SHOW_INV: inventory.toggleDisplay();
+           case NEXT_ITEM: takeNextItem();
+           case USE_ITEM: useItem();
+       }
+    }
+    private void useItem(){
+        if(inventory.getCurrentItem() == ARPGItem.BOMB){
+            getOwnerArea().registerActor(new Bomb(getOwnerArea(),Orientation.DOWN,getCurrentMainCellCoordinates()));
+            inventory.removeItemFromInventory(ARPGItem.BOMB);
+        }
     }
 
     private void takeNextItem()
