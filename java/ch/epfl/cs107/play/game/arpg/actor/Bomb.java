@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.actor.Entity;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
@@ -20,6 +21,8 @@ public class Bomb extends AreaEntity implements Interactor {
     private int bombRadius=3;
     private float fuseTime;
     private Animation animation;
+    private boolean exploded=false;
+    private static final float BOMBDAMAGE = .5f;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area,orientation,position);
@@ -106,13 +109,20 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean wantsViewInteraction() {
-        return (fuseTime<0);
+        if(fuseTime<0 && !exploded) {
+            exploded=true;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void interactWith(Interactable other) {
         if(other instanceof Grass){
             ((Grass) other).cutGrass();
+        }
+        if(other instanceof ARPGPlayer){
+            ((ARPGPlayer) other).giveDamage(BOMBDAMAGE);
         }
     }
 
