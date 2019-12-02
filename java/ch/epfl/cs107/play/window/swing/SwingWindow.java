@@ -61,6 +61,7 @@ public final class SwingWindow extends Node implements Window {
 		private int previous = 0;
 		private int current = 0;
 		private int buffer = 0;
+		private int mouseMovement = 0;
 		private Vector position = Vector.ZERO;
 
 		@Override
@@ -80,7 +81,13 @@ public final class SwingWindow extends Node implements Window {
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
 			//  implementation of mouse scroll can be added if wanted
+			System.out.println(e.getWheelRotation());
+			synchronized ( SwingWindow.this )
+			{
+				mouseMovement = e.getWheelRotation();
+			}
 		}
+
 
 		@Override
 		public Vector getPosition() {
@@ -91,6 +98,13 @@ public final class SwingWindow extends Node implements Window {
 		public Button getButton(int index) {
 			int mask = 1 << index;
 			return new Button((previous & mask) != 0, (current & mask) != 0);
+		}
+
+		public int getMouseWheelInput()
+		{
+			int temp = mouseMovement;
+			mouseMovement = 0;
+			return temp;
 		}
 		
 		@Override

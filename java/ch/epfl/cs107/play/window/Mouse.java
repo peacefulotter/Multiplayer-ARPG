@@ -32,9 +32,12 @@ public interface Mouse extends Positionable {
     }
     
     // methods for  wheel/scroll can be added if needed
+    default Button getWheelScroll() { return getButton( 7 ); }
 
+    int getMouseWheelInput();
 
     /// Mouse extends Positionable
+
 
     @Override
     default Transform getTransform() {

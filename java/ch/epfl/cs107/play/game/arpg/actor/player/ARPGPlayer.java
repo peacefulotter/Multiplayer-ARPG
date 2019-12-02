@@ -19,7 +19,9 @@ import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Mouse;
+import ch.epfl.cs107.play.window.swing.SwingWindow;
 
+import java.awt.event.MouseWheelEvent;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +34,6 @@ public class ARPGPlayer extends Player {
     private Animation[] animations;
     private int currentAnimation = 2;
     private boolean wantsInteraction = false;
-
 
     private ARPGItem currentItem;
     private ARPGInventory inventory;
@@ -63,6 +64,8 @@ public class ARPGPlayer extends Player {
     public void update(float deltaTime) {
         Keyboard keyboard = getOwnerArea().getKeyboard();
         Mouse mouse = getOwnerArea().getMouse();
+        // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
+        int mouseWheelInput = mouse.getMouseWheelInput();
 
         // register movement
         moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
@@ -86,11 +89,11 @@ public class ARPGPlayer extends Player {
             System.out.println("Inventory");
             inventory.toggleDisplay();
         }
-        // take the next item in inventory
-        else if ( keyboard.get( Keyboard.TAB ).isPressed() )
+        // take the next/previous item in inventory
+        else if ( mouseWheelInput != 0 )
         {
-            System.out.println("next item");
-            takeNextItem();
+            System.out.println("changing item : " + mouseWheelInput);
+            takeNextItem( mouseWheelInput );
         }
         else if ( mouse.getLeftButton().isPressed() )
         {
@@ -99,7 +102,7 @@ public class ARPGPlayer extends Player {
         }
         else if(keyboard.get(Keyboard.SPACE).isPressed()){
             if(inventory.getCurrentItem() == ARPGItem.BOMB){
-               getOwnerArea().registerActor(new Bomb(getOwnerArea(),Orientation.DOWN,getCurrentMainCellCoordinates()));
+               getOwnerArea().registerActor(new Bomb(getOwnerArea(),Orientation.DOWN,getFieldOfViewCells().get(0)));
                inventory.removeItemFromInventory(ARPGItem.BOMB);
             }
         }
@@ -110,21 +113,22 @@ public class ARPGPlayer extends Player {
         super.update(deltaTime);
     }
 
-    private void takeNextItem()
+    private void takeNextItem( int direction )
     {
-        currentItem = (ARPGItem)inventory.getNextItem(1);
+        currentItem = (ARPGItem)inventory.getNextItem(direction);
         playerGUI.setItemSprite(currentItem);
         System.out.println("player got the next item");
     }
+
     public ARPGItem getEquippedItem(){
         return (ARPGItem)inventory.getCurrentItem();
     }
+
     @Override
     public void draw(Canvas canvas) {
-        if(playerGUI == null) playerGUI= new ARPGPlayerStatusGUI(canvas,this);
+        if(playerGUI == null) { playerGUI= new ARPGPlayerStatusGUI(canvas,this); }
         playerGUI.draw(canvas);
         animations[currentAnimation].draw(canvas);
-        //message.draw(canvas);
     }
 
     /**
@@ -134,7 +138,8 @@ public class ARPGPlayer extends Player {
      * @param btn         (Button): button corresponding to the given orientation, not null
      */
     private void moveOrientate(Orientation orientation, Button btn) {
-        if (btn.isDown()) {
+        if ( btn.isDown() )
+        {
             if (getOrientation() == orientation) {
                 move(ANIMATION_DURATION);
             } else {

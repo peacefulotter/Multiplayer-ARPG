@@ -15,7 +15,7 @@ public abstract class ARPGArea extends Area
     private Window window;
     private ARPGBehavior behavior;
     protected Grass[] grasses;
-    private static final int ScaleFactor=10;
+    private static int ScaleFactor = 10;
 
     /**
      * Create the area by adding all its actors
@@ -37,6 +37,7 @@ public abstract class ARPGArea extends Area
 
     }
 
+
     @Override
     public boolean begin( Window window, FileSystem fileSystem )
     {
@@ -54,7 +55,7 @@ public abstract class ARPGArea extends Area
 
     @Override
     public final float getCameraScaleFactor() {
-        return ScaleFactor;
+        return getWidth() * 3 / 5;
     }
 
     public Grass getGrass( DiscreteCoordinates coords )
