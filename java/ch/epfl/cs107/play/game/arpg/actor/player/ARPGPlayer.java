@@ -175,6 +175,13 @@ public class ARPGPlayer extends Player {
     public float getHp() {
         return hp;
     }
+    public void giveDamage(float damage){
+        System.out.println(damage);
+        hp-=damage;
+        if(hp<0){
+            hp=0;
+        }
+    }
 
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
@@ -209,7 +216,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public boolean isViewInteractable() {
-        return false;
+        return true;
     }
 
 
