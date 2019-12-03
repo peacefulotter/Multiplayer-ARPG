@@ -76,7 +76,7 @@ public class ARPGPlayerStatusGUI implements Graphics {
 
         moneyBackgroundDisplay.setAnchor( bottomLeftAnchor );
         moneyBackgroundDisplay.draw( canvas );
-        System.out.println(itemDisplay.toString());
+
         if ( itemDisplay != null ) {
             // centers the itemDisplay inside the gearDisplay
             itemDisplay.setAnchor( gearDisplay.getAnchor().add( .35f, .32f ) );
