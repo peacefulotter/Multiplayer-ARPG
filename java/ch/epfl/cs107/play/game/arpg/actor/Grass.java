@@ -23,7 +23,7 @@ import java.util.Random;
 public class Grass extends AreaEntity {
     private final List<DiscreteCoordinates> currentCells;
     private static final Random random= new Random();
-    private boolean isCut = false;
+    public boolean isCut = false;
     private float grassDepth = -100f;
     private final Sprite sprite = new Sprite(
             "zelda/grass",
@@ -42,7 +42,7 @@ public class Grass extends AreaEntity {
             animationSprites[i] = new Sprite("zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, grassDepth);
         }
 
-        grassAnimation = new Animation(6, animationSprites, false);
+        grassAnimation = new Animation(8, animationSprites, false);
     }
 
     @Override
@@ -63,6 +63,7 @@ public class Grass extends AreaEntity {
     }
 
     public void cutGrass() {
+        if(isCut) return;
         isCut = true;
         if(random.nextBoolean()){
             if(random.nextDouble()<.75){
@@ -81,7 +82,7 @@ public class Grass extends AreaEntity {
 
     @Override
     public boolean takeCellSpace() {
-        return isCut;
+        return true;
     }
 
     @Override

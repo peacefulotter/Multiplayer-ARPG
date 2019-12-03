@@ -254,8 +254,8 @@ public class ARPGPlayer extends Player {
         }
         @Override
         public void interactWith(CollectibleAreaEntity collectible) {
-            System.out.println("heY");
-            collectible.collect();
+            if(!collectible.collect()) return;
+
             if (collectible instanceof Coin) {
                 inventory.addMoney(50);
             }else if(collectible instanceof Heart){

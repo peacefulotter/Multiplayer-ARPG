@@ -16,11 +16,11 @@ import java.util.List;
 
 public class CollectibleAreaEntity extends AreaEntity {
     protected Animation animation;
+    private boolean collected=false;
     /**
      * Default AreaEntity constructor
      *
      * @param area        (Area): Owner area. Not null
-     * @param orientation (Orientation): Initial orientation of the entity in the Area. Not null
      * @param position    (DiscreteCoordinate): Initial position of the entity in the Area. Not null
      */
     public CollectibleAreaEntity(Area area, DiscreteCoordinates position) {
@@ -63,7 +63,15 @@ public class CollectibleAreaEntity extends AreaEntity {
     public void update(float deltaTime) {
         animation.update(deltaTime);
     }
-    public void collect(){
-        getOwnerArea().unregisterActor(this);
+
+    //boolean collected necessary because otherwise item may be collected multiple times before actor is unregistered
+    //may actually not be necessary though
+    public boolean collect(){
+        if(!collected){
+            getOwnerArea().unregisterActor(this);
+            collected=true;
+            return true;
+        }
+        return false;
     }
 }
