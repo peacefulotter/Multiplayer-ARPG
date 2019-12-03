@@ -6,6 +6,8 @@ import ch.epfl.cs107.play.game.areagame.actor.AreaEntity;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.game.rpg.handler.RPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
@@ -15,10 +17,12 @@ import ch.epfl.cs107.play.window.Canvas;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class Grass extends AreaEntity {
     private final List<DiscreteCoordinates> currentCells;
+    private static final Random random= new Random();
     private boolean isCut = false;
     private float grassDepth = -100f;
     private final Sprite sprite = new Sprite(
@@ -27,7 +31,6 @@ public class Grass extends AreaEntity {
             this, new RegionOfInterest(0, 0, 16, 16), new Vector(0, 0), 1f, grassDepth
     );
     private Animation grassAnimation;
-    private int currentAnimationIndex = 0;
 
     public Grass(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area, orientation, position);
@@ -61,6 +64,13 @@ public class Grass extends AreaEntity {
 
     public void cutGrass() {
         isCut = true;
+        if(random.nextBoolean()){
+            if(random.nextDouble()<.75){
+                getOwnerArea().registerActor(new Coin(getOwnerArea(), getCurrentMainCellCoordinates()));
+            }else{
+                getOwnerArea().registerActor(new Heart(getOwnerArea(), getCurrentMainCellCoordinates()));
+            }
+        }
     }
 
 

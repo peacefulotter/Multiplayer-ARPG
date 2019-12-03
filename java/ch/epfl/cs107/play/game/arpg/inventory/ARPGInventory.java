@@ -131,10 +131,11 @@ public class ARPGInventory extends Inventory implements Actor {
     }
 
     public InventoryItem getNextItem(int direction){
-        itemOrderIndex+=direction;
+        int searchIndex=itemOrderIndex;
         for(int i=0; i<inventorySize;i++){
-            int searchIndex= itemOrderIndex+i;
+            searchIndex+=direction;
             if(searchIndex>=inventorySize) searchIndex-=inventorySize;
+            if(searchIndex<0) searchIndex+=inventorySize;
             if(itemOrder[searchIndex]!=null){
                 itemOrderIndex=searchIndex;
                 break;

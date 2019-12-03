@@ -1,16 +1,16 @@
 package ch.epfl.cs107.play.game.arpg.actor.player;
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.Animation;
-import ch.epfl.cs107.play.game.areagame.actor.Interactable;
-import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.areagame.actor.Sprite;
+import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
+import ch.epfl.cs107.play.game.arpg.inventory.items.CollectibleAreaEntity;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
@@ -92,7 +92,6 @@ public class ARPGPlayer extends Player {
         }
         if ( mouseWheelInput != 0 )
         {
-            System.out.println("changing item : " + mouseWheelInput);
             takeNextItem( mouseWheelInput );
         }
         super.update(deltaTime);
@@ -109,6 +108,9 @@ public class ARPGPlayer extends Player {
                 break;
             case USE_ITEM:
                 useItem();
+                break;
+            case NEXT_ITEM:
+                takeNextItem(1);
                 break;
         }
     }
@@ -250,11 +252,22 @@ public class ARPGPlayer extends Player {
                 setIsPassingADoor( door );
             }
         }
-
+        @Override
+        public void interactWith(CollectibleAreaEntity collectible) {
+            System.out.println("heY");
+            collectible.collect();
+            if (collectible instanceof Coin) {
+                inventory.addMoney(50);
+            }else if(collectible instanceof Heart){
+                hp+=1;
+                if(hp>maxHP) hp=maxHP;
+            }
+        }
         @Override
         public void interactWith( Grass grass )
         {
             grass.cutGrass();
         }
+
     }
 }
