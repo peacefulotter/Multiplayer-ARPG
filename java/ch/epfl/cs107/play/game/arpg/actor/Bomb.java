@@ -22,7 +22,7 @@ public class Bomb extends AreaEntity implements Interactor {
     private float fuseTime;
     private Animation animation;
     private boolean exploded=false;
-    private static final float BOMBDAMAGE = .5f;
+    private static final float BOMB_DAMAGE = .5f;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area,orientation,position);
@@ -122,7 +122,7 @@ public class Bomb extends AreaEntity implements Interactor {
             ((Grass) other).cutGrass();
         }
         if(other instanceof ARPGPlayer){
-            ((ARPGPlayer) other).giveDamage(BOMBDAMAGE);
+            ((ARPGPlayer) other).giveDamage(BOMB_DAMAGE);
         }
     }
 

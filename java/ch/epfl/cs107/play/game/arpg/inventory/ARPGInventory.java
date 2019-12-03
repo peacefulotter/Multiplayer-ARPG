@@ -1,3 +1,4 @@
+
 package ch.epfl.cs107.play.game.arpg.inventory;
 
 import ch.epfl.cs107.play.game.Inventory.InventoryItem;
@@ -118,12 +119,12 @@ public class ARPGInventory extends Inventory implements Actor {
         boolean removed= super.removeItemFromInventory(item, amount);
         if(removed){
             if(inventory.get(item)==0){
-               for(int i=0; i<inventorySize;i++){
-                   if(item==itemOrder[i]){
-                       itemOrder[i]=null;
-                       getNextItem(1);
-                   }
-               }
+                for(int i=0; i<inventorySize;i++){
+                    if(item==itemOrder[i]){
+                        itemOrder[i]=null;
+                        getNextItem(1);
+                    }
+                }
             }
         }
         return removed;
@@ -132,10 +133,10 @@ public class ARPGInventory extends Inventory implements Actor {
     public InventoryItem getNextItem(int direction){
         itemOrderIndex+=direction;
         for(int i=0; i<inventorySize;i++){
-            int searhIndex= itemOrderIndex+i;
-            if(searhIndex>=inventorySize) searhIndex-=inventorySize;
-            if(itemOrder[searhIndex]!=null){
-                itemOrderIndex=searhIndex;
+            int searchIndex= itemOrderIndex+i;
+            if(searchIndex>=inventorySize) searchIndex-=inventorySize;
+            if(itemOrder[searchIndex]!=null){
+                itemOrderIndex=searchIndex;
                 break;
             }
         }

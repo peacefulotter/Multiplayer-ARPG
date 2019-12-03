@@ -43,6 +43,8 @@ public enum ARPGItem implements InventoryItem
     {
         return price;
     }
+
+    @Override
     public String getSpriteName(){
         return spriteName;
     }

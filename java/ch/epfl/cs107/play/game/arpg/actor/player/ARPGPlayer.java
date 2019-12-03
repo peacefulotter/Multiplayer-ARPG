@@ -51,6 +51,7 @@ public class ARPGPlayer extends Player {
         super(area, orientation, coordinates);
         handler = new ARPGPlayerHandler();
         hp = maxHP;
+
         Sprite[][] sprites = RPGSprite.extractSprites("zelda/player",
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
@@ -61,6 +62,7 @@ public class ARPGPlayer extends Player {
         inventory.addItemToInventory(ARPGItem.BOMB, 3);
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
+        playerGUI = new ARPGPlayerStatusGUI( this, inventory.getCurrentItem().getSpriteName() );
     }
 
     public void update(float deltaTime) {
@@ -81,8 +83,12 @@ public class ARPGPlayer extends Player {
             animations[currentAnimation].update(deltaTime);
         }
         wantsInteraction = false;
-        for (PlayerInput input : PlayerInput.values()) {
-            if (keyboard.get(input.getKeyCode()).isPressed()) reactToInput(input);
+        for ( PlayerInput input : PlayerInput.values() )
+        {
+            if ( keyboard.get( input.getKeyCode() ).isPressed() )
+            {
+                reactToInput( input );
+            }
         }
         if ( mouseWheelInput != 0 )
         {
@@ -92,8 +98,9 @@ public class ARPGPlayer extends Player {
         super.update(deltaTime);
     }
 
-    private void reactToInput(PlayerInput input) {
-        switch (input) {
+    private void reactToInput( PlayerInput input )
+    {
+        switch ( input ) {
             case INTERACT:
                 wantsInteraction = true;
                 break;
@@ -108,14 +115,15 @@ public class ARPGPlayer extends Player {
 
     private void useItem() {
         if (inventory.getCurrentItem() == ARPGItem.BOMB) {
-            getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, getCurrentMainCellCoordinates()));
-            inventory.removeItemFromInventory(ARPGItem.BOMB);
+            getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, getFieldOfViewCells().get(0)));
+            boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
+            if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
         }
     }
 
     private void takeNextItem( int direction ) {
         currentItem = (ARPGItem) inventory.getNextItem( direction );
-        playerGUI.setItemSprite(currentItem);
+        playerGUI.setItemSprite( currentItem.getSpriteName() );
     }
 
     public ARPGItem getEquippedItem() {
@@ -124,8 +132,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public void draw(Canvas canvas) {
-        if(playerGUI == null) { playerGUI= new ARPGPlayerStatusGUI(canvas,this); }
-        playerGUI.draw(canvas);
+        playerGUI.draw( canvas );
         animations[currentAnimation].draw(canvas);
     }
 
@@ -175,6 +182,7 @@ public class ARPGPlayer extends Player {
     public float getHp() {
         return hp;
     }
+
     public void giveDamage(float damage){
         System.out.println(damage);
         hp-=damage;

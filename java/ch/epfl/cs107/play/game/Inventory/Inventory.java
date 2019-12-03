@@ -19,11 +19,12 @@ public class Inventory
         this.maxWeight = maxWeight;
         inventory= new Hashtable<InventoryItem, Integer>();
     }
-    public boolean addItemToInventory(InventoryItem item){
+
+    protected boolean addItemToInventory( InventoryItem item ){
         return addItemToInventory(item, 1);
     }
 
-    public boolean addItemToInventory( InventoryItem item, Integer amount)
+    protected boolean addItemToInventory( InventoryItem item, Integer amount )
     {
         if ( item.getWeight()*amount + inventoryWeight <= maxWeight )
         {
@@ -40,10 +41,12 @@ public class Inventory
             return false;
         }
     }
-    public boolean removeItemFromInventory(InventoryItem item){
+
+    protected boolean removeItemFromInventory(InventoryItem item){
        return removeItemFromInventory(item, 1);
     }
-    public boolean removeItemFromInventory( InventoryItem item, int amount)
+
+    protected boolean removeItemFromInventory( InventoryItem item, int amount)
     {
         int existingAmount=inventory.get(item);
         if(amount > inventory.get(item)) {
@@ -54,7 +57,7 @@ public class Inventory
         return true;
     }
 
-    public boolean isItemInInventory( InventoryItem item )
+    protected boolean isItemInInventory( InventoryItem item )
     {
         if(!inventory.contains(item)) return false;
         return inventory.get(item)>0;
