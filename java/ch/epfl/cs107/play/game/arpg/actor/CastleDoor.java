@@ -24,6 +24,11 @@ public class CastleDoor extends Door {
         return true;
     }
 
+    @Override
+    public boolean takeCellSpace() {
+        return isOpen();
+    }
+
     public void passDoor(){
         setSignal(Logic.FALSE);
     }

@@ -120,9 +120,12 @@ public class ARPGPlayer extends Player {
 
     private void useItem() {
         if (inventory.getCurrentItem() == ARPGItem.BOMB) {
-            getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, getFieldOfViewCells().get(0)));
-            boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
-            if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
+            boolean addedActor=getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, getFieldOfViewCells().get(0)));
+            System.out.println(addedActor);
+            if(addedActor){
+                boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
+                if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
+            }
         }
     }
 

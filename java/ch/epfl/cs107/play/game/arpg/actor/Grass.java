@@ -82,7 +82,7 @@ public class Grass extends AreaEntity {
 
     @Override
     public boolean takeCellSpace() {
-        return true;
+        return isCut;
     }
 
     @Override

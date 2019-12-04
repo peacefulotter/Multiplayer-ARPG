@@ -117,7 +117,7 @@ public abstract class AreaBehavior
     public abstract class Cell implements Interactable{
 
         /// Content of the cell as a set of Interactable
-        private Set<Interactable> entities;
+        protected Set<Interactable> entities;
         private DiscreteCoordinates coordinates;
 
 
