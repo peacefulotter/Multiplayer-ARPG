@@ -27,8 +27,6 @@ public class CollectibleAreaEntity extends AreaEntity {
         super(area, Orientation.DOWN, position);
     }
 
-
-
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
         return new ArrayList<DiscreteCoordinates>(Collections.singleton(getCurrentMainCellCoordinates()));

@@ -33,6 +33,7 @@ public class Route extends ARPGArea
                 Orientation.DOWN,
                 new DiscreteCoordinates(9, 0 ),
                 new DiscreteCoordinates( 10, 0 ) ) );
+        registerActor( new Door("zelda/RouteChateau", new DiscreteCoordinates(9,1), Logic.TRUE,this,Orientation.UP, new DiscreteCoordinates(9,19), new DiscreteCoordinates(10,19)));
 
         for ( int i = 0; i <= 2; i++ )
         {

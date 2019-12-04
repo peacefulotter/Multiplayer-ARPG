@@ -1,10 +1,6 @@
-package ch.epfl.cs107.play.game.Inventory;
+package ch.epfl.cs107.play.game.rpg.inventory;
 
-import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
-
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 
 public class Inventory
@@ -61,5 +57,10 @@ public class Inventory
     {
         if(!inventory.contains(item)) return false;
         return inventory.get(item)>0;
+    }
+    public int getItem(InventoryItem item){
+        if(inventory.containsKey(item)){
+            return inventory.get(item);
+        }else return 0;
     }
 }

@@ -3,11 +3,14 @@ package ch.epfl.cs107.play.game.arpg.actor.player;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.ARPG;
+import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
+import ch.epfl.cs107.play.game.arpg.inventory.items.CastleKey;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.arpg.inventory.items.CollectibleAreaEntity;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
@@ -184,6 +187,10 @@ public class ARPGPlayer extends Player {
     public float getHp() {
         return hp;
     }
+    public boolean hasItem(ARPGItem item){
+        if(inventory.getItem(item)>0) return true;
+        return false;
+    }
 
     public void giveDamage(float damage){
         System.out.println(damage);
@@ -232,8 +239,6 @@ public class ARPGPlayer extends Player {
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
-        System.out.println(v.toString());
-        // to do
     }
 
     @Override
@@ -251,6 +256,13 @@ public class ARPGPlayer extends Player {
             {
                 setIsPassingADoor( door );
             }
+            if(door instanceof CastleDoor){
+                if(door.isOpen()){
+                    ((CastleDoor) door).passDoor();
+                }else if(getEquippedItem()==ARPGItem.CASTLE_KEY){
+                    ((CastleDoor) door).openDoor();
+                }
+            }
         }
         @Override
         public void interactWith(CollectibleAreaEntity collectible) {
@@ -261,6 +273,8 @@ public class ARPGPlayer extends Player {
             }else if(collectible instanceof Heart){
                 hp+=1;
                 if(hp>maxHP) hp=maxHP;
+            }else if(collectible instanceof CastleKey){
+                inventory.addItemToInventory(ARPGItem.CASTLE_KEY);
             }
         }
         @Override

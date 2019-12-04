@@ -1,6 +1,6 @@
 package ch.epfl.cs107.play.game.arpg.inventory;
 
-import ch.epfl.cs107.play.game.Inventory.InventoryItem;
+import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
 
 public enum ARPGItem implements InventoryItem
 {
@@ -15,15 +15,15 @@ public enum ARPGItem implements InventoryItem
     protected String spriteName;
     protected float weight;
     protected int price;
-    private boolean equipable;
+    private boolean equippable;
 
-    ARPGItem(String name, String spriteName, float weight, int price, boolean equipable)
+    ARPGItem(String name, String spriteName, float weight, int price, boolean equippable)
     {
         this.name = name;
         this.spriteName = spriteName;
         this.weight = weight;
         this.price = price;
-        this.equipable=equipable;
+        this.equippable =equippable;
     }
 
     @Override
@@ -49,7 +49,7 @@ public enum ARPGItem implements InventoryItem
         return spriteName;
     }
 
-    public boolean isEquipable() {
-        return equipable;
+    public boolean isEquippable() {
+        return equippable;
     }
 }
