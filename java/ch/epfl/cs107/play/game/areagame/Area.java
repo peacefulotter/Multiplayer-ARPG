@@ -12,10 +12,7 @@ import ch.epfl.cs107.play.game.Playable;
 import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.io.FileSystem;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -121,7 +118,15 @@ public abstract class Area implements Playable {
      */
     public final boolean registerActor(Actor a){
         //  finer Area strategies can be implemented here if wanted
-        return registeredActors.add(a);
+        if(a instanceof  Interactable){
+            if(canEnterAreaCells((Interactable) a, Collections.singletonList(new DiscreteCoordinates((int)a.getPosition().x,(int)a.getPosition().y)))){
+                return registeredActors.add(a);
+            }else{
+                return false;
+            }
+        }else{
+            return registeredActors.add(a);
+        }
     }
 
     /**

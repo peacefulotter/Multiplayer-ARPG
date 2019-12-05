@@ -1,8 +1,8 @@
 package ch.epfl.cs107.play.game.areagame.actor;
 
+import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
-import ch.epfl.cs107.play.game.areagame.Area;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,10 +22,12 @@ public abstract class MovableAreaEntity extends AreaEntity {
     private int remainingFramesForCurrentMove;
 
     // The cells the entity left
-    private List<DiscreteCoordinates> leftCells;
+    private List<DiscreteCoordinates> leftCells; 
     // The cells the entity entered
     private List<DiscreteCoordinates> enteredCells;
 
+    private Vector targetPosition;
+    private Vector originPosition;
 
     /**
      * Default MovableAreaEntity constructor
@@ -88,6 +90,9 @@ public abstract class MovableAreaEntity extends AreaEntity {
                 startingFrame = Math.min(startingFrame, frameForMove);
                 remainingFramesForCurrentMove = framesForCurrentMove - startingFrame;
 
+                originPosition = getPosition();
+                targetPosition = getPosition().add(getOrientation().toVector());
+
                 increasePositionOf(startingFrame);
                 
                 return true;
@@ -111,6 +116,14 @@ public abstract class MovableAreaEntity extends AreaEntity {
                 
                 remainingFramesForCurrentMove = framesForCurrentMove - remainingFramesForCurrentMove;
                 
+                Vector tempPos = originPosition;
+                originPosition = targetPosition;
+                targetPosition = tempPos;
+                
+            	List<DiscreteCoordinates> tempCells = leftCells;
+            	leftCells = enteredCells;
+            	enteredCells = tempCells;
+
                 return true;
             }
         }
@@ -203,6 +216,7 @@ public abstract class MovableAreaEntity extends AreaEntity {
             if (!isTargetReached()) {
             	increasePositionOf(1);
             } else {
+                setCurrentPosition(targetPosition);
                 resetMotion();
             }
         }
