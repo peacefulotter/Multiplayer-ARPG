@@ -32,8 +32,8 @@ public class Bomb extends AreaEntity implements Interactor {
         super(area,orientation,position);
         fuseTime=3f;
         bombSprite = new Sprite[2];
-        bombSprite[0]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(0,0,16,16),Vector.ZERO,1f,-10f);
-        bombSprite[1]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16),Vector.ZERO,1f,-10f);
+        bombSprite[0]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(0,0,16,16),Vector.ZERO,1f,0);
+        bombSprite[1]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16),Vector.ZERO,1f,0);
         Sprite[] animationSprites= new Sprite[7];
         for(int i=0; i<7;i++){
             animationSprites[i] = new Sprite("zelda/explosion", bombRadius,bombRadius,this, new RegionOfInterest(i*32,0,32,32), new Vector(-bombRadius/2,-bombRadius/2));

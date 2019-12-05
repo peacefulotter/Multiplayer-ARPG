@@ -71,11 +71,7 @@ public class ARPGPlayer extends Player {
         // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
         int mouseWheelInput = mouse.getMouseWheelInput();
 
-        // register movement
-        moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
-        moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
-        moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
-        moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
+;
 
         // display animation if player is moving
         if( isDisplacementOccurs() )
@@ -94,6 +90,11 @@ public class ARPGPlayer extends Player {
         {
             takeNextItem( mouseWheelInput );
         }
+        // register movement
+        moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
+        moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
+        moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
+        moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
         super.update(deltaTime);
     }
 
@@ -117,9 +118,13 @@ public class ARPGPlayer extends Player {
 
     private void useItem() {
         if (inventory.getCurrentItem() == ARPGItem.BOMB) {
-            getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, getFieldOfViewCells().get(0)));
-            boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
-            if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
+            DiscreteCoordinates bombCoordinates = getFieldOfViewCells().get(0);
+            if(isDisplacementOccurs()) bombCoordinates=bombCoordinates.jump(getOrientation().toVector());
+            boolean registeredActor = getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, bombCoordinates));
+            if(registeredActor){
+                boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
+                if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
+            }
         }
     }
 
