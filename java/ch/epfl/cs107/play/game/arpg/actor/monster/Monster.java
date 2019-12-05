@@ -24,6 +24,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     private final float DAMAGE_BASIC = 0.5f;
     private final double CRITS_PERCENTAGE = 0.2;
     private final ARPGMonsterHandler handler;
+    private final Orientation[] orientations;
 
     private final String name;
     private final Sprite sprite;
@@ -38,7 +39,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     private Animation[] movementAnimation;
     private int currentAnimationIndex = 0;
 
-    public Monster( Area area, Orientation orientation, DiscreteCoordinates coords, String name, String spriteName, float maxHealth, Vulnerabilities ... vulnerabilities )
+    public Monster( Area area, Orientation orientation, Orientation[] orientations, DiscreteCoordinates coords, String name, String spriteName, float maxHealth, Vulnerabilities ... vulnerabilities )
     {
         super( area, orientation, coords );
         this.name = name;
@@ -49,6 +50,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         currentCells.add( coords );
         isDead = false;
         handler = new ARPGMonsterHandler();
+        this.orientations = orientations;
 
         this.vulnerabilities = new ArrayList<>();
         Collections.addAll( this.vulnerabilities, vulnerabilities );
@@ -61,8 +63,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 
         Sprite[][] sprites = RPGSprite.extractSprites( spriteName,
                 3, 2, 2,
-                this, 32, 32, new Vector(-0.5f, -0.5f), new Orientation[]{Orientation.UP,
-                        Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT});
+                this, 32, 32, new Vector(-0.5f, -0.5f), orientations);
         movementAnimation = RPGSprite.createAnimations(ANIMATION_DURATION, sprites);
     }
 
@@ -77,16 +78,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                     boolean orientationSuccessful = orientate( newOrientation );
                     if ( orientationSuccessful )
                     {
-                        switch( newOrientation ){
-                            case UP: currentAnimationIndex=0;
-                                break;
-                            case DOWN: currentAnimationIndex=2;
-                                break;
-                            case LEFT:  currentAnimationIndex=3;
-                                break;
-                            case RIGHT: currentAnimationIndex=1;
-                                break;
-                        }
+                        changeAnimationIndex( newOrientation );
                     }
                     move( ANIMATION_DURATION );
             }
@@ -102,6 +94,19 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         }
 
         super.update( deltaTime );
+    }
+
+
+    private void changeAnimationIndex( Orientation newOrientation )
+    {
+        for ( int i = 0; i < orientations.length; i++ )
+        {
+            if ( orientations[ i ] == newOrientation )
+            {
+                currentAnimationIndex = i;
+                return;
+            }
+        }
     }
 
     // implement this inside subclasses
@@ -131,7 +136,19 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
-    public void giveDamage( float damage )
+    public void giveDamage( Vulnerabilities vuln )
+    {
+        if ( vulnerabilities.contains( vuln ) )
+        {
+            giveDamage( DAMAGE_VULN );
+        }
+        else
+        {
+            giveDamage( DAMAGE_BASIC );
+        }
+    }
+
+    private void giveDamage( float damage )
     {
         currentHealth -= damage;
         if ( currentHealth <= 0 )

@@ -16,7 +16,8 @@ public class FlameSkull extends Monster implements FlyableEntity
 
     public FlameSkull( Area area, DiscreteCoordinates coords )
     {
-        super(area, Orientation.DOWN, coords,
+        super(area, Orientation.DOWN,
+                new Orientation[]{Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT}, coords,
                 "FlameSkull", "zelda/flameSkull",
                 3f, Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
         lifeTime = (float) (MIN_LIFE_TIME + Math.random() * (MAX_LIFE_TIME - MIN_LIFE_TIME));

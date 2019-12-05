@@ -15,40 +15,80 @@ import java.util.List;
 public class LogMonster extends Monster
 {
     private boolean isSleeping;
+    private boolean isWakingUp;
     private Animation sleepingAnimation;
+    private Animation wakingAnimation;
 
-    public LogMonster(Area area, Orientation orientation, DiscreteCoordinates coords, String name, String spriteName, float maxHealth, Vulnerabilities... vulnerabilities)
+    public LogMonster(Area area, DiscreteCoordinates coords )
     {
-        super(area, orientation, coords,
+        super(area, Orientation.DOWN,
+                new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT}, coords,
                 "LogMonster", "zelda/logMonster",
                 10, Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE
                 );
-        Sprite[] sleepingAnimationSprites = new Sprite[7];
-        for ( int i = 0; i < 7; i++ ) {
-            sleepingAnimationSprites[i] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, 1);
+        Sprite[] sleepingAnimationSprites = new Sprite[4];
+        for ( int i = 0; i < 4; i++ ) {
+            sleepingAnimationSprites[i] = new Sprite("zelda/logMonster.sleeping", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), new Vector( 0, 0 ), 1f, 1);
         }
-        sleepingAnimation = new Animation(7, sleepingAnimationSprites, false);
+        sleepingAnimation = new Animation(10, sleepingAnimationSprites, true);
 
-        isSleeping = false;
+        Sprite[] wakingAnimationSprites = new Sprite[3];
+        for ( int i = 0; i < 3; i++ ) {
+            sleepingAnimationSprites[i] = new Sprite("zelda/logMonster.wakingUp", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), new Vector( 0, 0 ), 1f, 1);
+        }
+        wakingAnimation = new Animation(3, sleepingAnimationSprites, false);
+
+        isSleeping = true;
+        isWakingUp = false;
     }
 
     @Override
     public void update(float deltaTime)
     {
-        if ( isSleeping )
+        if ( isWakingUp )
         {
-
+            wakingAnimation.update( deltaTime );
+            if ( wakingAnimation.isCompleted() )
+            {
+                wakingAnimation.reset();
+                isWakingUp = false;
+            }
         }
-        if ( !isSleeping )
+        else if ( isSleeping )
+        {
+            sleepingAnimation.update( deltaTime );
+        }
+        else
         {
             super.update(deltaTime);
+        }
+
+        if ( Math.random() < 0.01 && !isWakingUp )
+        {
+            isSleeping = !isSleeping;
+            if ( !isSleeping )
+            {
+                isWakingUp = true;
+            }
         }
     }
 
     @Override
     public void draw(Canvas canvas)
     {
-        super.draw(canvas);
+        if ( isWakingUp )
+        {
+            wakingAnimation.draw( canvas );
+        }
+        else if ( isSleeping )
+        {
+            sleepingAnimation.draw( canvas );
+        }
+        else
+        {
+            super.draw(canvas);
+        }
+
     }
 
     @Override

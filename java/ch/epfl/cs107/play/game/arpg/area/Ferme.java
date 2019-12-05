@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Background;
 import ch.epfl.cs107.play.game.areagame.actor.Foreground;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
+import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
@@ -43,7 +44,8 @@ public class Ferme extends ARPGArea
                 new DiscreteCoordinates( 14, 0 ) ) );
         registerActor(new Coin(this, new DiscreteCoordinates(10,10), 50));
         registerActor(new Heart(this,  new DiscreteCoordinates(9,10)));
-        registerActor( new FlameSkull( this, new DiscreteCoordinates( 2, 15 )));
+        registerActor( new FlameSkull( this, new DiscreteCoordinates( 2, 15 ) ));
+        registerActor( new LogMonster( this, new DiscreteCoordinates( 8, 8 ) ));
     }
 
     @Override
