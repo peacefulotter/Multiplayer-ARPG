@@ -39,7 +39,7 @@ public class Play {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		// Use Swing display
 		final Window window = new SwingWindow(game.getTitle(), fileSystem, 550,550);
-		
+
 		//Recorder recorder = new Recorder(window); 
 		//RecordReplayer replayer = new RecordReplayer(window); // not used in this project
 		try {

@@ -1,4 +1,5 @@
-package ch.epfl.cs107.play.game.arpg.actor;
+
+package ch.epfl.cs107.play.game.arpg.inventory;
 
 import ch.epfl.cs107.play.game.Inventory.InventoryItem;
 import ch.epfl.cs107.play.game.actor.Actor;
@@ -21,15 +22,20 @@ import java.util.List;
 public class ARPGInventory extends Inventory implements Actor {
     private int playerFortune = 0;
     private int playerMoney = 0;
+
     private Sprite sprite;
     private boolean isDisplaying = false;
+
     private AreaEntity holder;
+    private int coins;
     private InventoryItem[] itemOrder;
+
     private int inventorySize;
     private Integer itemOrderIndex;
 
-    public ARPGInventory(AreaEntity holder, float maxWeight, int inventorySize) {
+    public ARPGInventory(AreaEntity holder, float maxWeight, int inventorySize, int initialCoins) {
         super(maxWeight);
+        playerMoney=initialCoins;
         this.holder = holder;
         sprite = new Sprite("zelda/inventory.background", 7f, 10f, this);
         itemOrder= new InventoryItem[inventorySize];
@@ -59,7 +65,6 @@ public class ARPGInventory extends Inventory implements Actor {
     }
 
     public void toggleDisplay() {
-        System.out.println("toggle");
         isDisplaying = !isDisplaying;
     }
 
@@ -90,9 +95,11 @@ public class ARPGInventory extends Inventory implements Actor {
         if(added && !existedBefore){
             addedToOrder=false;
             for(int i=0; i< inventorySize;i++){
-                itemOrder[i]=item;
-                addedToOrder=true;
-                break;
+                if(itemOrder[i]==null){
+                    itemOrder[i]=item;
+                    addedToOrder=true;
+                    break;
+                }
             }
         }
         if(added && !addedToOrder){
@@ -112,20 +119,27 @@ public class ARPGInventory extends Inventory implements Actor {
         boolean removed= super.removeItemFromInventory(item, amount);
         if(removed){
             if(inventory.get(item)==0){
-               for(int i=0; i<inventorySize;i++){
-                   if(item==itemOrder[i]){
-                       itemOrder[i]=null;
-                   }
-               }
+                for(int i=0; i<inventorySize;i++){
+                    if(item==itemOrder[i]){
+                        itemOrder[i]=null;
+                        getNextItem(1);
+                    }
+                }
             }
         }
         return removed;
     }
 
     public InventoryItem getNextItem(int direction){
-        itemOrderIndex+=direction;
-        if(itemOrderIndex>=inventorySize){
-            itemOrderIndex=0;
+        int searchIndex=itemOrderIndex;
+        for(int i=0; i<inventorySize;i++){
+            searchIndex+=direction;
+            if(searchIndex>=inventorySize) searchIndex-=inventorySize;
+            if(searchIndex<0) searchIndex+=inventorySize;
+            if(itemOrder[searchIndex]!=null){
+                itemOrderIndex=searchIndex;
+                break;
+            }
         }
 
         return itemOrder[itemOrderIndex];

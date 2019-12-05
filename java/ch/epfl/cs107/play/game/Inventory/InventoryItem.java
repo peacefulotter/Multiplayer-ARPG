@@ -7,6 +7,7 @@ public interface InventoryItem
     String getName();
     float getWeight();
     float getPrice();
+    String getSpriteName();
 
     default boolean equals( InventoryItem other )
     {

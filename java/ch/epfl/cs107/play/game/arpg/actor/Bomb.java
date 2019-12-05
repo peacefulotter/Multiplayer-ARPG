@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.actor.Entity;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
@@ -16,15 +17,19 @@ import java.util.List;
 
 public class Bomb extends AreaEntity implements Interactor {
 
-    private Sprite bombSprite;
+    private Sprite[] bombSprite;
     private int bombRadius=3;
     private float fuseTime;
     private Animation animation;
+    private boolean exploded=false;
+    private static final float BOMB_DAMAGE = .5f;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area,orientation,position);
         fuseTime=3f;
-        bombSprite= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16),Vector.ZERO,1f,-10f);
+        bombSprite = new Sprite[2];
+        bombSprite[0]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(0,0,16,16),Vector.ZERO,1f,-10f);
+        bombSprite[1]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16),Vector.ZERO,1f,-10f);
         Sprite[] animationSprites= new Sprite[7];
         for(int i=0; i<7;i++){
             animationSprites[i] = new Sprite("zelda/explosion", bombRadius,bombRadius,this, new RegionOfInterest(i*32,0,32,32), new Vector(-bombRadius/2,-bombRadius/2));
@@ -35,7 +40,11 @@ public class Bomb extends AreaEntity implements Interactor {
     @Override
     public void draw(Canvas canvas) {
         if(fuseTime>0){
-            bombSprite.draw(canvas);
+            if(Math.cos(20/(fuseTime))>0){
+                bombSprite[0].draw(canvas);
+            }else{
+                bombSprite[1].draw(canvas);
+            }
         }
         else if(!animation.isCompleted())
             animation.draw(canvas);
@@ -58,7 +67,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean takeCellSpace() {
-        return false;
+        return true;
     }
 
     @Override
@@ -100,13 +109,20 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean wantsViewInteraction() {
-        return (fuseTime<0);
+        if(fuseTime<0 && !exploded) {
+            exploded=true;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void interactWith(Interactable other) {
         if(other instanceof Grass){
             ((Grass) other).cutGrass();
+        }
+        if(other instanceof ARPGPlayer){
+            ((ARPGPlayer) other).giveDamage(BOMB_DAMAGE);
         }
     }
 
