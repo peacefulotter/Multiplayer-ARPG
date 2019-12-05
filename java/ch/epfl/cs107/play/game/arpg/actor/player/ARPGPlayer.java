@@ -56,7 +56,16 @@ public class ARPGPlayer extends Player {
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
                         Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
-        animations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
+        Sprite[][] swordSprites= RPGSprite.extractSprites("zelda/player.sword",4,1,2,this,32,32,new Orientation[]{Orientation.DOWN,
+                Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
+        Animation[] swordAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, swordSprites);
+        animations= new Animation[8];
+        Animation[] defaultAnimations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
+
+        for(int i=0; i<8;i++){
+            if(i<4) animations[i]=defaultAnimations[i];
+            if(i>3) animations[i]=swordAnimation[i-4];
+        }
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
         inventory.addItemToInventory(ARPGItem.BOMB, 3);
