@@ -18,14 +18,14 @@ public class LogMonster extends Monster
     private boolean isWakingUp;
     private Animation sleepingAnimation;
     private Animation wakingAnimation;
+    private float time = 0;
 
     public LogMonster(Area area, DiscreteCoordinates coords )
     {
         super(area, Orientation.DOWN,
-                new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT}, coords,
+                new Orientation[]{Orientation.DOWN, Orientation.LEFT, Orientation.RIGHT, Orientation.UP}, coords,
                 "LogMonster", "zelda/logMonster",
-                10, Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE
-                );
+                10, 1, Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
         Sprite[] sleepingAnimationSprites = new Sprite[4];
         for ( int i = 0; i < 4; i++ ) {
             sleepingAnimationSprites[i] = new Sprite("zelda/logMonster.sleeping", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), new Vector( 0, 0 ), 1f, 1);
@@ -62,8 +62,7 @@ public class LogMonster extends Monster
         {
             super.update(deltaTime);
         }
-
-        if ( Math.random() < 0.01 && !isWakingUp )
+        if ( time % 300 == 0 )
         {
             isSleeping = !isSleeping;
             if ( !isSleeping )
@@ -71,6 +70,8 @@ public class LogMonster extends Monster
                 isWakingUp = true;
             }
         }
+        time += 1;
+
     }
 
     @Override

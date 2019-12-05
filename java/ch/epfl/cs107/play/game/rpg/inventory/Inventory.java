@@ -13,7 +13,7 @@ public class Inventory
     public Inventory( float maxWeight )
     {
         this.maxWeight = maxWeight;
-        inventory= new Hashtable<InventoryItem, Integer>();
+        inventory = new Hashtable<InventoryItem, Integer>();
     }
 
     protected boolean addItemToInventory( InventoryItem item ){
