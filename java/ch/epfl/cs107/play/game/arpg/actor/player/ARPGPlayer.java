@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.game.arpg.actor.player;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
@@ -15,6 +16,7 @@ import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
@@ -28,6 +30,7 @@ public class ARPGPlayer extends Player {
     private final static int ANIMATION_DURATION = 8;
     private final ARPGPlayerHandler handler;
 
+    private PlayerStates state;
     private float hp;
     private int maxHP = 3;
     private Animation[] animations;
@@ -49,6 +52,7 @@ public class ARPGPlayer extends Player {
      */
     public ARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
         super(area, orientation, coordinates);
+        state = PlayerStates.IDLE;
         handler = new ARPGPlayerHandler();
         hp = maxHP;
 
@@ -56,9 +60,14 @@ public class ARPGPlayer extends Player {
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
                         Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
-        Sprite[][] swordSprites= RPGSprite.extractSprites("zelda/player.sword",4,1,2,this,32,32,new Orientation[]{Orientation.DOWN,
+        Sprite[][] swordSprites= RPGSprite.extractSprites("zelda/player.sword",4,2,2,this,32,32,new Orientation[]{Orientation.DOWN,
                 Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
-        Animation[] swordAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, swordSprites);
+        for(Sprite[] spriteArray : swordSprites){
+            for(Sprite sprite : spriteArray){
+                sprite.setAnchor(new Vector(-0.5f,0));
+            }
+        }
+        Animation[] swordAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, swordSprites,false);
         animations= new Animation[8];
         Animation[] defaultAnimations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
 
@@ -80,14 +89,18 @@ public class ARPGPlayer extends Player {
         // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
         int mouseWheelInput = mouse.getMouseWheelInput();
 
-;
+        wantsInteraction = false;;
 
         // display animation if player is moving
-        if( isDisplacementOccurs() )
+        if( isDisplacementOccurs() || state!=PlayerStates.IDLE )
         {
             animations[currentAnimation].update(deltaTime);
+            if(state!=PlayerStates.IDLE && animations[currentAnimation].isCompleted()){
+                state= PlayerStates.IDLE;
+                animations[currentAnimation].reset();
+                setAnimationByOrientation(getOrientation());
+            }
         }
-        wantsInteraction = false;
         for ( PlayerInput input : PlayerInput.values() )
         {
             if ( keyboard.get( input.getKeyCode() ).isPressed() )
@@ -100,10 +113,12 @@ public class ARPGPlayer extends Player {
             takeNextItem( mouseWheelInput );
         }
         // register movement
-        moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
-        moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
-        moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
-        moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
+        if(state==PlayerStates.IDLE){
+            moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
+            moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
+            moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
+            moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
+        }
         super.update(deltaTime);
     }
 
@@ -126,14 +141,24 @@ public class ARPGPlayer extends Player {
     }
 
     private void useItem() {
-        if (inventory.getCurrentItem() == ARPGItem.BOMB) {
-            DiscreteCoordinates bombCoordinates = getFieldOfViewCells().get(0);
-            if(isDisplacementOccurs()) bombCoordinates=bombCoordinates.jump(getOrientation().toVector());
-            boolean registeredActor = getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, bombCoordinates));
-            if(registeredActor){
-                boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
-                if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
-            }
+        currentItem=getEquippedItem();
+        if(currentItem==null) return;
+        switch(currentItem){
+            case BOMB:
+                DiscreteCoordinates bombCoordinates = getFieldOfViewCells().get(0);
+                if(isDisplacementOccurs()) bombCoordinates=bombCoordinates.jump(getOrientation().toVector());
+                boolean registeredActor = getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, bombCoordinates));
+                if(registeredActor){
+                    boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
+                    if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
+                }
+                break;
+            case SWORD:
+                if(state==state.IDLE){
+                    wantsInteraction=true;
+                    state=PlayerStates.ATTACKING_SWORD;
+                    currentAnimation=currentAnimation+4;
+                }
         }
     }
 
@@ -163,30 +188,32 @@ public class ARPGPlayer extends Player {
         {
             if (getOrientation() == orientation) {
                 move(ANIMATION_DURATION);
-            } else {
+            } else{
                 boolean orientationSuccessful = orientate(orientation);
                 if (orientationSuccessful) {
-                    switch (orientation) {
-                        case UP:
-                            currentAnimation = 0;
-                            break;
-                        case DOWN:
-                            currentAnimation = 2;
-                            break;
-                        case LEFT:
-                            currentAnimation = 3;
-                            break;
-                        case RIGHT:
-                            currentAnimation = 1;
-                            break;
-                    }
-                    animations[currentAnimation].reset();
+                    setAnimationByOrientation(orientation);
                 }
 
             }
         }
     }
-
+    public void setAnimationByOrientation(Orientation orientation){
+        switch (orientation) {
+            case UP:
+                currentAnimation = 0;
+                break;
+            case DOWN:
+                currentAnimation = 2;
+                break;
+            case LEFT:
+                currentAnimation = 3;
+                break;
+            case RIGHT:
+                currentAnimation = 1;
+                break;
+        }
+        animations[currentAnimation].reset();
+    };
     public int getMoney() {
         return inventory.getMoney();
     }
@@ -286,6 +313,11 @@ public class ARPGPlayer extends Player {
         public void interactWith( Grass grass )
         {
             grass.cutGrass();
+        }
+        @Override
+        public void interactWith(FlameSkull skull){
+            giveDamage(1f);
+            skull.setHasAttacked();
         }
 
     }

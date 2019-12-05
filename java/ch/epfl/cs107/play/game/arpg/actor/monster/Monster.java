@@ -88,6 +88,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                                 break;
                         }
                     }
+                    onMove();
                     move( ANIMATION_DURATION );
             }
 
@@ -104,6 +105,9 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         super.update( deltaTime );
     }
 
+    protected void onMove(){
+
+    }
     // implement this inside subclasses
     // and then super.draw
     @Override
