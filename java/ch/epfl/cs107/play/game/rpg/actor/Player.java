@@ -38,12 +38,15 @@ public abstract class Player extends MovableAreaEntity implements Interactor {
      * @param area (Area): initial area, not null
      * @param position (DiscreteCoordinates): initial position, not null
      */
-    public void enterArea(Area area, DiscreteCoordinates position){
-        area.registerActor(this);
+    public void enterArea(Area area, DiscreteCoordinates position) {
+        setCurrentPosition(position.toVector());
+        boolean registered= area.registerActor(this);
+        if(!registered){
+            System.out.println("failed to register player in new area");
+        }
         area.setViewCandidate(this);
 
         setOwnerArea(area);
-        setCurrentPosition(position.toVector());
         resetDoorStates();
         resetMotion();
     }

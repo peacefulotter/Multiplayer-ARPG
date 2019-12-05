@@ -66,8 +66,9 @@ public class ARPG extends RPG
         {
             player.leaveArea();
             Door currentDoor = player.passedDoor();
-            Area newArea = setCurrentArea( currentDoor.getDestination(), false );
-            player.enterArea( newArea, currentDoor.getOtherSideCoordinates() );
+            Area newArea = setCurrentArea( currentDoor.getDestination(), true );
+            player.enterArea(newArea, currentDoor.getOtherSideCoordinates() );
+
         }
         super.update(deltaTime);
     }
