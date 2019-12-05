@@ -1,23 +1,14 @@
 
 package ch.epfl.cs107.play.game.arpg.inventory;
 
-import ch.epfl.cs107.play.game.Inventory.InventoryItem;
+import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
 import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.game.areagame.actor.AreaEntity;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
-import ch.epfl.cs107.play.game.Inventory.Inventory;
-import ch.epfl.cs107.play.game.arpg.ARPG;
-import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
+import ch.epfl.cs107.play.game.rpg.inventory.Inventory;
 import ch.epfl.cs107.play.math.Transform;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
-
-import java.lang.reflect.Array;
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.List;
 
 public class ARPGInventory extends Inventory implements Actor {
     private int playerFortune = 0;

@@ -17,13 +17,14 @@ public class Coin extends CollectibleAreaEntity {
      * @param position    (DiscreteCoordinate): Initial position of the entity in the Area. Not null
      */
     public Coin(Area area, DiscreteCoordinates position) {
-        super(area,position);
+        super(area, position);
         RPGSprite[] sprites = new RPGSprite[4];
-        for(int i=0; i<4; i++) {
+        for (int i = 0; i < 4; i++) {
             sprites[i] = new RPGSprite("zelda/coin", 1, 1, this, new RegionOfInterest(i * 16, 0, 16, 16));
         }
-        animation= new Animation(animFrameDuration,sprites,true);
+        animation = new Animation(animFrameDuration, sprites, true);
     }
+
 
     @Override
     public void draw(Canvas canvas) {

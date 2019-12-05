@@ -1,6 +1,6 @@
 package ch.epfl.cs107.play.game.arpg.inventory;
 
-import ch.epfl.cs107.play.game.Inventory.InventoryItem;
+import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public enum ARPGItem implements InventoryItem
     protected String spriteName;
     protected float weight;
     protected int price;
-    private boolean equipable;
+    private boolean equippable;
     private List<Vulnerabilities> weaponType;
 
     ARPGItem( String name, String spriteName, float weight, int price, boolean equipable, Vulnerabilities ... weaponType )
@@ -48,7 +48,7 @@ public enum ARPGItem implements InventoryItem
         this.spriteName = spriteName;
         this.weight = weight;
         this.price = price;
-        this.equipable=equipable;
+        this.equippable=equippable;
         this.weaponType = new ArrayList<>();
         Collections.addAll( this.weaponType, weaponType );
     }
@@ -76,7 +76,7 @@ public enum ARPGItem implements InventoryItem
         return spriteName;
     }
 
-    public boolean isEquipable() {
-        return equipable;
+    public boolean isEquippable() {
+        return equippable;
     }
 }

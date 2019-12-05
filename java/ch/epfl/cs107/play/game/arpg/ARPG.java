@@ -3,9 +3,7 @@ package ch.epfl.cs107.play.game.arpg;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
-import ch.epfl.cs107.play.game.arpg.area.Ferme;
-import ch.epfl.cs107.play.game.arpg.area.Route;
-import ch.epfl.cs107.play.game.arpg.area.Village;
+import ch.epfl.cs107.play.game.arpg.area.*;
 import ch.epfl.cs107.play.game.rpg.RPG;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.io.FileSystem;
@@ -43,6 +41,8 @@ public class ARPG extends RPG
         addArea( new Ferme() );
         addArea( new Village() );
         addArea( new Route() );
+        addArea( new RouteChateau());
+        addArea( new Chateau());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ARPG extends RPG
         {
             player.leaveArea();
             Door currentDoor = player.passedDoor();
-            Area newArea = setCurrentArea( currentDoor.getDestination(), true );
+            Area newArea = setCurrentArea( currentDoor.getDestination(), false );
             player.enterArea( newArea, currentDoor.getOtherSideCoordinates() );
         }
         super.update(deltaTime);

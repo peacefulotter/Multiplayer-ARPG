@@ -1,17 +1,11 @@
 package ch.epfl.cs107.play.game.arpg.actor.player;
 
-import ch.epfl.cs107.play.game.Inventory.InventoryItem;
 import ch.epfl.cs107.play.game.actor.Graphics;
 import ch.epfl.cs107.play.game.actor.ImageGraphics;
-import ch.epfl.cs107.play.game.actor.TextGraphics;
-import ch.epfl.cs107.play.game.areagame.actor.Interactor;
-import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
-import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
-import ch.epfl.cs107.play.window.Image;
 
 public class ARPGPlayerStatusGUI implements Graphics {
     private Vector topLeftAnchor;

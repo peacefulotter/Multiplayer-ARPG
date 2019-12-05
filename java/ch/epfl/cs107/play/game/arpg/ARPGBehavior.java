@@ -92,6 +92,9 @@ public class ARPGBehavior extends AreaBehavior
         @Override
         protected boolean canEnter( Interactable entity )
         {
+            for(Interactable occupant : entities){
+                if(occupant.takeCellSpace()) return false;
+            }
             return type.isWalkable;
         }
 

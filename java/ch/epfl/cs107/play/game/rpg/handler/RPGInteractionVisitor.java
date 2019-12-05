@@ -30,5 +30,6 @@ public interface RPGInteractionVisitor extends AreaInteractionVisitor {
     default void interactWith(Sign sign){
         // by default the interaction is empty
     }
+    default  void interactWith(CollectibleAreaEntity colllectible){}
 
 }

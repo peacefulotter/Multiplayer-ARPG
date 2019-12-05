@@ -10,7 +10,6 @@ import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
-import ch.epfl.cs107.play.game.rpg.handler.RPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
