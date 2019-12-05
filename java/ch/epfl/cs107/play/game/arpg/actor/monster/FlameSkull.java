@@ -13,6 +13,7 @@ public class FlameSkull extends Monster implements FlyableEntity
     private final float MIN_LIFE_TIME = 6f;
     private final float MAX_LIFE_TIME = 15f;
     private float lifeTime;
+    private boolean hasAttacked=false;
 
     public FlameSkull( Area area, DiscreteCoordinates coords )
     {
@@ -39,13 +40,21 @@ public class FlameSkull extends Monster implements FlyableEntity
     @Override
     public boolean takeCellSpace()
     {
-        return super.isDead;
+        return isDead;
     }
 
     @Override
     public boolean isCellInteractable()
     {
-        return !super.isDead;
+        return (!isDead && !hasAttacked);
+    }
+
+    @Override
+    protected void onMove() {
+        hasAttacked=false;
+    }
+    public void setHasAttacked(){
+        hasAttacked=true;
     }
 
     @Override

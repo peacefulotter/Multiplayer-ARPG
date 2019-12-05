@@ -80,6 +80,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                     {
                         changeAnimationIndex( newOrientation );
                     }
+                    onMove();
                     move( ANIMATION_DURATION );
             }
 
@@ -94,6 +95,11 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         }
 
         super.update( deltaTime );
+    }
+
+    protected void onMove()
+    {
+
     }
 
 
