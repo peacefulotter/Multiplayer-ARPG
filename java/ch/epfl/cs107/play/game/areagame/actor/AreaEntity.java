@@ -39,7 +39,6 @@ public abstract class AreaEntity extends Entity implements Interactable {
         this.currentMainCellCoordinates = position;
     }
 
-
     /**
      * Getter for the owner area
      * @return (Area)

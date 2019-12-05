@@ -1,11 +1,8 @@
 package ch.epfl.cs107.play.game.arpg.actor.monster;
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.Animation;
-import ch.epfl.cs107.play.game.areagame.actor.MovableAreaEntity;
-import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.areagame.actor.Sprite;
-import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.areagame.actor.*;
+import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
@@ -20,12 +17,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class Monster extends MovableAreaEntity
+public abstract class Monster extends MovableAreaEntity implements Interactor
 {
     private final int ANIMATION_DURATION = 10;
     private final float DAMAGE_VULN = 1.5f;
     private final float DAMAGE_BASIC = 0.5f;
     private final double CRITS_PERCENTAGE = 0.2;
+    private final ARPGMonsterHandler handler;
 
     private final String name;
     private final Sprite sprite;
@@ -33,7 +31,7 @@ public abstract class Monster extends MovableAreaEntity
     private float currentHealth;
 
     private List<DiscreteCoordinates> currentCells;
-    private boolean isDead;
+    protected boolean isDead;
     private boolean isAttacking = false;
     private List<Vulnerabilities> vulnerabilities;
     private Animation deathAnimation;
@@ -50,6 +48,7 @@ public abstract class Monster extends MovableAreaEntity
         currentCells = new ArrayList<>();
         currentCells.add( coords );
         isDead = false;
+        handler = new ARPGMonsterHandler();
 
         this.vulnerabilities = new ArrayList<>();
         Collections.addAll( this.vulnerabilities, vulnerabilities );
@@ -133,30 +132,6 @@ public abstract class Monster extends MovableAreaEntity
         return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
-    @Override
-    public boolean takeCellSpace()
-    {
-        return isDead;
-    }
-
-    @Override
-    public boolean isCellInteractable()
-    {
-        return true;
-    }
-
-    @Override
-    public boolean isViewInteractable()
-    {
-        return true;
-    }
-
-    @Override
-    public void acceptInteraction( AreaInteractionVisitor v )
-    {
-
-    }
-
     public void takeDamage( float damage )
     {
         currentHealth -= damage;
@@ -165,6 +140,13 @@ public abstract class Monster extends MovableAreaEntity
             // handle death here
         }
     }
+
+    @Override
+    public void interactWith( Interactable other )
+    {
+        other.acceptInteraction( handler );
+    }
+
 
     class ARPGMonsterHandler implements ARPGInteractionVisitor
     {

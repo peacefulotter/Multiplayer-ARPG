@@ -80,8 +80,6 @@ public final class SwingWindow extends Node implements Window {
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent e) {
-			//  implementation of mouse scroll can be added if wanted
-			System.out.println(e.getWheelRotation());
 			synchronized ( SwingWindow.this )
 			{
 				mouseMovement = e.getWheelRotation();

@@ -39,4 +39,8 @@ public interface Interactable {
      * */
     void acceptInteraction(AreaInteractionVisitor v);
 
+
+    default boolean canFly() { return false; }
+
+
 }

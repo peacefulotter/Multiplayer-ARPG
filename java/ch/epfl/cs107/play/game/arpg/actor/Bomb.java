@@ -4,7 +4,10 @@ import ch.epfl.cs107.play.game.actor.Entity;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.ARPGBehavior;
+import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
+import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
@@ -23,6 +26,7 @@ public class Bomb extends AreaEntity implements Interactor {
     private Animation animation;
     private boolean exploded=false;
     private static final float BOMB_DAMAGE = .5f;
+    private final BombHandler handler;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area,orientation,position);
@@ -35,6 +39,7 @@ public class Bomb extends AreaEntity implements Interactor {
             animationSprites[i] = new Sprite("zelda/explosion", bombRadius,bombRadius,this, new RegionOfInterest(i*32,0,32,32), new Vector(-bombRadius/2,-bombRadius/2));
         }
         animation = new Animation(4,animationSprites, false);
+        handler = new BombHandler();
     }
 
     @Override
@@ -48,6 +53,13 @@ public class Bomb extends AreaEntity implements Interactor {
         }
         else if(!animation.isCompleted())
             animation.draw(canvas);
+    }
+
+
+    public void explode()
+    {
+        fuseTime = 0;
+        exploded = true;
     }
 
     @Override
@@ -82,7 +94,6 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
-
     }
 
     @Override
@@ -104,7 +115,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean wantsCellInteraction() {
-        return false;
+        return true;
     }
 
     @Override
@@ -117,13 +128,31 @@ public class Bomb extends AreaEntity implements Interactor {
     }
 
     @Override
-    public void interactWith(Interactable other) {
-        if(other instanceof Grass){
-            ((Grass) other).cutGrass();
+    public void interactWith(Interactable other)
+    {
+        other.acceptInteraction( handler );
+    }
+
+
+    private class BombHandler implements ARPGInteractionVisitor
+    {
+        @Override
+        public void interactWith( Grass grass )
+        {
+            grass.cutGrass();
         }
-        if(other instanceof ARPGPlayer){
-            ((ARPGPlayer) other).giveDamage(BOMB_DAMAGE);
+
+        @Override
+        public void interactWith( ARPGPlayer player )
+        {
+            player.giveDamage( BOMB_DAMAGE );
+        }
+
+        public void interactWith( FlameSkull flameSkull )
+        {
+            explode();
         }
     }
+
 
 }
