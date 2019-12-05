@@ -1,12 +1,7 @@
 package ch.epfl.cs107.play.game.arpg.inventory.items;
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.Animation;
-import ch.epfl.cs107.play.game.areagame.actor.AreaEntity;
-import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.rpg.handler.RPGInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
+import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Canvas;
 
@@ -14,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CollectibleAreaEntity extends AreaEntity {
+public abstract class CollectibleAreaEntity extends AreaEntity implements Interactable
+{
     protected Animation animation;
     private boolean collected=false;
     /**
@@ -34,6 +30,7 @@ public class CollectibleAreaEntity extends AreaEntity {
         return new ArrayList<DiscreteCoordinates>(Collections.singleton(getCurrentMainCellCoordinates()));
     }
 
+
     @Override
     public boolean takeCellSpace() {
         return false;
@@ -47,11 +44,6 @@ public class CollectibleAreaEntity extends AreaEntity {
     @Override
     public boolean isViewInteractable() {
         return false;
-    }
-
-    @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
-        ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
     @Override

@@ -151,6 +151,7 @@ public class Bomb extends AreaEntity implements Interactor {
         public void interactWith( FlameSkull flameSkull )
         {
             explode();
+            flameSkull.giveDamage( BOMB_DAMAGE );
         }
     }
 

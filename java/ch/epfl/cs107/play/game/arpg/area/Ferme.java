@@ -41,7 +41,7 @@ public class Ferme extends ARPGArea
                 Orientation.DOWN,
                 new DiscreteCoordinates(13, 0 ),
                 new DiscreteCoordinates( 14, 0 ) ) );
-        registerActor(new Coin(this, new DiscreteCoordinates(10,10)));
+        registerActor(new Coin(this, new DiscreteCoordinates(10,10), 50));
         registerActor(new Heart(this,  new DiscreteCoordinates(9,10)));
         registerActor( new FlameSkull( this, new DiscreteCoordinates( 2, 15 )));
     }

@@ -57,7 +57,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         for ( int i = 0; i < 7; i++ ) {
             deathAnimationSprites[i] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, 1);
         }
-        deathAnimation = new Animation(ANIMATION_DURATION, deathAnimationSprites, false);
+        deathAnimation = new Animation(7, deathAnimationSprites, false);
 
         Sprite[][] sprites = RPGSprite.extractSprites( spriteName,
                 3, 2, 2,
@@ -65,7 +65,6 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                         Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT});
         movementAnimation = RPGSprite.createAnimations(ANIMATION_DURATION, sprites);
     }
-
 
     @Override
     public void update(float deltaTime)
@@ -132,12 +131,12 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
-    public void takeDamage( float damage )
+    public void giveDamage( float damage )
     {
         currentHealth -= damage;
         if ( currentHealth <= 0 )
         {
-            // handle death here
+            isDead = true;
         }
     }
 
@@ -156,10 +155,10 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
             float crits = ( Math.random() < CRITS_PERCENTAGE ) ? 2 : 1;
             if ( vulnerabilities.contains( item ) )
             {
-                takeDamage( DAMAGE_VULN * crits );
+                giveDamage( DAMAGE_VULN * crits );
             } else
             {
-                takeDamage( DAMAGE_BASIC * crits );
+                giveDamage( DAMAGE_BASIC * crits );
             }
         }
 

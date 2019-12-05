@@ -67,7 +67,7 @@ public class Grass extends AreaEntity {
         isCut = true;
         if(random.nextBoolean()){
             if(random.nextDouble()<.75){
-                getOwnerArea().registerActor(new Coin(getOwnerArea(), getCurrentMainCellCoordinates()));
+                getOwnerArea().registerActor(new Coin(getOwnerArea(), getCurrentMainCellCoordinates(), 50));
             }else{
                 getOwnerArea().registerActor(new Heart(getOwnerArea(), getCurrentMainCellCoordinates()));
             }

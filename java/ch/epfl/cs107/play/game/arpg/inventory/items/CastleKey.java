@@ -3,6 +3,8 @@ package ch.epfl.cs107.play.game.arpg.inventory.items;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Animation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
+import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
 public class CastleKey extends CollectibleAreaEntity{
@@ -15,6 +17,13 @@ public class CastleKey extends CollectibleAreaEntity{
     public CastleKey(Area area, DiscreteCoordinates position) {
         super(area, position);
         animation= new Animation(1, new Sprite[]{new Sprite("zelda/key",1,1,this)});
+    }
+
+    @Override
+    public void acceptInteraction(AreaInteractionVisitor v)
+    {
+        System.out.println("castlekey interact");
+        ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
 }

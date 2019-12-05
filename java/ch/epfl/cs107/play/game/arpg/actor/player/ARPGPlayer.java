@@ -246,8 +246,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
-        System.out.println(v.toString());
-        // to do
+        ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
     @Override
@@ -266,17 +265,23 @@ public class ARPGPlayer extends Player {
                 setIsPassingADoor( door );
             }
         }
-        @Override
-        public void interactWith(CollectibleAreaEntity collectible) {
-            if(!collectible.collect()) return;
 
-            if (collectible instanceof Coin) {
-                inventory.addMoney(50);
-            }else if(collectible instanceof Heart){
-                hp+=1;
-                if(hp>maxHP) hp=maxHP;
-            }
+        public void interactWith( Coin coin )
+        {
+            inventory.addMoney( coin.getValue() );
+            getOwnerArea().unregisterActor( coin );
         }
+
+        public void interactWith( Heart heart )
+        {
+            hp += 1;
+            if ( hp > maxHP )
+            {
+                hp = maxHP;
+            }
+            getOwnerArea().unregisterActor( heart );
+        }
+
         @Override
         public void interactWith( Grass grass )
         {

@@ -10,14 +10,29 @@ import java.util.List;
 
 public class FlameSkull extends Monster implements FlyableEntity
 {
-    private final float MIN_LIFE_TIME = (float) (Math.random() * 0.3f);
-    private final float MAX_LIFE_TIME = 0.5f;
+    private final float MIN_LIFE_TIME = 6f;
+    private final float MAX_LIFE_TIME = 15f;
+    private float lifeTime;
 
     public FlameSkull( Area area, DiscreteCoordinates coords )
     {
         super(area, Orientation.DOWN, coords,
                 "FlameSkull", "zelda/flameSkull",
                 3f, Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
+        lifeTime = (float) (MIN_LIFE_TIME + Math.random() * (MAX_LIFE_TIME - MIN_LIFE_TIME));
+
+    }
+
+
+    @Override
+    public void update(float deltaTime)
+    {
+        super.update(deltaTime);
+        lifeTime -= deltaTime;
+        if ( lifeTime <= 0 )
+        {
+            super.isDead = true;
+        }
     }
 
     @Override
