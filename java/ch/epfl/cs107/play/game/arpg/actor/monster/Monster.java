@@ -169,6 +169,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 
     private void giveDamage( float damage )
     {
+        System.out.println("dealt damage"   );
         currentHealth -= damage;
         if ( currentHealth <= 0 )
         {
@@ -189,16 +190,6 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         {
             player.giveDamage( PLAYER_DAMAGE );
         }
-
-        /*/ deal critical damage ? if yes, then double the damage
-            float crits = ( Math.random() < CRITS_PERCENTAGE ) ? 2 : 1;
-            if ( vulnerabilities.contains( item ) )
-            {
-                giveDamage( DAMAGE_VULN * crits );
-            } else
-            {
-                giveDamage( DAMAGE_BASIC * crits );
-            }*/
 
         @Override
         public void interactWith(Grass grass)

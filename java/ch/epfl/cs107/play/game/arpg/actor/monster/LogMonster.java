@@ -5,6 +5,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Animation;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
@@ -169,13 +170,13 @@ public class LogMonster extends Monster
     @Override
     public void acceptInteraction(AreaInteractionVisitor v)
     {
-
+        ((ARPGInteractionVisitor) v).interactWith(this);
     }
 
     @Override
     public List<DiscreteCoordinates> getFieldOfViewCells()
     {
-        return null;
+        return getNextCurrentCells();
     }
 
     @Override
@@ -187,6 +188,6 @@ public class LogMonster extends Monster
     @Override
     public boolean wantsViewInteraction()
     {
-        return false;
+        return true;
     }
 }

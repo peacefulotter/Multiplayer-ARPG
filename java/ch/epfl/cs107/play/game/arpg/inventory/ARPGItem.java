@@ -41,7 +41,7 @@ public enum ARPGItem implements InventoryItem
     protected int price;
     private boolean equippable;
     private float damage;
-    private List<Vulnerabilities> weaponType;
+    private Vulnerabilities[] weaponType;
 
     ARPGItem( String name, String spriteName, float weight, int price, boolean equipable, float damage, Vulnerabilities ... weaponType )
     {
@@ -51,8 +51,11 @@ public enum ARPGItem implements InventoryItem
         this.price = price;
         this.equippable=equippable;
         this.damage = damage;
-        this.weaponType = new ArrayList<>();
-        Collections.addAll( this.weaponType, weaponType );
+        this.weaponType = new Vulnerabilities[ weaponType.length ];
+        for ( int i = 0; i < weaponType.length; i++ )
+        {
+            this.weaponType[ i ] = weaponType[ i ];
+        }
     }
 
     @Override
@@ -84,5 +87,5 @@ public enum ARPGItem implements InventoryItem
 
     public float getDamage() { return damage; }
 
-    public Vulnerabilities[] getVuln() { return (Vulnerabilities[]) weaponType.toArray(); }
+    public Vulnerabilities[] getVuln() { return weaponType; }
 }
