@@ -5,6 +5,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.Vector;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class FlameSkull extends Monster implements FlyableEntity
         super(area, Orientation.DOWN,
                 new Orientation[]{Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT}, coords,
                 "FlameSkull", "zelda/flameSkull",
-                3f, 1, Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
+                3f, 1, 3, new Vector( -0.5f, 0 ), Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
         lifeTime = (float) (MIN_LIFE_TIME + Math.random() * (MAX_LIFE_TIME - MIN_LIFE_TIME));
 
     }

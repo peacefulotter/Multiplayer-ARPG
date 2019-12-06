@@ -5,6 +5,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Animation;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
@@ -14,21 +15,33 @@ import java.util.List;
 
 public class LogMonster extends Monster
 {
+    private static int MIN_SLEEPING_DURATION = 50;
+    private static int MAX_SLEEPING_DURATION = 100;
+    private static int maxSteps = 100;
+    private int steps;
+
+    // monster states
     private boolean isSleeping;
     private boolean isWakingUp;
+    private boolean isAttacking;
+
+    private float time;
+    private int idleTime;
+    private int idleTimeBound;
+
     private Animation sleepingAnimation;
     private Animation wakingAnimation;
-    private float time = 0;
+
 
     public LogMonster(Area area, DiscreteCoordinates coords )
     {
         super(area, Orientation.DOWN,
-                new Orientation[]{Orientation.DOWN, Orientation.LEFT, Orientation.RIGHT, Orientation.UP}, coords,
+                new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT}, coords,
                 "LogMonster", "zelda/logMonster",
-                10, 1, Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
+                10, 1, 4, new Vector( -0.5f, 0 ), Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
         Sprite[] sleepingAnimationSprites = new Sprite[4];
         for ( int i = 0; i < 4; i++ ) {
-            sleepingAnimationSprites[i] = new Sprite("zelda/logMonster.sleeping", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), new Vector( 0, 0 ), 1f, 1);
+            sleepingAnimationSprites[i] = new Sprite("zelda/logMonster.sleeping", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), Vector.ZERO, 1f, 1);
         }
         sleepingAnimation = new Animation(10, sleepingAnimationSprites, true);
 
@@ -40,56 +53,99 @@ public class LogMonster extends Monster
 
         isSleeping = true;
         isWakingUp = false;
+        idleTimeBound = 0;
+        idleTime = 0;
+        idleTimeBound = 0;
+        steps = 0;
+        time = 0;
     }
 
     @Override
     public void update(float deltaTime)
     {
-        if ( isWakingUp )
+        if ( !isAttacking )
         {
-            wakingAnimation.update( deltaTime );
-            if ( wakingAnimation.isCompleted() )
+            if ( !isSleeping && !isWakingUp )
             {
-                wakingAnimation.reset();
-                isWakingUp = false;
+                super.update( deltaTime );
             }
-        }
-        else if ( isSleeping )
-        {
-            sleepingAnimation.update( deltaTime );
-        }
-        else
-        {
-            super.update(deltaTime);
-        }
-        if ( time % 300 == 0 )
-        {
-            isSleeping = !isSleeping;
-            if ( !isSleeping )
-            {
-                isWakingUp = true;
-            }
-        }
-        time += 1;
 
+            if ( Math.random() < 0.01 && !isSleeping )
+            {
+                isSleeping = true;
+                idleTime = 0;
+                idleTimeBound = (int) (MIN_SLEEPING_DURATION + Math.random() * (MAX_SLEEPING_DURATION-MIN_SLEEPING_DURATION));
+            }
+
+            if ( isSleeping && idleTime <= idleTimeBound )
+            {
+                sleepingAnimation.update( deltaTime );
+                idleTime++;
+            } else if ( isSleeping )
+            {
+                isSleeping = false;
+                isWakingUp = true;
+                sleepingAnimation.reset();
+            }
+
+            else if ( isWakingUp && !wakingAnimation.isCompleted() )
+            {
+                wakingAnimation.update( deltaTime );
+            }
+            else if ( isWakingUp && wakingAnimation.isCompleted() )
+            {
+                isWakingUp = false;
+                wakingAnimation.reset();
+            }
+
+        }
+
+        else if ( isAttacking )
+        {
+            super.move( 4 );
+            // Monster failed to attack
+            if ( steps >= maxSteps )
+            {
+                isAttacking = false;
+                steps = 0;
+            }
+            steps++;
+        }
+
+
+        if ( deathAnimation.isCompleted() )
+        {
+            new Coin( getOwnerArea(), getCurrentCells().get(0), 50 );
+        }
+
+
+        // change monster state every 300;
+        if ( time >= 300 )
+        {
+            if ( !isSleeping && !isWakingUp && !isAttacking )
+            {
+                isAttacking = !isAttacking;
+                time = 0;
+            }
+        }
+        time++;
     }
 
     @Override
     public void draw(Canvas canvas)
     {
-        if ( isWakingUp )
+        if ( isSleeping )
+        {
+            sleepingAnimation.setAnchor( new Vector( -0.5f, 0 ) );
+            sleepingAnimation.draw( canvas );
+        } else if ( isWakingUp )
         {
             wakingAnimation.draw( canvas );
-        }
-        else if ( isSleeping )
-        {
-            sleepingAnimation.draw( canvas );
         }
         else
         {
             super.draw(canvas);
         }
-
     }
 
     @Override

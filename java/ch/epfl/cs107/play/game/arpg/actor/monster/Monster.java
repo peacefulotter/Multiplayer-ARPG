@@ -35,11 +35,11 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     protected boolean isDead;
     private boolean isAttacking = false;
     private List<Vulnerabilities> vulnerabilities;
-    private Animation deathAnimation;
+    protected Animation deathAnimation;
     private Animation[] movementAnimation;
     private int currentAnimationIndex = 0;
 
-    public Monster( Area area, Orientation orientation, Orientation[] orientations, DiscreteCoordinates coords, String name, String spriteName, float maxHealth, float damage, Vulnerabilities ... vulnerabilities )
+    public Monster( Area area, Orientation orientation, Orientation[] orientations, DiscreteCoordinates coords, String name, String spriteName, float maxHealth, float damage, int nbFrames, Vector spriteOffset, Vulnerabilities ... vulnerabilities )
     {
         super( area, orientation, coords );
         this.name = name;
@@ -63,8 +63,8 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         deathAnimation = new Animation(7, deathAnimationSprites, false);
 
         Sprite[][] sprites = RPGSprite.extractSprites( spriteName,
-                3, 2, 2,
-                this, 32, 32, Vector.ZERO, orientations);
+                nbFrames, 2, 2,
+                this, 32, 32, spriteOffset, orientations);
         movementAnimation = RPGSprite.createAnimations(ANIMATION_DURATION, sprites);
     }
 
@@ -106,14 +106,22 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 
     private void changeAnimationIndex( Orientation newOrientation )
     {
-        for ( int i = 0; i < orientations.length; i++ )
+        switch ( newOrientation )
         {
-            if ( orientations[ i ] == newOrientation )
-            {
-                currentAnimationIndex = i;
-                return;
-            }
+            case UP:
+                currentAnimationIndex = 0;
+                break;
+            case DOWN:
+                currentAnimationIndex = 2;
+                break;
+            case LEFT:
+                currentAnimationIndex = 3;
+                break;
+            case RIGHT:
+                currentAnimationIndex = 1;
+                break;
         }
+
     }
 
     // implement this inside subclasses
