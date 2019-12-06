@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
@@ -320,5 +321,10 @@ public class ARPGPlayer extends Player {
             skull.setHasAttacked();
         }
 
+        @Override
+        public void interactWith(Monster monster)
+        {
+            monster.giveDamage( getEquippedItem().getDamage(), getEquippedItem().getVuln() );
+        }
     }
 }

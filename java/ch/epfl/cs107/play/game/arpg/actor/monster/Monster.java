@@ -151,17 +151,20 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
-    public void giveDamage( float damage, Vulnerabilities vuln )
+    public void giveDamage( float damage, Vulnerabilities ... vuln )
     {
         float crits = ( Math.random() < CRITS_PERCENTAGE ) ? 2 : 1;
-        if ( vulnerabilities.contains( vuln ) )
+        for ( Vulnerabilities v : vuln )
         {
-            giveDamage( damage * crits );
+            // if the monster is vulnerable to the weapon, then
+            // deal *1.5 more damage to him
+            if ( vulnerabilities.contains( vuln ) )
+            {
+                giveDamage( damage * 1.5f * crits );
+                return;
+            }
         }
-        else
-        {
-            giveDamage( damage * crits );
-        }
+        giveDamage( damage * crits );
     }
 
     private void giveDamage( float damage )
