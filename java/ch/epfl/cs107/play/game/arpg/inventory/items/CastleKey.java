@@ -22,7 +22,6 @@ public class CastleKey extends CollectibleAreaEntity{
     @Override
     public void acceptInteraction(AreaInteractionVisitor v)
     {
-        System.out.println("castlekey interact");
         ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
