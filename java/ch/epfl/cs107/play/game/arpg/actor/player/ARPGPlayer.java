@@ -19,6 +19,7 @@ import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
@@ -47,6 +48,10 @@ public class ARPGPlayer extends Player {
 
     private ARPGPlayerStatusGUI playerGUI;
 
+    private boolean isDashing = false;
+    private Vector dashStartingPos;
+    private Animation dashAnimation;
+
     /**
      * Default Player constructor
      *
@@ -68,6 +73,11 @@ public class ARPGPlayer extends Player {
                 Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
         Sprite[][] bowSprites= RPGSprite.extractSprites("zelda/player.bow",4,2,2,this,32,32,new Vector(-0.5f,0),new Orientation[]{Orientation.DOWN,
                 Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
+        Sprite[] dashAnimationSprites = new Sprite[5];
+        for ( int i = 2; i < 7; i++ ) {
+            dashAnimationSprites[i-2] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, 1);
+        }
+        dashAnimation = new Animation(5, dashAnimationSprites, false);
 
         Animation[] bowAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, bowSprites,false);
         Animation[] swordAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, swordSprites,false);
@@ -89,6 +99,22 @@ public class ARPGPlayer extends Player {
     }
 
     public void update(float deltaTime) {
+        if ( isDashing )
+        {
+            if ( dashAnimation.isCompleted() )
+            {
+                isDashing = false;
+                dashAnimation.reset();
+            }
+            else
+            {
+                dashAnimation.update( deltaTime );
+                move( 5 );
+                super.update( deltaTime );
+                return;
+            }
+        }
+
         Keyboard keyboard = getOwnerArea().getKeyboard();
         Mouse mouse = getOwnerArea().getMouse();
         // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
@@ -97,13 +123,14 @@ public class ARPGPlayer extends Player {
         wantsInteraction = false;;
 
         // display animation if player is moving
-        if( isDisplacementOccurs() || state!=PlayerStates.IDLE )
+        if ( isDisplacementOccurs() || state != PlayerStates.IDLE )
         {
-            animations[currentAnimation].update(deltaTime);
-            if(state!=PlayerStates.IDLE && animations[currentAnimation].isCompleted()){
-                state= PlayerStates.IDLE;
-                animations[currentAnimation].reset();
-                setAnimationByOrientation(getOrientation());
+            animations[ currentAnimation ].update( deltaTime );
+            if ( state != PlayerStates.IDLE && animations[ currentAnimation ].isCompleted() )
+            {
+                state = PlayerStates.IDLE;
+                animations[ currentAnimation ].reset();
+                setAnimationByOrientation( getOrientation() );
             }
         }
         for ( PlayerInput input : PlayerInput.values() )
@@ -118,7 +145,7 @@ public class ARPGPlayer extends Player {
             takeNextItem( mouseWheelInput );
         }
         // register movement
-        if(state==PlayerStates.IDLE){
+        if( state == PlayerStates.IDLE ){
             moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
             moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
             moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
@@ -142,6 +169,20 @@ public class ARPGPlayer extends Player {
             case NEXT_ITEM:
                 takeNextItem(1);
                 break;
+            case DASH:
+                playerDash();
+                break;
+        }
+    }
+
+    private void playerDash()
+    {
+        System.out.println("try dash");
+        if ( isDisplacementOccurs() && !isDashing )
+        {
+            isDashing = true;
+            dashStartingPos = getCurrentCells().get( 0 ).toVector();
+            System.out.println("dashed");
         }
     }
 
@@ -186,6 +227,11 @@ public class ARPGPlayer extends Player {
     public void draw(Canvas canvas) {
         playerGUI.draw( canvas );
         animations[currentAnimation].draw(canvas);
+        if (isDashing)
+        {
+            dashAnimation.setAnchor(dashStartingPos.sub( getCurrentCells().get(0).toVector()));
+            dashAnimation.draw( canvas );
+        }
     }
 
     /**

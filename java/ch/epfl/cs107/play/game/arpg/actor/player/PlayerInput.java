@@ -7,7 +7,9 @@ public enum PlayerInput {
     INTERACT(Keyboard.E),
     SHOW_INV(Keyboard.I),
     NEXT_ITEM(Keyboard.TAB),
-    USE_ITEM(Keyboard.SPACE);
+    USE_ITEM(Keyboard.SPACE),
+    DASH(Keyboard.A);
+
     private int keyCode;
 
     PlayerInput(int keyCode){

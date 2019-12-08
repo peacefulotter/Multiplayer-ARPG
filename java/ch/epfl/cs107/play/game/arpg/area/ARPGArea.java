@@ -55,7 +55,7 @@ public abstract class ARPGArea extends Area
 
     @Override
     public final float getCameraScaleFactor() {
-        return getWidth() * 3 / 5;
+        return 15; //getWidth() * 4 / 5;
     }
 
     public Grass getGrass( DiscreteCoordinates coords )
