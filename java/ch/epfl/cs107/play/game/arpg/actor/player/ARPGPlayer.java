@@ -167,7 +167,6 @@ public class ARPGPlayer extends Player {
             case BOW:
                 if(state==state.IDLE){
                     state=PlayerStates.ATTACKING_BOW;
-                    System.out.println(currentAnimation);
                     currentAnimation=currentAnimation+8;
                 }
         }
@@ -185,7 +184,6 @@ public class ARPGPlayer extends Player {
     @Override
     public void draw(Canvas canvas) {
         playerGUI.draw( canvas );
-        System.out.println(currentAnimation);
         animations[currentAnimation].draw(canvas);
     }
 
@@ -195,7 +193,7 @@ public class ARPGPlayer extends Player {
      * @param orientation (Orientation): given orientation, not null
      * @param btn         (Button): button corresponding to the given orientation, not null
      */
-    private void moveOrientate(Orientation orientation, Button btn) {
+    protected void moveOrientate(Orientation orientation, Button btn) {
         if ( btn.isDown() )
         {
             if (getOrientation() == orientation) {
@@ -239,7 +237,6 @@ public class ARPGPlayer extends Player {
     }
 
     public void giveDamage(float damage){
-        System.out.println(damage);
         hp-=damage;
         if(hp<0){
             hp=0;
