@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.game.arpg.actor.player;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
@@ -10,6 +11,7 @@ import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
+import ch.epfl.cs107.play.game.arpg.inventory.items.CastleKey;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.arpg.inventory.items.CollectibleAreaEntity;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
@@ -61,20 +63,21 @@ public class ARPGPlayer extends Player {
                 4, 1, 2,
                 this, 16, 32, new Orientation[]{Orientation.DOWN,
                         Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
-        Sprite[][] swordSprites= RPGSprite.extractSprites("zelda/player.sword",4,2,2,this,32,32,new Orientation[]{Orientation.DOWN,
+        Sprite[][] swordSprites= RPGSprite.extractSprites("zelda/player.sword",4,2,2,this,32,32,new Vector(-0.5f,0),new Orientation[]{Orientation.DOWN,
                 Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
-        for(Sprite[] spriteArray : swordSprites){
-            for(Sprite sprite : spriteArray){
-                sprite.setAnchor(new Vector(-0.5f,0));
-            }
-        }
+        Sprite[][] bowSprites= RPGSprite.extractSprites("zelda/player.bow",4,2,2,this,32,32,new Vector(-0.5f,0),new Orientation[]{Orientation.DOWN,
+                Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
+
+        Animation[] bowAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, bowSprites,false);
         Animation[] swordAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, swordSprites,false);
-        animations= new Animation[8];
         Animation[] defaultAnimations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
 
-        for(int i=0; i<8;i++){
+
+        animations= new Animation[16];
+        for(int i=0; i<16;i++){
             if(i<4) animations[i]=defaultAnimations[i];
-            if(i>3) animations[i]=swordAnimation[i-4];
+            else if(i<8) animations[i] = swordAnimation[i-4];
+            else if(i<12) animations[i] = bowAnimation[i-8];
         }
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
@@ -160,6 +163,12 @@ public class ARPGPlayer extends Player {
                     state=PlayerStates.ATTACKING_SWORD;
                     currentAnimation=currentAnimation+4;
                 }
+                break;
+            case BOW:
+                if(state==state.IDLE){
+                    state=PlayerStates.ATTACKING_BOW;
+                    currentAnimation=currentAnimation+8;
+                }
         }
     }
 
@@ -184,7 +193,7 @@ public class ARPGPlayer extends Player {
      * @param orientation (Orientation): given orientation, not null
      * @param btn         (Button): button corresponding to the given orientation, not null
      */
-    private void moveOrientate(Orientation orientation, Button btn) {
+    protected void moveOrientate(Orientation orientation, Button btn) {
         if ( btn.isDown() )
         {
             if (getOrientation() == orientation) {
@@ -296,7 +305,7 @@ public class ARPGPlayer extends Player {
         public void interactWith( Coin coin )
         {
             inventory.addMoney( coin.getValue() );
-            getOwnerArea().unregisterActor( coin );
+            coin.collect();
         }
 
         public void interactWith( Heart heart )
@@ -306,7 +315,16 @@ public class ARPGPlayer extends Player {
             {
                 hp = maxHP;
             }
-            getOwnerArea().unregisterActor( heart );
+            heart.collect();
+        }
+        @Override
+        public void interactWith(CastleKey key){
+            inventory.addItemToInventory(ARPGItem.CASTLE_KEY);
+            key.collect();
+        }
+        @Override
+        public void interactWith(CastleDoor door){
+            door.passDoor();
         }
 
         @Override
@@ -316,7 +334,6 @@ public class ARPGPlayer extends Player {
         }
         @Override
         public void interactWith(FlameSkull skull){
-            System.out.println("llol");
             giveDamage(1f);
             skull.setHasAttacked();
         }
@@ -324,7 +341,6 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith(Monster monster)
         {
-            System.out.println("xs");
             monster.giveDamage( getEquippedItem().getDamage(), getEquippedItem().getVuln() );
         }
     }
