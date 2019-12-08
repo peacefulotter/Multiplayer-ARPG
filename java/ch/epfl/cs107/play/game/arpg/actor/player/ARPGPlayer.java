@@ -228,7 +228,6 @@ public class ARPGPlayer extends Player {
     }
 
     public void giveDamage(float damage){
-        System.out.println(damage);
         hp-=damage;
         if(hp<0){
             hp=0;
@@ -317,6 +316,7 @@ public class ARPGPlayer extends Player {
         }
         @Override
         public void interactWith(FlameSkull skull){
+            System.out.println("llol");
             giveDamage(1f);
             skull.setHasAttacked();
         }
@@ -324,6 +324,7 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith(Monster monster)
         {
+            System.out.println("xs");
             monster.giveDamage( getEquippedItem().getDamage(), getEquippedItem().getVuln() );
         }
     }

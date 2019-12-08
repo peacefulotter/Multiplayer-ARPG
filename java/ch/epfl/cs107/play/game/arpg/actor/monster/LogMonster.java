@@ -11,14 +11,16 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
+import com.sun.security.jgss.GSSUtil;
 
+import java.sql.SQLOutput;
 import java.util.List;
 
 public class LogMonster extends Monster
 {
     private static int MIN_SLEEPING_DURATION = 50;
     private static int MAX_SLEEPING_DURATION = 100;
-    private static int maxSteps = 100;
+    private static int maxSteps = 200;
     private int steps;
 
     // monster states
@@ -71,8 +73,9 @@ public class LogMonster extends Monster
                 super.update( deltaTime );
             }
 
-            if ( Math.random() < 0.01 && !isSleeping )
+            if ( Math.random() < 0.005 && !isSleeping )
             {
+                System.out.println("sleeping");
                 isSleeping = true;
                 idleTime = 0;
                 idleTimeBound = (int) (MIN_SLEEPING_DURATION + Math.random() * (MAX_SLEEPING_DURATION-MIN_SLEEPING_DURATION));
@@ -116,13 +119,15 @@ public class LogMonster extends Monster
 
         if ( deathAnimation.isCompleted() )
         {
+            System.out.println("dropped coin");
             new Coin( getOwnerArea(), getCurrentCells().get(0), 50 );
         }
 
 
         // change monster state every 300;
-        if ( time >= 300 )
+        if ( time >= 350 )
         {
+            System.out.println( "swap " + isAttacking );
             if ( !isSleeping && !isWakingUp && !isAttacking )
             {
                 isAttacking = !isAttacking;

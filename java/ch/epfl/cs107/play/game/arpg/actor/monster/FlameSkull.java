@@ -85,6 +85,6 @@ public class FlameSkull extends Monster implements FlyableEntity
     @Override
     public boolean wantsViewInteraction()
     {
-        return true;
+        return false;
     }
 }
