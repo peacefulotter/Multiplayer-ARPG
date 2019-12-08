@@ -2,11 +2,6 @@ package ch.epfl.cs107.play.game.arpg.actor.monster;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
-import ch.epfl.cs107.play.game.arpg.actor.Bomb;
-import ch.epfl.cs107.play.game.arpg.actor.Grass;
-import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
-import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RandomGenerator;
@@ -22,36 +17,34 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 {
     private final int ANIMATION_DURATION = 10;
     private final double CRITS_PERCENTAGE = 0.2;
-    private final float PLAYER_DAMAGE;
-    private final ARPGMonsterHandler handler;
+    protected final float PLAYER_DAMAGE;
     private final Orientation[] orientations;
 
     private final String name;
-    private final Sprite sprite;
     private final float maxHealth;
     private float currentHealth;
 
     private List<DiscreteCoordinates> currentCells;
     protected boolean isDead;
-    private boolean isAttacking = false;
     private List<Vulnerabilities> vulnerabilities;
     protected Animation deathAnimation;
     private Animation[] movementAnimation;
-    private int currentAnimationIndex = 0;
+    private int currentAnimationIndex = 2;
 
-    public Monster( Area area, Orientation orientation, Orientation[] orientations, DiscreteCoordinates coords, String name, String spriteName, float maxHealth, float damage, int nbFrames, Vector spriteOffset, Vulnerabilities ... vulnerabilities )
+    public Monster(
+            Area area, Orientation orientation, Orientation[] orientations, DiscreteCoordinates coords,
+            String name, String spriteName, float maxHealth, float damage, int nbFrames,
+            Vector spriteOffset, Vulnerabilities ... vulnerabilities )
     {
         super( area, orientation, coords );
         this.name = name;
-        sprite = new Sprite( spriteName, 1f, 1f, this );
         this.maxHealth = maxHealth;
         currentHealth = maxHealth;
         currentCells = new ArrayList<>();
         currentCells.add( coords );
         isDead = false;
-        handler = new ARPGMonsterHandler();
-        this.orientations = orientations;
         PLAYER_DAMAGE = damage;
+        this.orientations = orientations;
 
         this.vulnerabilities = new ArrayList<>();
         Collections.addAll( this.vulnerabilities, vulnerabilities );
@@ -69,24 +62,30 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     }
 
     @Override
-    public void update(float deltaTime)
+    public void update( float deltaTime )
+    {
+        update( deltaTime, true );
+    }
+
+    public void update(float deltaTime, boolean canMove )
     {
         if ( !isDead )
         {
-            Orientation newOrientation = getRandomOrientation();
-            if ( Math.random() < 0.01 )
+            if ( canMove )
             {
+                Orientation newOrientation = getRandomOrientation();
+                if ( Math.random() < 0.01 )
+                {
                     boolean orientationSuccessful = orientate( newOrientation );
                     if ( orientationSuccessful )
                     {
                         changeAnimationIndex( newOrientation );
                     }
-                    onMove();
                     move( ANIMATION_DURATION );
+                }
             }
 
             movementAnimation[currentAnimationIndex].update(deltaTime);
-
         }
         else if ( !deathAnimation.isCompleted() )
         {
@@ -96,11 +95,6 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         }
 
         super.update( deltaTime );
-    }
-
-    protected void onMove()
-    {
-
     }
 
 
@@ -154,6 +148,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     public void giveDamage( float damage, Vulnerabilities ... vuln )
     {
         float crits = ( Math.random() < CRITS_PERCENTAGE ) ? 2 : 1;
+        System.out.println("crits : " + crits);
         for ( Vulnerabilities v : vuln )
         {
             // if the monster is vulnerable to the weapon, then
@@ -173,28 +168,9 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         currentHealth -= damage;
         if ( currentHealth <= 0 )
         {
+            resetMotion();
             isDead = true;
         }
     }
 
-    @Override
-    public void interactWith( Interactable other )
-    {
-        other.acceptInteraction( handler );
-    }
-
-
-    class ARPGMonsterHandler implements ARPGInteractionVisitor
-    {
-        public void interactWith( ARPGPlayer player )
-        {
-            player.giveDamage( PLAYER_DAMAGE );
-        }
-
-        @Override
-        public void interactWith(Grass grass)
-        {
-            grass.cutGrass();
-        }
-    }
 }

@@ -25,6 +25,7 @@ import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Mouse;
 
+import java.sql.SQLOutput;
 import java.util.Collections;
 import java.util.List;
 
@@ -333,7 +334,8 @@ public class ARPGPlayer extends Player {
             grass.cutGrass();
         }
         @Override
-        public void interactWith(FlameSkull skull){
+        public void interactWith( FlameSkull skull ) {
+            System.out.println("flameskull player");
             giveDamage(1f);
             skull.setHasAttacked();
         }
@@ -341,6 +343,7 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith(Monster monster)
         {
+            System.out.println("monster player");
             monster.giveDamage( getEquippedItem().getDamage(), getEquippedItem().getVuln() );
         }
     }

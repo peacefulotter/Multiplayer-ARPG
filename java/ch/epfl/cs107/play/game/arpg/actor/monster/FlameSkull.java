@@ -1,9 +1,13 @@
 package ch.epfl.cs107.play.game.arpg.actor.monster;
 
 import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.Grass;
+import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
 
@@ -13,6 +17,7 @@ public class FlameSkull extends Monster implements FlyableEntity
 {
     private final float MIN_LIFE_TIME = 6f;
     private final float MAX_LIFE_TIME = 15f;
+    private final flameSkullHandler handler;
     private float lifeTime;
     private boolean hasAttacked=false;
 
@@ -21,9 +26,9 @@ public class FlameSkull extends Monster implements FlyableEntity
         super(area, Orientation.DOWN,
                 new Orientation[]{Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT}, coords,
                 "FlameSkull", "zelda/flameSkull",
-                3f, 1, 3, new Vector( -0.5f, 0 ), Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
+                3f, 1f, 3, new Vector( -0.5f, 0 ), Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
         lifeTime = (float) (MIN_LIFE_TIME + Math.random() * (MAX_LIFE_TIME - MIN_LIFE_TIME));
-
+        handler = new flameSkullHandler();
     }
 
 
@@ -50,7 +55,6 @@ public class FlameSkull extends Monster implements FlyableEntity
         return (!isDead && !hasAttacked);
     }
 
-    @Override
     protected void onMove() {
         hasAttacked=false;
     }
@@ -86,5 +90,30 @@ public class FlameSkull extends Monster implements FlyableEntity
     public boolean wantsViewInteraction()
     {
         return false;
+    }
+
+    @Override
+    public void interactWith( Interactable other )
+    {
+        other.acceptInteraction( handler );
+    }
+
+    class flameSkullHandler implements ARPGInteractionVisitor {
+        public void interactWith( ARPGPlayer player )
+        {
+            System.out.println("flameskull damage");
+            player.giveDamage( PLAYER_DAMAGE );
+        }
+
+        @Override
+        public void interactWith(Grass grass)
+        {
+            grass.cutGrass();
+        }
+
+        public void interactWith( LogMonster logMonster )
+        {
+            logMonster.giveDamage( 1f, Vulnerabilities.FIRE );
+        }
     }
 }
