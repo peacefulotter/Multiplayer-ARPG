@@ -5,6 +5,8 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.Bomb;
+import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
@@ -13,7 +15,7 @@ import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.window.Canvas;
 
 public class Arrow extends Projectile {
-    private static Sprite sprite;
+    private Sprite sprite;
     private ArrowInteractionHandler interactionHandler;
 
     /**
@@ -84,6 +86,18 @@ public class Arrow extends Projectile {
         public void interactWith(Monster monster) {
             stopProjectile();
             monster.giveDamage(.5f, Vulnerabilities.LONG_RANGE);
+        }
+
+        @Override
+        public void interactWith(Grass grass) {
+            stopProjectile();
+            grass.cutGrass();
+        }
+
+        @Override
+        public void interactWith(Bomb bomb) {
+            stopProjectile();
+            bomb.explode();
         }
     }
 }

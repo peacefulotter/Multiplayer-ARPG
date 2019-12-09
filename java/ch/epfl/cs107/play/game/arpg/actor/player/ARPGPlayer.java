@@ -82,7 +82,7 @@ public class ARPGPlayer extends Player {
         dashAnimation = new Animation(5, dashAnimationSprites, false);
 
         animations = new Animation[][] {
-                RPGSprite.createAnimations( ANIMATION_DURATION / 2, sprites, false ),
+                RPGSprite.createAnimations( ANIMATION_DURATION / 2, sprites, true ),
                 RPGSprite.createAnimations( ANIMATION_DURATION / 2, swordSprites, false ),
                 RPGSprite.createAnimations( ANIMATION_DURATION / 2, bowSprites, false )
         };
@@ -131,10 +131,10 @@ public class ARPGPlayer extends Player {
         }
         for ( PlayerInput input : PlayerInput.values() )
         {
-            if ( keyboard.get( input.getKeyCode() ).isPressed() )
-            {
-                reactToInput( input );
-            }
+            boolean reactToInput=false;
+            if(input.getCanHoldDown()  && keyboard.get(input.getKeyCode()).isDown()) reactToInput=true;
+            if ( keyboard.get( input.getKeyCode() ).isPressed()) reactToInput=true;
+            if(reactToInput) reactToInput( input );
         }
 
         if ( mouseWheelInput != 0 )
@@ -207,7 +207,7 @@ public class ARPGPlayer extends Player {
                 if ( state == state.IDLE )
                 {
                     state=PlayerStates.ATTACKING_BOW;
-                    getOwnerArea().registerActor(new Arrow(getOwnerArea(),getOrientation(),getCurrentMainCellCoordinates(),2,10));
+                    getOwnerArea().registerActor(new Arrow(getOwnerArea(),getOrientation(),getCurrentMainCellCoordinates().jump(getOrientation().toVector()),2,5));
                     currentAnimation = 2;
                 }
         }

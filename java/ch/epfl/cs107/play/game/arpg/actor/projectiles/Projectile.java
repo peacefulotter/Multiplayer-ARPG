@@ -8,6 +8,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlyableEntity;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
 import java.util.Collections;
@@ -17,6 +18,7 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
 
     private int speed;
     private int maxDistance;
+    private Vector startingPos;
 
     /**
      * Default MovableAreaEntity constructor
@@ -29,6 +31,7 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
         super(area, orientation, position);
         this.speed = speed;
         this.maxDistance = maxDistance;
+        startingPos=getPosition();
     }
 
     public void stopProjectile() {
@@ -38,6 +41,8 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+        Vector currentPos= getPosition().mul(-1);
+        if(currentPos.add(startingPos).getLength()>maxDistance)stopProjectile();
         move(speed);
         if(!isDisplacementOccurs()){
             stopProjectile();

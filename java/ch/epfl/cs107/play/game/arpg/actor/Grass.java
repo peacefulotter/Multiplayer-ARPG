@@ -21,8 +21,8 @@ import java.util.Random;
 
 
 public class Grass extends AreaEntity {
+    private static final Random random = new Random();
     private final List<DiscreteCoordinates> currentCells;
-    private static final Random random= new Random();
     public boolean isCut = false;
     private float grassDepth = -100f;
     private final Sprite sprite = new Sprite(
@@ -49,7 +49,7 @@ public class Grass extends AreaEntity {
     public void draw(Canvas canvas) {
         if (!isCut) {
             sprite.draw(canvas);
-        } else if(!grassAnimation.isCompleted()){
+        } else if (!grassAnimation.isCompleted()) {
             grassAnimation.draw(canvas);
         } else {
             getOwnerArea().unregisterActor(this);
@@ -58,17 +58,17 @@ public class Grass extends AreaEntity {
 
     @Override
     public void update(float deltaTime) {
-        if(isCut)
+        if (isCut)
             grassAnimation.update(deltaTime);
     }
 
     public void cutGrass() {
-        if(isCut) return;
+        if (isCut) return;
         isCut = true;
-        if(random.nextBoolean()){
-            if(random.nextDouble()<.75){
+        if (random.nextBoolean()) {
+            if (random.nextDouble() < .75) {
                 getOwnerArea().registerActor(new Coin(getOwnerArea(), getCurrentMainCellCoordinates(), 50));
-            }else{
+            } else {
                 getOwnerArea().registerActor(new Heart(getOwnerArea(), getCurrentMainCellCoordinates()));
             }
         }
@@ -87,12 +87,12 @@ public class Grass extends AreaEntity {
 
     @Override
     public boolean isCellInteractable() {
-        return false;
+        return !isCut;
     }
 
     @Override
     public boolean isViewInteractable() {
-        return true;
+        return !isCut;
     }
 
     @Override

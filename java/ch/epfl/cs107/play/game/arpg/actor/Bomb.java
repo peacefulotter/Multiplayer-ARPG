@@ -95,6 +95,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
+        ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
     @Override

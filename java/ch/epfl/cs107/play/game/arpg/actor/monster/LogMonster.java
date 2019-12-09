@@ -23,6 +23,7 @@ public class LogMonster extends Monster
     private static final float MIN_SLEEPING_DURATION = 2;
     private static final float MAX_SLEEPING_DURATION = 3;
     private static final float MAX_TIME_ATTACK = 2;
+    private static final int MAX_HP=4;
     private static final Random random = new Random();
 
     private final logMonsterHandler handler;
@@ -49,7 +50,7 @@ public class LogMonster extends Monster
         super(area, Orientation.DOWN,
                 new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT}, coords,
                 "LogMonster", "zelda/logMonster",
-                10, 1f, 4, new Vector( -0.5f, 0 ), Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
+                MAX_HP, 1f, 4, new Vector( -0.5f, 0 ), Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
         Sprite[] sleepingAnimationSprites = new Sprite[4];
         for ( int i = 0; i < 4; i++ ) {
             sleepingAnimationSprites[i] = new Sprite("zelda/logMonster.sleeping", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), new Vector( -0.5f, 0 ), 1, -1000 );
@@ -131,9 +132,11 @@ public class LogMonster extends Monster
         switch( state )
         {
             case IS_WAKING:
+                //wakingAnimation.setAnchor( new Vector( -0.5f, 0 ) );
                 wakingAnimation.draw( canvas );
                 break;
             case IS_SLEEPING:
+                //sleepingAnimation.setAnchor( new Vector( -0.5f, 0 ) );
                 sleepingAnimation.draw( canvas );
                 break;
             case IS_IDLE:
@@ -156,18 +159,18 @@ public class LogMonster extends Monster
         timeAttack = 0;
     }
 
-    protected void onMove() {}
+    public void onMove() {}
 
     @Override
     public boolean takeCellSpace()
     {
-        return true;
+        return !isDead;
     }
 
     @Override
     public boolean isCellInteractable()
     {
-        return false;
+        return !isDead;
     }
 
     @Override
@@ -236,7 +239,6 @@ public class LogMonster extends Monster
         public void interactWith( ARPGPlayer player )
         {
             // if the monster is attacking and a player is right next to him
-            System.out.println(state == LogMonsterState.IS_ATTACKING );
             System.out.println(getNextCurrentCells().contains( player.getCurrentCells().get(0) ));
             if ( state == LogMonsterState.IS_ATTACKING && getNextCurrentCells().contains( player.getCurrentCells().get(0) ) )
             {
