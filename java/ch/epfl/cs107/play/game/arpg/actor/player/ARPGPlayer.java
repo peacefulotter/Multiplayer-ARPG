@@ -6,6 +6,8 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
+import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
@@ -13,6 +15,7 @@ import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
 import ch.epfl.cs107.play.game.arpg.inventory.items.CastleKey;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
+import ch.epfl.cs107.play.game.arpg.inventory.items.CollectibleAreaEntity;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
@@ -204,6 +207,7 @@ public class ARPGPlayer extends Player {
                 if ( state == state.IDLE )
                 {
                     state=PlayerStates.ATTACKING_BOW;
+                    getOwnerArea().registerActor(new Arrow(getOwnerArea(),getOrientation(),getCurrentMainCellCoordinates(),2,10));
                     currentAnimation = 2;
                 }
         }

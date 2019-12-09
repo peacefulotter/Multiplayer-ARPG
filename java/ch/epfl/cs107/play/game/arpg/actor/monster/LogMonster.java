@@ -131,11 +131,9 @@ public class LogMonster extends Monster
         switch( state )
         {
             case IS_WAKING:
-                //wakingAnimation.setAnchor( new Vector( -0.5f, 0 ) );
                 wakingAnimation.draw( canvas );
                 break;
             case IS_SLEEPING:
-                //sleepingAnimation.setAnchor( new Vector( -0.5f, 0 ) );
                 sleepingAnimation.draw( canvas );
                 break;
             case IS_IDLE:
@@ -158,7 +156,7 @@ public class LogMonster extends Monster
         timeAttack = 0;
     }
 
-    public void onMove() {}
+    protected void onMove() {}
 
     @Override
     public boolean takeCellSpace()

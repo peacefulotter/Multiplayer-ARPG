@@ -7,7 +7,6 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
 
@@ -58,7 +57,6 @@ public class FlameSkull extends Monster implements FlyableEntity
     protected void onMove() {
         hasAttacked = false;
     }
-
     public void setHasAttacked(){
         hasAttacked=true;
     }

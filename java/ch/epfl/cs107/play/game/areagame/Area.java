@@ -62,8 +62,8 @@ public abstract class Area implements Playable {
     public final void setViewCandidate(Actor a){
         this.viewCandidate = a;
     }
-    
-    
+
+
     /**
      * Add an actor to the actors list
      * and to the behavior area cell if the actor is an Interactable
@@ -121,7 +121,8 @@ public abstract class Area implements Playable {
         if(a instanceof  Interactable){
             if(canEnterAreaCells((Interactable) a, Collections.singletonList(new DiscreteCoordinates((int)a.getPosition().x,(int)a.getPosition().y)))){
                 return registeredActors.add(a);
-            }else{
+            }
+            else{
                 return false;
             }
         }else{
@@ -153,7 +154,7 @@ public abstract class Area implements Playable {
      * Getter for the area width
      * @return (int) : the width in number of cols
      */
-    public int getWidth(){ 
+    public int getWidth(){
         return areaBehavior.getWidth();
     }
 
@@ -161,7 +162,7 @@ public abstract class Area implements Playable {
      * Getter for the area height
      * @return (int) : the height in number of rows
      */
-    public int getHeight(){ 
+    public int getHeight(){
         return areaBehavior.getHeight();
     }
 
@@ -169,7 +170,7 @@ public abstract class Area implements Playable {
     public final Keyboard getKeyboard () {
         return window.getKeyboard();
     }
-    
+
     /** @return the Window Mouse for inputs */
     public final Mouse getMouse() {
     	return window.getMouse();
@@ -181,14 +182,14 @@ public abstract class Area implements Playable {
     			/*.max(new Vector(0,0))
 				.min(new Vector(getWidth(),getHeight()));*/
     }
-    
+
     /** @return the mouse coordinates relatively to the area and the cells */
     public DiscreteCoordinates getRelativeMouseCoordinates() {
     	Vector mousePosition = getRelativeMousePosition();
     	DiscreteCoordinates mouseCoordinate = new DiscreteCoordinates((int)Math.floor(mousePosition.x), (int)Math.floor(mousePosition.y));
     	return mouseCoordinate;
     }
-    
+
     /** @return (boolean): true if the method begin already called once. You can use resume() instead*/
     public final boolean isStarted() {
         return started;
@@ -225,7 +226,7 @@ public abstract class Area implements Playable {
         }
         return false;
     }
-    
+
     /**
      * Inform if the entity can enter the area cells
      * @param entity (Interactable), not null
@@ -266,7 +267,7 @@ public abstract class Area implements Playable {
     }
 
     @Override
-    public void update(float deltaTime) {    	
+    public void update(float deltaTime) {
     	purgeRegistration();
 
     	// Render actors
@@ -328,7 +329,7 @@ public abstract class Area implements Playable {
         // Update expected viewport center
         if (viewCandidate != null) {
             viewCenter = viewCandidate.getPosition();
-            if ( viewCenter.x < 7.5f )
+            if ( viewCenter.x < 8 )
             {
                 viewCenter = new Vector( 7.5f, viewCenter.y );
             }

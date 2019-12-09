@@ -139,7 +139,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         return Orientation.fromInt( random );
     }
 
-    abstract void onMove();
+    abstract protected void onMove();
 
     @Override
     public List<DiscreteCoordinates> getCurrentCells()
