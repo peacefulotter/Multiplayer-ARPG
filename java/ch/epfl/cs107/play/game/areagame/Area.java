@@ -328,7 +328,7 @@ public abstract class Area implements Playable {
         // Update expected viewport center
         if (viewCandidate != null) {
             viewCenter = viewCandidate.getPosition();
-            if ( viewCenter.x < 8 )
+            if ( viewCenter.x < 7.5f )
             {
                 viewCenter = new Vector( 7.5f, viewCenter.y );
             }
@@ -344,7 +344,6 @@ public abstract class Area implements Playable {
             {
                 viewCenter = new Vector( areaBehavior.getWidth() - 7.5f, viewCenter.y );
             }
-            System.out.println(viewCenter);
         }else { // Set default view to center
         	viewCenter = new Vector(getWidth()/(float)2,getHeight()/(float)2);
         }
