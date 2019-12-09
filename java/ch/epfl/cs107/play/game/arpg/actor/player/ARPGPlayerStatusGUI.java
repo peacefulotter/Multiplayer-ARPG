@@ -122,7 +122,7 @@ public class ARPGPlayerStatusGUI implements Graphics {
                     bottomLeftAnchor,  1, DEPTH);
             heartsDisplay[ i ].setAnchor(
                     bottomLeftAnchor.add(
-                            moneyBackgroundDisplayWidth + i + 0.2f, moneyBackgroundDisplayHeight / 6 ) );
+                            moneyBackgroundDisplayWidth * (i+4) * heartsDisplaySize / (hearts * 2), moneyBackgroundDisplayHeight / 6 ) );
             heartsDisplay[i].draw(canvas);
 
         }

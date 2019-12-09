@@ -5,8 +5,7 @@ public enum PlayerStates {
     ATTACKING_SWORD(true, true ),
     ATTACKING_BOW(true, false ),
     ATTACKING_STAFF(true, false ),
-    TAKING_DAMAGE(false, false ),
-    IS_DASHING( true, false );
+    TAKING_DAMAGE(false, false );
 
     private boolean vulnerable;
     private boolean closeRangeAttack;

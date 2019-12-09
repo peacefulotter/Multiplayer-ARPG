@@ -4,19 +4,25 @@ import ch.epfl.cs107.play.window.Keyboard;
 
 
 public enum PlayerInput {
-    INTERACT(Keyboard.E),
-    SHOW_INV(Keyboard.I),
-    NEXT_ITEM(Keyboard.TAB),
-    USE_ITEM(Keyboard.SPACE),
-    DASH(Keyboard.A);
+    INTERACT(Keyboard.E, false),
+    SHOW_INV(Keyboard.I, false),
+    NEXT_ITEM(Keyboard.TAB, false),
+    USE_ITEM(Keyboard.SPACE, true),
+    DASH(Keyboard.A,false);
 
     private int keyCode;
+    private boolean canHoldDown;
 
-    PlayerInput(int keyCode){
+    PlayerInput(int keyCode, boolean canHoldDown){
         this.keyCode=keyCode;
+        this.canHoldDown=canHoldDown;
     }
 
     public int getKeyCode() {
         return keyCode;
+    }
+
+    public boolean getCanHoldDown() {
+        return canHoldDown;
     }
 }

@@ -6,6 +6,8 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
+import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
@@ -13,6 +15,7 @@ import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
 import ch.epfl.cs107.play.game.arpg.inventory.items.CastleKey;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
+import ch.epfl.cs107.play.game.arpg.inventory.items.CollectibleAreaEntity;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
@@ -26,6 +29,7 @@ import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Mouse;
 
+import java.sql.SQLOutput;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,10 +40,9 @@ public class ARPGPlayer extends Player {
 
     private PlayerStates state;
     private float hp;
-    private int maxHP = 5;
-    private Animation[][] animations;
-    private int currentAnimation = 0;
-    private int currentAnimationIndex = 2;
+    private int maxHP = 3;
+    private Animation[] animations;
+    private int currentAnimation = 2;
     private boolean wantsInteraction = false;
 
 
@@ -48,6 +51,7 @@ public class ARPGPlayer extends Player {
 
     private ARPGPlayerStatusGUI playerGUI;
 
+    private boolean isDashing = false;
     private Vector dashStartingPos;
     private Animation dashAnimation;
 
@@ -78,23 +82,17 @@ public class ARPGPlayer extends Player {
         }
         dashAnimation = new Animation(5, dashAnimationSprites, false);
 
-        /*
         Animation[] bowAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, bowSprites,false);
         Animation[] swordAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, swordSprites,false);
         Animation[] defaultAnimations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
-        */
 
-        animations = new Animation[][] {
-                RPGSprite.createAnimations( ANIMATION_DURATION / 2, sprites, false ),
-                RPGSprite.createAnimations( ANIMATION_DURATION / 2, swordSprites, false ),
-                RPGSprite.createAnimations( ANIMATION_DURATION / 2, bowSprites, false )
-        };
-        /*
+
+        animations= new Animation[16];
         for(int i=0; i<16;i++){
             if(i<4) animations[i]=defaultAnimations[i];
             else if(i<8) animations[i] = swordAnimation[i-4];
             else if(i<12) animations[i] = bowAnimation[i-8];
-        }*/
+        }
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
         inventory.addItemToInventory(ARPGItem.BOMB, 3);
@@ -104,11 +102,11 @@ public class ARPGPlayer extends Player {
     }
 
     public void update(float deltaTime) {
-        if ( state == PlayerStates.IS_DASHING )
+        if ( isDashing )
         {
             if ( dashAnimation.isCompleted() )
             {
-                state = PlayerStates.IDLE;
+                isDashing = false;
                 dashAnimation.reset();
             }
             else
@@ -125,16 +123,16 @@ public class ARPGPlayer extends Player {
         // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
         int mouseWheelInput = mouse.getMouseWheelInput();
 
-        wantsInteraction = false;
+        wantsInteraction = false;;
 
         // display animation if player is moving
         if ( isDisplacementOccurs() || state != PlayerStates.IDLE )
         {
-            animations[ currentAnimation ][ currentAnimationIndex ].update( deltaTime );
-            if ( state != PlayerStates.IDLE && animations[ currentAnimation ][ currentAnimationIndex ].isCompleted() )
+            animations[ currentAnimation ].update( deltaTime );
+            if ( state != PlayerStates.IDLE && animations[ currentAnimation ].isCompleted() )
             {
                 state = PlayerStates.IDLE;
-                animations[ currentAnimation ][ currentAnimationIndex ].reset();
+                animations[ currentAnimation ].reset();
                 setAnimationByOrientation( getOrientation() );
             }
         }
@@ -145,7 +143,6 @@ public class ARPGPlayer extends Player {
                 reactToInput( input );
             }
         }
-
         if ( mouseWheelInput != 0 )
         {
             takeNextItem( mouseWheelInput );
@@ -156,7 +153,6 @@ public class ARPGPlayer extends Player {
             moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
             moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
             moveOrientate(Orientation.DOWN, keyboard.get(Keyboard.DOWN));
-            currentAnimation = 0;
         }
         super.update(deltaTime);
     }
@@ -184,10 +180,12 @@ public class ARPGPlayer extends Player {
 
     private void playerDash()
     {
-        if ( isDisplacementOccurs() && state == PlayerStates.IDLE )
+        System.out.println("try dash");
+        if ( isDisplacementOccurs() && !isDashing )
         {
-            state = PlayerStates.IS_DASHING;
+            isDashing = true;
             dashStartingPos = getCurrentCells().get( 0 ).toVector();
+            System.out.println("dashed");
         }
     }
 
@@ -205,18 +203,17 @@ public class ARPGPlayer extends Player {
                 }
                 break;
             case SWORD:
-                if ( state == state.IDLE )
-                {
-                    wantsInteraction = true;
-                    state = PlayerStates.ATTACKING_SWORD;
-                    currentAnimation = 1;
+                if(state==state.IDLE){
+                    wantsInteraction=true;
+                    state=PlayerStates.ATTACKING_SWORD;
+                    currentAnimation=currentAnimation+4;
                 }
                 break;
             case BOW:
-                if ( state == state.IDLE )
-                {
+                if(state==state.IDLE){
                     state=PlayerStates.ATTACKING_BOW;
-                    currentAnimation = 2;
+                    getOwnerArea().registerActor(new Arrow(getOwnerArea(),getOrientation(),getCurrentMainCellCoordinates(),2,10));
+                    currentAnimation=currentAnimation+8;
                 }
         }
     }
@@ -233,14 +230,11 @@ public class ARPGPlayer extends Player {
     @Override
     public void draw(Canvas canvas) {
         playerGUI.draw( canvas );
-        switch ( state )
+        animations[currentAnimation].draw(canvas);
+        if (isDashing)
         {
-            case IS_DASHING:
-                dashAnimation.setAnchor( dashStartingPos.sub( getCurrentCells().get(0).toVector() ) );
-                dashAnimation.draw( canvas );
-            default:
-                animations[ currentAnimation ][ currentAnimationIndex ].draw( canvas );
-                break;
+            dashAnimation.setAnchor(dashStartingPos.sub( getCurrentCells().get(0).toVector()));
+            dashAnimation.draw( canvas );
         }
     }
 
@@ -260,26 +254,25 @@ public class ARPGPlayer extends Player {
                 if (orientationSuccessful) {
                     setAnimationByOrientation(orientation);
                 }
-
             }
         }
     }
     public void setAnimationByOrientation(Orientation orientation){
         switch (orientation) {
             case UP:
-                currentAnimationIndex = 0;
+                currentAnimation = 0;
                 break;
             case DOWN:
-                currentAnimationIndex = 2;
+                currentAnimation = 2;
                 break;
             case LEFT:
-                currentAnimationIndex = 3;
+                currentAnimation = 3;
                 break;
             case RIGHT:
-                currentAnimationIndex = 1;
+                currentAnimation = 1;
                 break;
         }
-        animations[currentAnimation][currentAnimationIndex].reset();
+        animations[currentAnimation].reset();
     };
     public int getMoney() {
         return inventory.getMoney();
