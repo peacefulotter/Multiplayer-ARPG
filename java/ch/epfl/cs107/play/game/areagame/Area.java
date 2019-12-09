@@ -344,7 +344,6 @@ public abstract class Area implements Playable {
             {
                 viewCenter = new Vector( areaBehavior.getWidth() - 7.5f, viewCenter.y );
             }
-            System.out.println(viewCenter);
         }else { // Set default view to center
         	viewCenter = new Vector(getWidth()/(float)2,getHeight()/(float)2);
         }
