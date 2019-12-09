@@ -383,12 +383,13 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith( CastleDoor door )
         {
-            System.out.println(inventory.getItem((InventoryItem)ARPGItem.CASTLE_KEY) );
-            if ( inventory.getItem((InventoryItem)ARPGItem.CASTLE_KEY) == 1 )
+            if (!door.isOpen() && inventory.getCurrentItem()==ARPGItem.CASTLE_KEY)
             {
-                System.out.println("has key");
+                door.openDoor();
+            } else if(door.isOpen()){
                 door.passDoor();
-            } else
+                setIsPassingADoor(door);
+            }else
             {
                 System.out.println("You need the key");
             }

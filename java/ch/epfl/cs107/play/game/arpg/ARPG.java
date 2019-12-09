@@ -66,7 +66,7 @@ public class ARPG extends RPG {
         if (player.isPassingADoor()) {
             player.leaveArea();
             Door currentDoor = player.passedDoor();
-            Area newArea = setCurrentArea(currentDoor.getDestination(), true);
+            Area newArea = setCurrentArea(currentDoor.getDestination(), false);
             player.enterArea(newArea, currentDoor.getOtherSideCoordinates());
 
         }
