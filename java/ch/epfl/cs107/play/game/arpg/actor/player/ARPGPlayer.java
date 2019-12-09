@@ -78,23 +78,11 @@ public class ARPGPlayer extends Player {
         }
         dashAnimation = new Animation(5, dashAnimationSprites, false);
 
-        /*
-        Animation[] bowAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, bowSprites,false);
-        Animation[] swordAnimation = RPGSprite.createAnimations(ANIMATION_DURATION/2, swordSprites,false);
-        Animation[] defaultAnimations = RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites);
-        */
-
         animations = new Animation[][] {
                 RPGSprite.createAnimations( ANIMATION_DURATION / 2, sprites, false ),
                 RPGSprite.createAnimations( ANIMATION_DURATION / 2, swordSprites, false ),
                 RPGSprite.createAnimations( ANIMATION_DURATION / 2, bowSprites, false )
         };
-        /*
-        for(int i=0; i<16;i++){
-            if(i<4) animations[i]=defaultAnimations[i];
-            else if(i<8) animations[i] = swordAnimation[i-4];
-            else if(i<12) animations[i] = bowAnimation[i-8];
-        }*/
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
         inventory.addItemToInventory(ARPGItem.BOMB, 3);
@@ -233,15 +221,12 @@ public class ARPGPlayer extends Player {
     @Override
     public void draw(Canvas canvas) {
         playerGUI.draw( canvas );
-        switch ( state )
+        if ( state == PlayerStates.IS_DASHING )
         {
-            case IS_DASHING:
-                dashAnimation.setAnchor( dashStartingPos.sub( getCurrentCells().get(0).toVector() ) );
-                dashAnimation.draw( canvas );
-            default:
-                animations[ currentAnimation ][ currentAnimationIndex ].draw( canvas );
-                break;
+            dashAnimation.setAnchor( dashStartingPos.sub( getCurrentCells().get(0).toVector() ) );
+            dashAnimation.draw( canvas );
         }
+        animations[ currentAnimation ][ currentAnimationIndex ].draw( canvas );
     }
 
     /**

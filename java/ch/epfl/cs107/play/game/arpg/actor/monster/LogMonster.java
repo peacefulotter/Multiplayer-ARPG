@@ -238,6 +238,7 @@ public class LogMonster extends Monster
         public void interactWith( ARPGPlayer player )
         {
             // if the monster is attacking and a player is right next to him
+            System.out.println(state == LogMonsterState.IS_ATTACKING );
             System.out.println(getNextCurrentCells().contains( player.getCurrentCells().get(0) ));
             if ( state == LogMonsterState.IS_ATTACKING && getNextCurrentCells().contains( player.getCurrentCells().get(0) ) )
             {
