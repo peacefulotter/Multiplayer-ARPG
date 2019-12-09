@@ -328,9 +328,27 @@ public abstract class Area implements Playable {
         // Update expected viewport center
         if (viewCandidate != null) {
             viewCenter = viewCandidate.getPosition();
+            if ( viewCenter.x < 8 )
+            {
+                viewCenter = new Vector( 7.5f, viewCenter.y );
+            }
+            if ( viewCenter.y > areaBehavior.getHeight() - 7 )
+            {
+                viewCenter = new Vector( viewCenter.x, areaBehavior.getHeight() - 7 );
+            }
+            if ( viewCenter.y < 7 )
+            {
+                viewCenter = new Vector( viewCenter.x, 7 );
+            }
+            if ( viewCenter.x > areaBehavior.getWidth() - 7.5f )
+            {
+                viewCenter = new Vector( areaBehavior.getWidth() - 7.5f, viewCenter.y );
+            }
+            System.out.println(viewCenter);
         }else { // Set default view to center
         	viewCenter = new Vector(getWidth()/(float)2,getHeight()/(float)2);
         }
+
         // Compute new viewport
         Transform viewTransform = Transform.I.scaled(getCameraScaleFactor()).translated(viewCenter);
         window.setRelativeTransform(viewTransform);

@@ -6,6 +6,7 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
@@ -18,6 +19,7 @@ import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
+import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
@@ -369,16 +371,35 @@ public class ARPGPlayer extends Player {
             inventory.addItemToInventory(ARPGItem.CASTLE_KEY);
             key.collect();
         }
+
         @Override
-        public void interactWith(CastleDoor door){
-            door.passDoor();
+        public void interactWith( CastleDoor door )
+        {
+            System.out.println(inventory.getItem((InventoryItem)ARPGItem.CASTLE_KEY) );
+            if ( inventory.getItem((InventoryItem)ARPGItem.CASTLE_KEY) == 1 )
+            {
+                System.out.println("has key");
+                door.passDoor();
+            } else
+            {
+                System.out.println("You need the key");
+            }
         }
 
         @Override
         public void interactWith( Grass grass )
         {
-            grass.cutGrass();
+            if ( state.isCloseRangeAttacking() )
+            {
+                grass.cutGrass();
+            }
         }
+
+
+        /* PLAYER SHOULDNT INTERACT WITH FLAMESKULL
+         -> FLAMESKULL SHOULD INTERACT WITH PLAYER
+         */
+
         @Override
         public void interactWith( FlameSkull skull ) {
             System.out.println("flameskull player");
@@ -387,10 +408,12 @@ public class ARPGPlayer extends Player {
         }
 
         @Override
-        public void interactWith(Monster monster)
+        public void interactWith( Monster monster )
         {
-            System.out.println("monster player");
-            monster.giveDamage( getEquippedItem().getDamage(), getEquippedItem().getVuln() );
+            if ( state.isCloseRangeAttacking() )
+            {
+                monster.giveDamage( getEquippedItem().getDamage(), getEquippedItem().getVuln() );
+            }
         }
     }
 }
