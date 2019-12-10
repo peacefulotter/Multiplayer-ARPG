@@ -1,19 +1,18 @@
 package ch.epfl.cs107.play.game.arpg;
 
-import ch.epfl.cs107.play.Networking.ConnectionHandler;
+import ch.epfl.cs107.play.Networking.Connection;
+import ch.epfl.cs107.play.Networking.Packets.Packet;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Window;
 
-import java.util.List;
 
 public class NARPG extends ARPG {
-    private ConnectionHandler connectionHandler;
+    private Connection connection;
     private boolean isServer;
 
     public NARPG(boolean isServer) {
@@ -27,7 +26,7 @@ public class NARPG extends ARPG {
         if (super.begin(window, fileSystem)) {
             createAreas();
             Area area = setCurrentArea("zelda/Ferme", true);
-            player = new NetworkARPGPlayer(getCurrentArea(), Orientation.DOWN, new DiscreteCoordinates(6, 10), connectionHandler);
+            player = new NetworkARPGPlayer(getCurrentArea(), Orientation.DOWN, new DiscreteCoordinates(6, 10), connection);
             initPlayer(player);
             return true;
         }
@@ -35,26 +34,11 @@ public class NARPG extends ARPG {
 
     }
 
-    public void setConnectionHandler(ConnectionHandler connectionHandler) {
-        this.connectionHandler = connectionHandler;
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
-    public void updatePlayerState(int i) {
-        System.out.println(i);
-        switch (i) {
-            case Keyboard.UP:
-                ((NetworkARPGPlayer) player).updatePlayerState(Orientation.UP);
-                break;
-            case Keyboard.RIGHT:
-                ((NetworkARPGPlayer) player).updatePlayerState(Orientation.RIGHT);
-                break;
-            case Keyboard.DOWN:
-                ((NetworkARPGPlayer) player).updatePlayerState(Orientation.DOWN);
-                break;
-            case Keyboard.LEFT:
-                ((NetworkARPGPlayer) player).updatePlayerState(Orientation.LEFT);
-                break;
-
-        }
+    public void updateState(Packet packet) {
+        System.out.println(packet.getObjectId());
     }
 }

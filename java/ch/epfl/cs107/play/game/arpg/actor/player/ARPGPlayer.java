@@ -8,6 +8,7 @@ import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
+import ch.epfl.cs107.play.game.arpg.actor.projectiles.MagicProjectile;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
@@ -67,46 +68,40 @@ public class ARPGPlayer extends Player {
         handler = new ARPGPlayerHandler();
         hp = maxHP;
 
-        Sprite[][] sprites = RPGSprite.extractSprites("zelda/player",
-                4, 1, 2,
-                this, 16, 32, new Orientation[]{Orientation.DOWN,
-                        Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
-        Sprite[][] swordSprites= RPGSprite.extractSprites("zelda/player.sword",4,2,2,this,32,32,new Vector(-0.5f,0),new Orientation[]{Orientation.DOWN,
-                Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
-        Sprite[][] bowSprites= RPGSprite.extractSprites("zelda/player.bow",4,2,2,this,32,32,new Vector(-0.5f,0),new Orientation[]{Orientation.DOWN,
-                Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
+        Sprite[][] sprites = RPGSprite.extractSprites("zelda/player", 4, 1, 2, this, 16, 32, new Orientation[]{Orientation.DOWN, Orientation.RIGHT, Orientation.UP, Orientation.LEFT});
+        Sprite[][] swordSprites = RPGSprite.extractSprites("zelda/player.sword", 4, 2, 2, this, 32, 32, new Vector(-0.5f, 0), new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
+        Sprite[][] bowSprites = RPGSprite.extractSprites("zelda/player.bow", 4, 2, 2, this, 32, 32, new Vector(-0.5f, 0), new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
+        Sprite[][] staffSprites = RPGSprite.extractSprites("zelda/player.staff_water", 4, 2, 2, this, 32, 32, new Vector(-0.5f, 0), new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
         Sprite[] dashAnimationSprites = new Sprite[5];
-        for ( int i = 2; i < 7; i++ ) {
-            dashAnimationSprites[i-2] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, 1);
+        for (int i = 2; i < 7; i++) {
+            dashAnimationSprites[i - 2] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, 1);
         }
         dashAnimation = new Animation(5, dashAnimationSprites, false);
 
-        animations = new Animation[][] {
-                RPGSprite.createAnimations( ANIMATION_DURATION / 2, sprites, true ),
-                RPGSprite.createAnimations( ANIMATION_DURATION / 2, swordSprites, false ),
-                RPGSprite.createAnimations( ANIMATION_DURATION / 2, bowSprites, false )
+        animations = new Animation[][]{
+                RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites, true),
+                RPGSprite.createAnimations(ANIMATION_DURATION / 2, swordSprites, false),
+                RPGSprite.createAnimations(ANIMATION_DURATION / 2, bowSprites, false),
+                RPGSprite.createAnimations(ANIMATION_DURATION/2,staffSprites,false)
         };
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
-        inventory.addItemToInventory(ARPGItem.BOMB, 3);
+        inventory.addItemToInventory(ARPGItem.BOMB, 10);
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
-        playerGUI = new ARPGPlayerStatusGUI( this, inventory.getCurrentItem().getSpriteName() );
+        inventory.addItemToInventory(ARPGItem.STAFF);
+        playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
     public void update(float deltaTime) {
-        if ( state == PlayerStates.IS_DASHING )
-        {
-            if ( dashAnimation.isCompleted() )
-            {
+        if (state == PlayerStates.IS_DASHING) {
+            if (dashAnimation.isCompleted()) {
                 state = PlayerStates.IDLE;
                 dashAnimation.reset();
-            }
-            else
-            {
-                dashAnimation.update( deltaTime );
-                move( 5 );
-                super.update( deltaTime );
+            } else {
+                dashAnimation.update(deltaTime);
+                move(5);
+                super.update(deltaTime);
                 return;
             }
         }
@@ -119,30 +114,26 @@ public class ARPGPlayer extends Player {
         wantsInteraction = false;
 
         // display animation if player is moving
-        if ( isDisplacementOccurs() || state != PlayerStates.IDLE )
-        {
-            animations[ currentAnimation ][ currentAnimationIndex ].update( deltaTime );
-            if ( state != PlayerStates.IDLE && animations[ currentAnimation ][ currentAnimationIndex ].isCompleted() )
-            {
+        if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
+            animations[currentAnimation][currentAnimationIndex].update(deltaTime);
+            if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationIndex].isCompleted()) {
                 state = PlayerStates.IDLE;
-                animations[ currentAnimation ][ currentAnimationIndex ].reset();
-                setAnimationByOrientation( getOrientation() );
+                animations[currentAnimation][currentAnimationIndex].reset();
+                setAnimationByOrientation(getOrientation());
             }
         }
-        for ( PlayerInput input : PlayerInput.values() )
-        {
-            boolean reactToInput=false;
-            if(input.getCanHoldDown()  && keyboard.get(input.getKeyCode()).isDown()) reactToInput=true;
-            if ( keyboard.get( input.getKeyCode() ).isPressed()) reactToInput=true;
-            if(reactToInput) reactToInput( input );
+        for (PlayerInput input : PlayerInput.values()) {
+            boolean reactToInput = false;
+            if (input.getCanHoldDown() && keyboard.get(input.getKeyCode()).isDown()) reactToInput = true;
+            if (keyboard.get(input.getKeyCode()).isPressed()) reactToInput = true;
+            if (reactToInput) reactToInput(input);
         }
 
-        if ( mouseWheelInput != 0 )
-        {
-            takeNextItem( mouseWheelInput );
+        if (mouseWheelInput != 0) {
+            takeNextItem(mouseWheelInput);
         }
         // register movement
-        if( state == PlayerStates.IDLE ){
+        if (state == PlayerStates.IDLE) {
             moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
             moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
             moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
@@ -152,9 +143,8 @@ public class ARPGPlayer extends Player {
         super.update(deltaTime);
     }
 
-    private void reactToInput( PlayerInput input )
-    {
-        switch ( input ) {
+    private void reactToInput(PlayerInput input) {
+        switch (input) {
             case INTERACT:
                 wantsInteraction = true;
                 break;
@@ -173,49 +163,53 @@ public class ARPGPlayer extends Player {
         }
     }
 
-    private void playerDash()
-    {
-        if ( isDisplacementOccurs() && state == PlayerStates.IDLE )
-        {
+    private void playerDash() {
+        if (isDisplacementOccurs() && state == PlayerStates.IDLE) {
             state = PlayerStates.IS_DASHING;
-            dashStartingPos = getCurrentCells().get( 0 ).toVector();
+            dashStartingPos = getCurrentCells().get(0).toVector();
         }
     }
 
     private void useItem() {
-        currentItem=getEquippedItem();
-        if(currentItem==null) return;
-        switch(currentItem){
+        currentItem = getEquippedItem();
+        if (currentItem == null) return;
+        switch (currentItem) {
             case BOMB:
                 DiscreteCoordinates bombCoordinates = getFieldOfViewCells().get(0);
-                if(isDisplacementOccurs()) bombCoordinates=bombCoordinates.jump(getOrientation().toVector());
+                if (isDisplacementOccurs()) bombCoordinates = bombCoordinates.jump(getOrientation().toVector());
                 boolean registeredActor = getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, bombCoordinates));
-                if(registeredActor){
+                if (registeredActor) {
                     boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
-                    if ( removed ) { playerGUI.setItemSprite( inventory.getCurrentItem().getSpriteName() ); }
+                    if (removed) {
+                        playerGUI.setItemSprite(inventory.getCurrentItem().getSpriteName());
+                    }
                 }
                 break;
             case SWORD:
-                if ( state == state.IDLE )
-                {
+                if (state == state.IDLE) {
                     wantsInteraction = true;
                     state = PlayerStates.ATTACKING_SWORD;
                     currentAnimation = 1;
                 }
                 break;
             case BOW:
-                if ( state == state.IDLE )
-                {
-                    state=PlayerStates.ATTACKING_BOW;
-                    getOwnerArea().registerActor(new Arrow(getOwnerArea(),getOrientation(),getCurrentMainCellCoordinates().jump(getOrientation().toVector()),2,5));
+                if (state == state.IDLE) {
+                    state = PlayerStates.ATTACKING_BOW;
+                    getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
                     currentAnimation = 2;
+                }
+            case STAFF:
+                if(state==state.IDLE){
+                    state= PlayerStates.ATTACKING_STAFF;
+                    getOwnerArea().registerActor(new MagicProjectile(getOwnerArea(),getOrientation(),getCurrentMainCellCoordinates().jump(getOrientation().toVector()),2,5));
+                    currentAnimation=3;
                 }
         }
     }
 
-    private void takeNextItem( int direction ) {
-        currentItem = (ARPGItem) inventory.getNextItem( direction );
-        playerGUI.setItemSprite( currentItem.getSpriteName() );
+    private void takeNextItem(int direction) {
+        currentItem = (ARPGItem) inventory.getNextItem(direction);
+        playerGUI.setItemSprite(currentItem.getSpriteName());
     }
 
     public ARPGItem getEquippedItem() {
@@ -224,13 +218,12 @@ public class ARPGPlayer extends Player {
 
     @Override
     public void draw(Canvas canvas) {
-        playerGUI.draw( canvas );
-        if ( state == PlayerStates.IS_DASHING )
-        {
-            dashAnimation.setAnchor( dashStartingPos.sub( getCurrentCells().get(0).toVector() ) );
-            dashAnimation.draw( canvas );
+        playerGUI.draw(canvas);
+        if (state == PlayerStates.IS_DASHING) {
+            dashAnimation.setAnchor(dashStartingPos.sub(getCurrentCells().get(0).toVector()));
+            dashAnimation.draw(canvas);
         }
-        animations[ currentAnimation ][ currentAnimationIndex ].draw( canvas );
+        animations[currentAnimation][currentAnimationIndex].draw(canvas);
     }
 
     /**
@@ -240,11 +233,10 @@ public class ARPGPlayer extends Player {
      * @param btn         (Button): button corresponding to the given orientation, not null
      */
     protected void moveOrientate(Orientation orientation, Button btn) {
-        if ( btn.isDown() )
-        {
+        if (btn.isDown()) {
             if (getOrientation() == orientation) {
                 move(ANIMATION_DURATION);
-            } else{
+            } else {
                 boolean orientationSuccessful = orientate(orientation);
                 if (orientationSuccessful) {
                     setAnimationByOrientation(orientation);
@@ -253,7 +245,8 @@ public class ARPGPlayer extends Player {
             }
         }
     }
-    public void setAnimationByOrientation(Orientation orientation){
+
+    public void setAnimationByOrientation(Orientation orientation) {
         switch (orientation) {
             case UP:
                 currentAnimationIndex = 0;
@@ -269,7 +262,10 @@ public class ARPGPlayer extends Player {
                 break;
         }
         animations[currentAnimation][currentAnimationIndex].reset();
-    };
+    }
+
+    ;
+
     public int getMoney() {
         return inventory.getMoney();
     }
@@ -282,10 +278,10 @@ public class ARPGPlayer extends Player {
         return hp;
     }
 
-    public void giveDamage(float damage){
-        hp-=damage;
-        if(hp<0){
-            hp=0;
+    public void giveDamage(float damage) {
+        hp -= damage;
+        if (hp < 0) {
+            hp = 0;
         }
     }
 
@@ -328,67 +324,56 @@ public class ARPGPlayer extends Player {
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
-        ((ARPGInteractionVisitor)v).interactWith(this);
+        ((ARPGInteractionVisitor) v).interactWith(this);
     }
 
     @Override
-    public void interactWith( Interactable other )
-    {
-        other.acceptInteraction( handler );
+    public void interactWith(Interactable other) {
+        other.acceptInteraction(handler);
     }
 
-    class ARPGPlayerHandler implements ARPGInteractionVisitor
-    {
+    class ARPGPlayerHandler implements ARPGInteractionVisitor {
         @Override
-        public void interactWith( Door door )
-        {
-            if ( door.isOpen() )
-            {
-                setIsPassingADoor( door );
+        public void interactWith(Door door) {
+            if (door.isOpen()) {
+                setIsPassingADoor(door);
             }
         }
 
-        public void interactWith( Coin coin )
-        {
-            inventory.addMoney( coin.getValue() );
+        public void interactWith(Coin coin) {
+            inventory.addMoney(coin.getValue());
             coin.collect();
         }
 
-        public void interactWith( Heart heart )
-        {
+        public void interactWith(Heart heart) {
             hp += 1;
-            if ( hp > maxHP )
-            {
+            if (hp > maxHP) {
                 hp = maxHP;
             }
             heart.collect();
         }
+
         @Override
-        public void interactWith(CastleKey key){
+        public void interactWith(CastleKey key) {
             inventory.addItemToInventory(ARPGItem.CASTLE_KEY);
             key.collect();
         }
 
         @Override
-        public void interactWith( CastleDoor door )
-        {
-            if (!door.isOpen() && inventory.getCurrentItem()==ARPGItem.CASTLE_KEY)
-            {
+        public void interactWith(CastleDoor door) {
+            if (!door.isOpen() && inventory.getCurrentItem() == ARPGItem.CASTLE_KEY) {
                 door.openDoor();
-            } else if(door.isOpen()){
+            } else if (door.isOpen()) {
                 door.passDoor();
                 setIsPassingADoor(door);
-            }else
-            {
+            } else {
                 System.out.println("You need the key");
             }
         }
 
         @Override
-        public void interactWith( Grass grass )
-        {
-            if ( state.isCloseRangeAttacking() )
-            {
+        public void interactWith(Grass grass) {
+            if (state.isCloseRangeAttacking()) {
                 grass.cutGrass();
             }
         }
@@ -399,18 +384,16 @@ public class ARPGPlayer extends Player {
          */
 
         @Override
-        public void interactWith( FlameSkull skull ) {
+        public void interactWith(FlameSkull skull) {
             System.out.println("flameskull player");
             giveDamage(1f);
             skull.setHasAttacked();
         }
 
         @Override
-        public void interactWith( Monster monster )
-        {
-            if ( state.isCloseRangeAttacking() )
-            {
-                monster.giveDamage( getEquippedItem().getDamage(), getEquippedItem().getVuln() );
+        public void interactWith(Monster monster) {
+            if (state.isCloseRangeAttacking()) {
+                monster.giveDamage(getEquippedItem().getDamage(), getEquippedItem().getVuln());
             }
         }
     }

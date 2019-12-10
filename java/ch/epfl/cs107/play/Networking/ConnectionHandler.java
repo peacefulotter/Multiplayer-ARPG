@@ -15,7 +15,8 @@ public class ConnectionHandler implements Runnable{
     private boolean isServer;
     private NARPG game;
     private Socket socket;
-    private PrintWriter out;
+    private OutputStream out;
+    private BufferedReader in;
     public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer){
         this.socket=socket;
         this.isServer=isServer;
@@ -33,23 +34,31 @@ public class ConnectionHandler implements Runnable{
         }
     }
     public void sendData(String data){
-        out.println(data);
+        sendData(data.getBytes());
+    }
+    public void sendData(byte[] data){
+        try{
+            var dos=new DataOutputStream(out);
+            dos.writeInt(data.length);
+            dos.write(data,0,data.length);
+        }catch (IOException e){
+            e.printStackTrace();
+            e.printStackTrace();        }
     }
     private void processIncomingData(InputStream inStream, OutputStream outStream) throws IOException{
-        String msg;
-        var in= new Scanner(inStream, StandardCharsets.UTF_8);
-        out= new PrintWriter(new OutputStreamWriter(outStream,StandardCharsets.UTF_8),true);
+        out= outStream;
         boolean done=false;
-        while (!done && in.hasNextLine()) { //in = new BufferedReader(new
+        while (!done) { //in = new BufferedReader(new
             // InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
-            msg=in.nextLine();
-            if(isServer){
-                System.out.println(msg);
-                game.updatePlayerState(Integer.parseInt(msg));
+            DataInputStream dis= new DataInputStream(inStream);
+            int len=dis.readInt();
+            byte[] data =new byte[len];
+            if(len>0){
+                dis.readFully(data);
             }
-            if(msg.trim().equals("BYE")){
-                out.println("bye");
-                done=true;
+
+            if(isServer){
+                System.out.println(data.toString());
             }
         }
     }

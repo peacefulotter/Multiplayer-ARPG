@@ -54,22 +54,7 @@ public class Arrow extends Projectile {
         sprite.draw(canvas);
     }
 
-    private enum Directions {
-        UP(0),
-        RIGHT(1),
-        DOWN(2),
-        LEFT(3);
-        private int directionIndex;
 
-        Directions(int directionIndex) {
-            this.directionIndex = directionIndex;
-        }
-
-        public int value() {
-            return this.directionIndex;
-        }
-
-    }
 
     @Override
     public void interactWith(Interactable other) {
@@ -99,5 +84,21 @@ public class Arrow extends Projectile {
             stopProjectile();
             bomb.explode();
         }
+    }
+    private enum Directions {
+        UP(0),
+        RIGHT(1),
+        DOWN(2),
+        LEFT(3);
+        private int directionIndex;
+
+        Directions(int directionIndex) {
+            this.directionIndex = directionIndex;
+        }
+
+        public int value() {
+            return this.directionIndex;
+        }
+
     }
 }

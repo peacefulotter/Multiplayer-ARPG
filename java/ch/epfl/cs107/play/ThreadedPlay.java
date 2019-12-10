@@ -26,7 +26,6 @@ public class ThreadedPlay implements Runnable {
     private final Game game;
     private final Window window;
     private Dimension screenSize;
-    private ConnectionHandler connectionHandler;
 
     public ThreadedPlay(Game game) {
 
@@ -43,10 +42,7 @@ public class ThreadedPlay implements Runnable {
         //RecordReplayer replayer = new RecordReplayer(window); // not used in this project
     }
 
-    public void setConnectionHandler(ConnectionHandler connectionHandler){
-        this.connectionHandler= connectionHandler;
-        ((NARPG)game).setConnectionHandler(connectionHandler);
-    }
+
 
     @Override
     public void run() {
