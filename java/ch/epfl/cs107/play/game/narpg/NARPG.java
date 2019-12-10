@@ -14,7 +14,6 @@ import ch.epfl.cs107.play.game.narpg.actor.NetworkedBomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Window;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class NARPG extends ARPG {
             createAreas();
             Area area = setCurrentArea("zelda/Ferme", true);
             if(!isServer){
-                var player = new NetworkARPGPlayer(getCurrentArea(), Orientation.DOWN, new DiscreteCoordinates(6, 10), connection);
+                var player = new NetworkARPGPlayer(getCurrentArea(), Orientation.DOWN, new DiscreteCoordinates(6, 10), connection,true);
                 initPlayer(player);
                 new Packet00Spawn(player.getId(), NetworkEntities.PLAYER, player.getOrientation(),player.getCurrentCells().get(0),getCurrentArea()).writeData(connection);
                 players.add(player);
@@ -57,8 +56,18 @@ public class NARPG extends ARPG {
         System.out.println(packet.getObjectId());
     }
     public void moveObject(Packet02Move packet){
+        System.out.println(networkEntities.size());
         for(NetworkEntity p: networkEntities){
-            if(p.isMovable)
+            if(p.isMovable() && packet.getObjectId()==p.getId()){
+                if(p instanceof NetworkARPGPlayer){
+                    if(!((NetworkARPGPlayer) p).isClientAuthority()){
+                        ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),5,packet.getStart());
+                    }
+                    return;
+                }
+                ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),5,packet.getStart());
+
+            }
         }
     }
 
@@ -70,9 +79,8 @@ public class NARPG extends ARPG {
                     return false;
                 }
             }
-            var newPlayer = new NetworkARPGPlayer(getCurrentArea(),packet.getOrientation(),packet.getDiscreteCoordinate(),connection);
-            System.out.println(packet.getDiscreteCoordinate());
-            System.out.println(newPlayer.getPosition());
+            var newPlayer = new NetworkARPGPlayer(getCurrentArea(),packet.getOrientation(),packet.getDiscreteCoordinate(),connection, false);
+            newPlayer.setId(packet.getObjectId());
             players.add(newPlayer);
             networkEntities.add(newPlayer);
             getCurrentArea().registerActor(newPlayer);

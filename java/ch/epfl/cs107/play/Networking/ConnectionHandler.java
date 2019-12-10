@@ -4,6 +4,7 @@ package ch.epfl.cs107.play.Networking;
 import ch.epfl.cs107.play.Networking.Packets.Packet;
 import ch.epfl.cs107.play.Networking.Packets.Packet.PacketTypes;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
+import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.narpg.NARPG;
 
@@ -77,10 +78,14 @@ public class ConnectionHandler implements Runnable {
             case INVALID:
                 break;
             case LOGIN:
-                Packet00Spawn packet= new Packet00Spawn(data);
-                game.spawnObject(packet);
+                Packet00Spawn spawnPacket= new Packet00Spawn(data);
+                game.spawnObject(spawnPacket);
                 break;
             case DISCONNECT:
+                break;
+            case MOVE:
+                Packet02Move movePacket = new Packet02Move(data);
+                game.moveObject(movePacket);
                 break;
         }
 

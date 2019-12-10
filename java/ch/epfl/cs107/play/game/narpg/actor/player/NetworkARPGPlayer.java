@@ -15,6 +15,7 @@ import java.util.Random;
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
     private Connection connection;
     private int id;
+    private boolean clientAuthority;
     /**
      * Default Player constructor
      *
@@ -22,10 +23,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      * @param orientation (Orientation): Initial player orientation, not null
      * @param coordinates (Coordinates): Initial position, not null
      */
-    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection) {
+    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
         super(area, orientation, coordinates);
         this.connection = connection;
         this.id= IdGenerator.generateId();
+        this.clientAuthority=clientAuthority;
     }
 
     @Override
@@ -41,6 +43,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
             }
 
             if(moved){
+                System.out.println("sending move");
                 Packet02Move packet = new Packet02Move(id,getOrientation(),getCurrentMainCellCoordinates());
                 packet.writeData(connection);
             }
@@ -65,18 +68,23 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void setPosition(DiscreteCoordinates position) {
-        setPosition(position);
     }
 
     @Override
     public void setOrientation(Orientation orientation) {
-        setOrientation(orientation);
+        orientate(orientation);
     }
 
     @Override
-    public void move(Orientation orientation, int Speed, DiscreteCoordinates startPosition) {
-        setOrientation(orientation);
-        setPosition(startPosition);
-        move(Speed);
+    public void networkMove(Orientation orientation, int Speed, DiscreteCoordinates startPosition) {
+        moveOrientate(orientation);
+    }
+
+    public void setId(int objectId) {
+        this.id=objectId;
+    }
+
+    public boolean isClientAuthority() {
+        return clientAuthority;
     }
 }

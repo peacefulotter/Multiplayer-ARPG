@@ -234,15 +234,18 @@ public class ARPGPlayer extends Player {
      */
     protected void moveOrientate(Orientation orientation, Button btn) {
         if (btn.isDown()) {
-            if (getOrientation() == orientation) {
-                move(ANIMATION_DURATION);
-            } else {
-                boolean orientationSuccessful = orientate(orientation);
-                if (orientationSuccessful) {
-                    setAnimationByOrientation(orientation);
-                }
-
+            moveOrientate(orientation);
+        }
+    }
+    protected void moveOrientate(Orientation orientation){
+        if (getOrientation() == orientation) {
+            move(ANIMATION_DURATION);
+        } else {
+            boolean orientationSuccessful = orientate(orientation);
+            if (orientationSuccessful) {
+                setAnimationByOrientation(orientation);
             }
+
         }
     }
 
