@@ -10,8 +10,8 @@ public enum PlayerInput {
     USE_ITEM(Keyboard.SPACE, true),
     DASH(Keyboard.A,false);
 
-    private int keyCode;
-    private boolean canHoldDown;
+    private final int keyCode;
+    private final boolean canHoldDown;
 
     PlayerInput(int keyCode, boolean canHoldDown){
         this.keyCode=keyCode;

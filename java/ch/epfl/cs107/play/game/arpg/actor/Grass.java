@@ -39,7 +39,7 @@ public class Grass extends AreaEntity {
         Sprite[] animationSprites = new Sprite[4];
 
         for (int i = 0; i < 4; i++) {
-            animationSprites[i] = new Sprite("zelda/grass.sliced", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, grassDepth);
+            animationSprites[i] = new Sprite("zelda/grass.sliced", 1.5f, 1.5f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, grassDepth);
         }
 
         grassAnimation = new Animation(8, animationSprites, false);

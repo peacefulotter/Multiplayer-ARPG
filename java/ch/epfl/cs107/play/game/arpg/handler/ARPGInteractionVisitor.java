@@ -3,7 +3,9 @@ package ch.epfl.cs107.play.game.arpg.handler;
 import ch.epfl.cs107.play.game.arpg.ARPGBehavior;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
+import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
+import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.inventory.items.CastleKey;
@@ -18,9 +20,10 @@ public interface ARPGInteractionVisitor extends RPGInteractionVisitor
     default void interactWith( Coin coin ) {}
     default void interactWith( Heart heart ) {}
     default void interactWith( FlameSkull flameSkull ) {}
+    default void interactWith( LogMonster logMonster ) {}
     default void interactWith( Monster monster ) {}
-    default void interactWith(CastleDoor door){}
-    default void interactWith(CastleKey key){}
-    default void interactWith(Bomb bomb){}
+    default void interactWith( CastleDoor door ){}
+    default void interactWith( CastleKey key ){}
+    default void interactWith( Bomb bomb ){}
 
 }

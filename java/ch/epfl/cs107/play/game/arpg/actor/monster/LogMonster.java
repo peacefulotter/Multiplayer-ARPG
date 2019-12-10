@@ -47,8 +47,7 @@ public class LogMonster extends Monster
 
     public LogMonster(Area area, DiscreteCoordinates coords )
     {
-        super(area, Orientation.DOWN,
-                new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT}, coords,
+        super(area, coords, new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT},
                 "LogMonster", "zelda/logMonster",
                 MAX_HP, 1f, 4, new Vector( -0.5f, 0 ), Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
         Sprite[] sleepingAnimationSprites = new Sprite[4];

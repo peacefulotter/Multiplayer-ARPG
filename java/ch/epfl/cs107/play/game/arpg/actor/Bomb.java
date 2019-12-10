@@ -6,6 +6,8 @@ import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.ARPGBehavior;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
+import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
@@ -150,10 +152,18 @@ public class Bomb extends AreaEntity implements Interactor {
             player.giveDamage( BOMB_DAMAGE );
         }
 
+        @Override
         public void interactWith( FlameSkull flameSkull )
         {
             explode();
             flameSkull.giveDamage( BOMB_DAMAGE, Vulnerabilities.CLOSE_RANGE );
+        }
+
+        @Override
+        public void interactWith( LogMonster logMonster )
+        {
+            System.out.println("ouch");
+            logMonster.giveDamage( 1f, Vulnerabilities.CLOSE_RANGE );
         }
     }
 
