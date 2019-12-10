@@ -2,11 +2,7 @@ package ch.epfl.cs107.play;
 
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.ConnectionHandler;
-import ch.epfl.cs107.play.Networking.EchoThreadedHandler;
-import ch.epfl.cs107.play.game.Game;
-import ch.epfl.cs107.play.game.areagame.actor.Interactor;
-import ch.epfl.cs107.play.game.arpg.ARPG;
-import ch.epfl.cs107.play.game.arpg.NARPG;
+import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -18,7 +14,7 @@ public class Server implements Connection {
     private List<ConnectionHandler> connections = new ArrayList<ConnectionHandler>();
 
     public Server(int port) {
-        NARPG game = new NARPG(true);
+        NARPG game = new NARPG(true,this);
         Thread GameThread = new Thread(new ThreadedPlay(game));
         GameThread.start();
         try {
@@ -27,7 +23,7 @@ public class Server implements Connection {
             while (true) {
                 Socket incoming = server.accept();
                 System.out.println("Welcome : " + num);
-                ConnectionHandler handler = new ConnectionHandler(incoming, game, true);
+                ConnectionHandler handler = new ConnectionHandler(incoming, game, true, this);
                 connections.add(handler);
                 Thread thread = new Thread(handler);
                 thread.start();

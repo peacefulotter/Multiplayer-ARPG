@@ -1,16 +1,13 @@
 package ch.epfl.cs107.play.game.arpg;
 
-import ch.epfl.cs107.play.Play;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
-import ch.epfl.cs107.play.game.arpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.area.*;
 import ch.epfl.cs107.play.game.rpg.RPG;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.signal.logic.Or;
 import ch.epfl.cs107.play.window.Window;
 
 public class ARPG extends RPG {
@@ -19,7 +16,7 @@ public class ARPG extends RPG {
             "zelda/Village",
             "zelda/Route"
     };
-    protected ARPGPlayer player;
+    private ARPGPlayer player;
 
     public ARPG() {
         super();

@@ -6,7 +6,7 @@ import ch.epfl.cs107.play.Server;
 
 public abstract class Packet {
     public byte packetId;
-    private int objectId;
+    protected int objectId;
 
     public Packet(int packetId, int objectId) {
         this.packetId = (byte) packetId;
@@ -17,7 +17,13 @@ public abstract class Packet {
         this.objectId= Integer.parseInt(message[0]);
     }
 
-
+    public static PacketTypes lookupPacket(String packetId){
+        try{
+            return lookUpPacket(Integer.parseInt(packetId));
+        }catch (NumberFormatException e){
+            return PacketTypes.INVALID;
+        }
+    }
     public static PacketTypes lookUpPacket(int id) {
         for (PacketTypes p : PacketTypes.values()) {
             if (p.getPacketID() == id) {
@@ -41,7 +47,8 @@ public abstract class Packet {
     public abstract byte[] getData();
 
     public static enum PacketTypes {
-        INVALID(-1), LOGIN(00), DISCONNECT(01);
+        INVALID(-1), LOGIN(00), DISCONNECT(01),
+        UPDATE(10),MOVE(11);
 
         private int packetID;
 
