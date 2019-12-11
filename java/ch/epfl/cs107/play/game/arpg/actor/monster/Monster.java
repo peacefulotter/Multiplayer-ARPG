@@ -2,6 +2,7 @@ package ch.epfl.cs107.play.game.arpg.actor.monster;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
+import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RandomGenerator;
@@ -29,19 +30,19 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     private List<Vulnerabilities> vulnerabilities;
     protected Animation deathAnimation;
     private Animation[] movementAnimation;
-    private int currentAnimationIndex = 2;
+    protected int currentAnimationIndex = 2;
 
     public Monster(
-            Area area, Orientation orientation, Orientation[] orientations, DiscreteCoordinates coords,
+            Area area, DiscreteCoordinates position, Orientation[] orientations,
             String name, String spriteName, float maxHealth, float damage, int nbFrames,
-            Vector spriteOffset, Vulnerabilities ... vulnerabilities )
+            Vector spriteOffset, Vulnerabilities... vulnerabilities)
     {
-        super( area, orientation, coords );
+        super( area, Orientation.DOWN, position );
         this.name = name;
         this.maxHealth = maxHealth;
         currentHealth = maxHealth;
         currentCells = new ArrayList<>();
-        currentCells.add( coords );
+        currentCells.add( position );
         isDead = false;
         PLAYER_DAMAGE = damage;
         this.orientations = orientations;
@@ -133,7 +134,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         }
     }
 
-    private Orientation getRandomOrientation()
+    protected Orientation getRandomOrientation()
     {
         int random = RandomGenerator.getInstance().nextInt( 3 );
         return Orientation.fromInt( random );

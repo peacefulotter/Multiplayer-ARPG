@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.game.arpg.area;
 import ch.epfl.cs107.play.game.areagame.actor.Background;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
+import ch.epfl.cs107.play.game.arpg.actor.monster.DarkLord;
 import ch.epfl.cs107.play.game.arpg.inventory.items.CastleKey;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.io.FileSystem;
@@ -17,6 +18,7 @@ public class RouteChateau extends ARPGArea {
         registerActor(new Door("zelda/Route",new DiscreteCoordinates(9,18), Logic.TRUE, this ,Orientation.DOWN,new DiscreteCoordinates(9,0),new DiscreteCoordinates(10,0)));
         registerActor(new CastleDoor(this));
         registerActor(new CastleKey(this, new DiscreteCoordinates(9,10)));
+        registerActor( new DarkLord( this, new DiscreteCoordinates( 9, 12 ) ) );
     }
 
 
