@@ -206,6 +206,10 @@ public abstract class MovableAreaEntity extends AreaEntity {
     	}
         return !displacementOccurs && super.orientate(orientation);
     }
+    protected  boolean orientate(Orientation orientation, boolean force){
+        if(!force) return orientate(orientation);
+        return super.orientate(orientation);
+    }
 
 
     /// MovableAreaEntity implements Actor

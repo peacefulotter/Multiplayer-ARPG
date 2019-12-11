@@ -1,65 +1,94 @@
 package ch.epfl.cs107.play.Networking;
 
 
-import ch.epfl.cs107.play.game.arpg.ARPG;
-import ch.epfl.cs107.play.game.arpg.NARPG;
+import ch.epfl.cs107.play.Networking.Packets.Packet;
+import ch.epfl.cs107.play.Networking.Packets.Packet.PacketTypes;
+import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
+import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
+import ch.epfl.cs107.play.Server;
+import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 
-public class ConnectionHandler implements Runnable{
+public class ConnectionHandler implements Runnable {
     private boolean isServer;
     private NARPG game;
     private Socket socket;
     private OutputStream out;
     private BufferedReader in;
-    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer){
-        this.socket=socket;
-        this.isServer=isServer;
-        this.game=arpg;
+    private Connection connection;
+
+    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection) {
+        this.socket = socket;
+        this.isServer = isServer;
+        this.game = arpg;
+        this.connection=connection;
     }
 
     @Override
     public void run() {
-        try(InputStream inStream = socket.getInputStream();
-            OutputStream outStream = socket.getOutputStream()){
+        try (InputStream inStream = socket.getInputStream();
+             OutputStream outStream = socket.getOutputStream()) {
             processIncomingData(inStream, outStream);
 
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    public void sendData(String data){
+
+    public void sendData(String data) {
         sendData(data.getBytes());
     }
-    public void sendData(byte[] data){
-        try{
-            var dos=new DataOutputStream(out);
+
+    public void sendData(byte[] data) {
+        try {
+            var dos = new DataOutputStream(out);
             dos.writeInt(data.length);
-            dos.write(data,0,data.length);
-        }catch (IOException e){
+            dos.write(data, 0, data.length);
+        } catch (IOException e) {
             e.printStackTrace();
-            e.printStackTrace();        }
+        }
     }
-    private void processIncomingData(InputStream inStream, OutputStream outStream) throws IOException{
-        out= outStream;
-        boolean done=false;
+
+    private void processIncomingData(InputStream inStream, OutputStream outStream) throws IOException {
+        out = outStream;
+        boolean done = false;
         while (!done) { //in = new BufferedReader(new
             // InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
-            DataInputStream dis= new DataInputStream(inStream);
-            int len=dis.readInt();
-            byte[] data =new byte[len];
-            if(len>0){
+            DataInputStream dis = new DataInputStream(inStream);
+            int len = dis.readInt();
+            byte[] data = new byte[len];
+            if (len > 0) {
                 dis.readFully(data);
             }
 
-            if(isServer){
-                System.out.println(data.toString());
+            if (isServer) {
+                ((Server)connection).sendDataToAllClients(data);
             }
+            parsePacket(data);
         }
     }
+    private void parsePacket(byte[] data){
+        String message=new String(data).trim();
+        PacketTypes type= Packet.lookupPacket(message.substring(0,2));
+        switch(type){
+            default:
+            case INVALID:
+                break;
+            case LOGIN:
+                Packet00Spawn spawnPacket= new Packet00Spawn(data);
+                game.spawnObject(spawnPacket);
+                break;
+            case DISCONNECT:
+                break;
+            case MOVE:
+                Packet02Move movePacket = new Packet02Move(data);
+                game.moveObject(movePacket);
+                break;
+        }
+
+    }
+
 }

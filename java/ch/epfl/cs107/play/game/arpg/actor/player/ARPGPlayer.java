@@ -4,7 +4,6 @@ import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
-import ch.epfl.cs107.play.game.arpg.actor.monster.FireSpell;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
@@ -234,16 +233,19 @@ public class ARPGPlayer extends Player {
      * @param btn         (Button): button corresponding to the given orientation, not null
      */
     protected void moveOrientate(Orientation orientation, Button btn) {
-        if ( btn.isDown() ) {
-            if ( getOrientation() == orientation ) {
-                move( ANIMATION_DURATION );
-            } else {
-                boolean orientationSuccessful = orientate(orientation);
-                if (orientationSuccessful) {
-                    setAnimationByOrientation(orientation);
-                }
-
+        if (btn.isDown()) {
+            moveOrientate(orientation);
+        }
+    }
+    protected void moveOrientate(Orientation orientation){
+        if (getOrientation() == orientation) {
+            move(ANIMATION_DURATION);
+        } else {
+            boolean orientationSuccessful = orientate(orientation);
+            if (orientationSuccessful) {
+                setAnimationByOrientation(orientation);
             }
+
         }
     }
 
