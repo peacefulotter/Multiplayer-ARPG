@@ -53,11 +53,9 @@ public class FlameSkull extends Monster implements FlyableEntity
         return (!isDead && !hasAttacked);
     }
 
-    protected void onMove() {
-        hasAttacked = false;
-    }
+    protected void onMove() { hasAttacked = false; }
     public void setHasAttacked(){
-        hasAttacked=true;
+        hasAttacked = true;
     }
 
     @Override

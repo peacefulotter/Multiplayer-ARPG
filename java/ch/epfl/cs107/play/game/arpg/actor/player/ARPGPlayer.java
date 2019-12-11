@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
+import ch.epfl.cs107.play.game.arpg.actor.monster.FireSpell;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
@@ -74,7 +75,7 @@ public class ARPGPlayer extends Player {
         Sprite[][] staffSprites = RPGSprite.extractSprites("zelda/player.staff_water", 4, 2, 2, this, 32, 32, new Vector(-0.5f, 0), new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
         Sprite[] dashAnimationSprites = new Sprite[5];
         for (int i = 2; i < 7; i++) {
-            dashAnimationSprites[i - 2] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, 1);
+            dashAnimationSprites[i - 2] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, -100);
         }
         dashAnimation = new Animation(5, dashAnimationSprites, false);
 
@@ -233,9 +234,9 @@ public class ARPGPlayer extends Player {
      * @param btn         (Button): button corresponding to the given orientation, not null
      */
     protected void moveOrientate(Orientation orientation, Button btn) {
-        if (btn.isDown()) {
-            if (getOrientation() == orientation) {
-                move(ANIMATION_DURATION);
+        if ( btn.isDown() ) {
+            if ( getOrientation() == orientation ) {
+                move( ANIMATION_DURATION );
             } else {
                 boolean orientationSuccessful = orientate(orientation);
                 if (orientationSuccessful) {

@@ -23,7 +23,7 @@ public class LogMonster extends Monster
     private static final float MIN_SLEEPING_DURATION = 2;
     private static final float MAX_SLEEPING_DURATION = 3;
     private static final float MAX_TIME_ATTACK = 2;
-    private static final int MAX_HP=4;
+    private static final int MAX_HP = 4;
     private static final Random random = new Random();
 
     private final logMonsterHandler handler;
@@ -189,27 +189,21 @@ public class LogMonster extends Monster
     {
         DiscreteCoordinates cell = getCurrentCells().get(0);
         List<DiscreteCoordinates> viewCells = new ArrayList<>();
-        int x = 0; int y = 0;
+        Vector orientationVector = getOrientation().toVector();
 
-        switch ( getOrientation() )
+        int maxView = 0;
+        switch ( state )
         {
-            case UP:
-                y = 1;
+            case IS_ATTACKING:
+                maxView = 1;
                 break;
-            case DOWN:
-                y = -1;
-                break;
-            case LEFT:
-                x = -1;
-                break;
-            case RIGHT:
-                x = 1;
-                break;
+            case IS_IDLE:
+                maxView = 10;
         }
 
-        for ( int i = 0; i < 10; i++ )
+        for ( int i = 1; i < maxView+1; i++ )
         {
-            viewCells.add( new DiscreteCoordinates( cell.x + (i*x), cell.y + (i*y) ) );
+            viewCells.add( new DiscreteCoordinates( cell.x + (i*(int)orientationVector.x), cell.y + (i*(int)orientationVector.y) ) );
         }
         return viewCells;
     }
@@ -223,7 +217,7 @@ public class LogMonster extends Monster
     @Override
     public boolean wantsViewInteraction()
     {
-        return state == LogMonsterState.IS_IDLE;
+        return state == LogMonsterState.IS_IDLE || state == LogMonsterState.IS_ATTACKING;
     }
 
     @Override
@@ -238,10 +232,8 @@ public class LogMonster extends Monster
         public void interactWith( ARPGPlayer player )
         {
             // if the monster is attacking and a player is right next to him
-            System.out.println(getNextCurrentCells().contains( player.getCurrentCells().get(0) ));
-            if ( state == LogMonsterState.IS_ATTACKING && getNextCurrentCells().contains( player.getCurrentCells().get(0) ) )
+            if ( state == LogMonsterState.IS_ATTACKING )
             {
-                System.out.println("damaged");
                 player.giveDamage( PLAYER_DAMAGE );
                 resetAttack();
             }

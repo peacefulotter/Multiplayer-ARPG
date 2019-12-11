@@ -10,6 +10,7 @@ import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,6 +61,12 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                 nbFrames, 2, 2,
                 this, 32, 32, spriteOffset, orientations);
         movementAnimation = RPGSprite.createAnimations(ANIMATION_DURATION, sprites);
+    }
+
+
+    public List<Vulnerabilities> getVulnerabilities()
+    {
+        return vulnerabilities;
     }
 
     @Override
@@ -136,7 +143,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 
     protected Orientation getRandomOrientation()
     {
-        int random = RandomGenerator.getInstance().nextInt( 3 );
+        int random = RandomGenerator.getInstance().nextInt( 4 );
         return Orientation.fromInt( random );
     }
 
