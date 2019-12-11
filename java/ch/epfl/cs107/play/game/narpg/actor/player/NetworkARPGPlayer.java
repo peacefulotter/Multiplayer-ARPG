@@ -2,14 +2,17 @@ package ch.epfl.cs107.play.game.narpg.actor.player;
 
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
+import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
+import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Keyboard;
 
+import java.util.Collections;
 import java.util.Random;
 
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
@@ -28,23 +31,22 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.connection = connection;
         this.id= IdGenerator.generateId();
         this.clientAuthority=clientAuthority;
+        if(!clientAuthority) unReactive=true;
     }
 
     @Override
     public void update(float deltaTime) {
-        if(!connection.isServer()){
+        if(!connection.isServer() && clientAuthority){
             Keyboard keyboard = getOwnerArea().getKeyboard();
-            boolean moved=false;
+            Orientation moved=null;
             if(connection !=null){
-                if(keyboard.get(keyboard.UP).isDown()) moved=true;
-                else if(keyboard.get(keyboard.DOWN).isDown()) moved=true;
-                else if(keyboard.get(keyboard.LEFT).isDown()) moved=true;
-                else if(keyboard.get(keyboard.RIGHT).isDown()) moved=true;
+                if(keyboard.get(keyboard.UP).isDown()) moved=Orientation.UP;
+                else if(keyboard.get(keyboard.DOWN).isDown()) moved=Orientation.DOWN;
+                else if(keyboard.get(keyboard.LEFT).isDown()) moved=Orientation.LEFT;
+                else if(keyboard.get(keyboard.RIGHT).isDown()) moved=Orientation.RIGHT;
             }
-
-            if(moved){
-                System.out.println("sending move");
-                Packet02Move packet = new Packet02Move(id,getOrientation(),getCurrentMainCellCoordinates());
+            if(moved!=null){
+                Packet02Move packet = new Packet02Move(id,moved,getCurrentMainCellCoordinates(),ANIMATION_DURATION);
                 packet.writeData(connection);
             }
         }
@@ -76,8 +78,20 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     }
 
     @Override
-    public void networkMove(Orientation orientation, int Speed, DiscreteCoordinates startPosition) {
-        moveOrientate(orientation);
+    public Packet00Spawn getSpawnPacket() {
+        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(),getCurrentCells().get(0),getOwnerArea());
+    }
+
+    @Override
+    public void networkMove(Orientation orientation, int speed, DiscreteCoordinates startPosition) {
+        if(!isDisplacementOccurs()){
+            super.orientate(orientation);
+            getOwnerArea().leaveAreaCells(this,getCurrentCells());
+            getOwnerArea().enterAreaCells(this,getCurrentCells());
+            setCurrentPosition(startPosition.toVector());
+            setAnimationByOrientation(orientation);
+            move(speed);
+        }
     }
 
     public void setId(int objectId) {

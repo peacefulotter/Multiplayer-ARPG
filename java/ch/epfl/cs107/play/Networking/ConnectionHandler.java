@@ -4,6 +4,7 @@ package ch.epfl.cs107.play.Networking;
 import ch.epfl.cs107.play.Networking.Packets.Packet;
 import ch.epfl.cs107.play.Networking.Packets.Packet.PacketTypes;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
+import ch.epfl.cs107.play.Networking.Packets.Packet01Login;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.narpg.NARPG;
@@ -19,12 +20,24 @@ public class ConnectionHandler implements Runnable {
     private OutputStream out;
     private BufferedReader in;
     private Connection connection;
+    private long connectionId;
 
-    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection) {
+    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection,long connectionId) {
         this.socket = socket;
         this.isServer = isServer;
         this.game = arpg;
         this.connection=connection;
+        this.connectionId=connectionId;
+    }
+    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection) {
+        this.socket = socket;
+        this.isServer = isServer;
+        this.game = arpg;
+        this.connection = connection;
+    }
+
+    public long getConnectionId() {
+        return connectionId;
     }
 
     @Override
@@ -72,16 +85,19 @@ public class ConnectionHandler implements Runnable {
     }
     private void parsePacket(byte[] data){
         String message=new String(data).trim();
+        if(message.length()<2) return;
         PacketTypes type= Packet.lookupPacket(message.substring(0,2));
         switch(type){
             default:
             case INVALID:
                 break;
-            case LOGIN:
+            case SPAWN:
                 Packet00Spawn spawnPacket= new Packet00Spawn(data);
                 game.spawnObject(spawnPacket);
                 break;
-            case DISCONNECT:
+            case LOGIN:
+                Packet01Login loginPacket = new Packet01Login(data);
+                game.login(loginPacket.getConnectionId());
                 break;
             case MOVE:
                 Packet02Move movePacket = new Packet02Move(data);

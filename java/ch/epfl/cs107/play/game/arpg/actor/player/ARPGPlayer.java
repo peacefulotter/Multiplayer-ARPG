@@ -35,9 +35,9 @@ import java.util.List;
 
 public class ARPGPlayer extends Player {
     /// Animation duration in frame number
-    private final static int ANIMATION_DURATION = 8;
+    protected final static int ANIMATION_DURATION = 8;
     private final ARPGPlayerHandler handler;
-
+    protected boolean unReactive = false;
     private PlayerStates state;
     private float hp;
     private int maxHP = 5;
@@ -45,13 +45,9 @@ public class ARPGPlayer extends Player {
     private int currentAnimation = 0;
     private int currentAnimationIndex = 2;
     private boolean wantsInteraction = false;
-
-
     private ARPGItem currentItem;
     private ARPGInventory inventory;
-
     private ARPGPlayerStatusGUI playerGUI;
-
     private Vector dashStartingPos;
     private Animation dashAnimation;
 
@@ -82,7 +78,7 @@ public class ARPGPlayer extends Player {
                 RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites, true),
                 RPGSprite.createAnimations(ANIMATION_DURATION / 2, swordSprites, false),
                 RPGSprite.createAnimations(ANIMATION_DURATION / 2, bowSprites, false),
-                RPGSprite.createAnimations(ANIMATION_DURATION/2,staffSprites,false)
+                RPGSprite.createAnimations(ANIMATION_DURATION / 2, staffSprites, false)
         };
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
@@ -105,7 +101,10 @@ public class ARPGPlayer extends Player {
                 return;
             }
         }
-
+        if (unReactive) {
+            super.update(deltaTime);
+            return;
+        }
         Keyboard keyboard = getOwnerArea().getKeyboard();
         Mouse mouse = getOwnerArea().getMouse();
         // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
@@ -199,10 +198,10 @@ public class ARPGPlayer extends Player {
                     currentAnimation = 2;
                 }
             case STAFF:
-                if(state==state.IDLE){
-                    state= PlayerStates.ATTACKING_STAFF;
-                    getOwnerArea().registerActor(new MagicProjectile(getOwnerArea(),getOrientation(),getCurrentMainCellCoordinates().jump(getOrientation().toVector()),2,5));
-                    currentAnimation=3;
+                if (state == state.IDLE) {
+                    state = PlayerStates.ATTACKING_STAFF;
+                    getOwnerArea().registerActor(new MagicProjectile(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                    currentAnimation = 3;
                 }
         }
     }
@@ -237,7 +236,8 @@ public class ARPGPlayer extends Player {
             moveOrientate(orientation);
         }
     }
-    protected void moveOrientate(Orientation orientation){
+
+    protected void moveOrientate(Orientation orientation) {
         if (getOrientation() == orientation) {
             move(ANIMATION_DURATION);
         } else {

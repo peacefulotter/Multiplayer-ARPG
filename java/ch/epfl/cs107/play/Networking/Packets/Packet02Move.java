@@ -11,22 +11,28 @@ public class Packet02Move extends Packet {
     private Orientation orientation;
     private int startX;
     private int startY;
-
-    public Packet02Move(int objectId, Orientation orientation, DiscreteCoordinates start) {
+    private int speed;
+    public Packet02Move(int objectId, Orientation orientation, DiscreteCoordinates start, int speed) {
         super(02, objectId);
         this.objectId = objectId;
         this.orientation = orientation;
         this.startX = start.x;
         this.startY = start.y;
+        this.speed = speed;
     }
+
     public Packet02Move(byte[] data) {
         super(02, data);
         String[] dataArray = readData(data).split(",");
         this.orientation = OrientationValues.getOrientationByValue(Integer.parseInt(dataArray[1]));
         this.startX = Integer.parseInt(dataArray[2]);
         this.startY = Integer.parseInt(dataArray[3]);
+        this.speed = Integer.parseInt(dataArray[4]);
     }
 
+    public int getSpeed() {
+        return speed;
+    }
 
     public Orientation getOrientation() {
         return orientation;
@@ -46,7 +52,7 @@ public class Packet02Move extends Packet {
         return ("02" + this.objectId + ","
                 + OrientationValues.getOrientationValue(this.orientation) + ","
                 + this.startX + ","
-                + this.startY).getBytes();
+                + this.startY + "," + this.speed).getBytes();
     }
 
 

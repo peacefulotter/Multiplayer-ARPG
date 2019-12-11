@@ -1,10 +1,12 @@
 package ch.epfl.cs107.play.game.narpg;
 
+import ch.epfl.cs107.play.Client;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
+import ch.epfl.cs107.play.Networking.Packets.Packet01Login;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -39,6 +41,7 @@ public class NARPG extends ARPG {
             createAreas();
             Area area = setCurrentArea("zelda/Ferme", true);
             if(!isServer){
+                ((Client) connection).login();
                 var player = new NetworkARPGPlayer(getCurrentArea(), Orientation.DOWN, new DiscreteCoordinates(6, 10), connection,true);
                 initPlayer(player);
                 new Packet00Spawn(player.getId(), NetworkEntities.PLAYER, player.getOrientation(),player.getCurrentCells().get(0),getCurrentArea()).writeData(connection);
@@ -52,20 +55,17 @@ public class NARPG extends ARPG {
     }
 
 
-    public void updateState(Packet packet) {
-        System.out.println(packet.getObjectId());
-    }
     public void moveObject(Packet02Move packet){
-        System.out.println(networkEntities.size());
+        System.out.println(packet.getObjectId());
         for(NetworkEntity p: networkEntities){
             if(p.isMovable() && packet.getObjectId()==p.getId()){
                 if(p instanceof NetworkARPGPlayer){
                     if(!((NetworkARPGPlayer) p).isClientAuthority()){
-                        ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),5,packet.getStart());
+                        ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),packet.getSpeed(),packet.getStart());
                     }
                     return;
                 }
-                ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),5,packet.getStart());
+                ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),packet.getSpeed(),packet.getStart());
 
             }
         }
@@ -90,4 +90,10 @@ public class NARPG extends ARPG {
         if(object==NetworkEntities.BOMB) new NetworkedBomb(getCurrentArea(),packet.getOrientation(),packet.getDiscreteCoordinate(),connection);
         return  true;
     };
+    public void login(long mainId){
+        for(NetworkEntity p: networkEntities){
+            var packet = p.getSpawnPacket();
+            packet.writeData(connection);
+        }
+    }
 }
