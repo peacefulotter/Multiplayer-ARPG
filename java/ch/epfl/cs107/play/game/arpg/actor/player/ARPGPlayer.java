@@ -5,10 +5,7 @@ import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.ARPG;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
-import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
-import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
-import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
-import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
+import ch.epfl.cs107.play.game.arpg.actor.monster.*;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.MagicProjectile;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
@@ -363,40 +360,54 @@ public class ARPGPlayer extends Player {
         }
 
         @Override
-        public void interactWith(CastleKey key) {
-            inventory.addItemToInventory(ARPGItem.CASTLE_KEY);
+        public void interactWith( FireSpell fireSpell )
+        {
+            if ( !fireSpell.hasAttacked )
+            {
+                giveDamage( fireSpell.getDamage() );
+                fireSpell.hasAttacked = true;
+            }
+        }
+
+        @Override
+        public void interactWith( CastleKey key )
+        {
+            inventory.addItemToInventory( ARPGItem.CASTLE_KEY );
             key.collect();
         }
 
         @Override
-        public void interactWith(CastleDoor door) {
-            if (!door.isOpen() && inventory.getCurrentItem() == ARPGItem.CASTLE_KEY) {
+        public void interactWith( CastleDoor door )
+        {
+            if ( !door.isOpen() && inventory.getCurrentItem() == ARPGItem.CASTLE_KEY )
+            {
                 door.openDoor();
-            } else if (door.isOpen()) {
+            } else if ( door.isOpen() )
+            {
                 door.passDoor();
-                setIsPassingADoor(door);
+                setIsPassingADoor( door );
             } else {
-                System.out.println("You need the key");
+                System.out.println( "You need the key" );
             }
         }
 
         @Override
-        public void interactWith(Grass grass) {
-            if (state.isCloseRangeAttacking()) {
+        public void interactWith( Grass grass )
+        {
+            if ( state.isCloseRangeAttacking() )
+            {
                 grass.cutGrass();
             }
         }
 
-
-        /* PLAYER SHOULDNT INTERACT WITH FLAMESKULL
-         -> FLAMESKULL SHOULD INTERACT WITH PLAYER
-         */
-
         @Override
-        public void interactWith(FlameSkull skull) {
-            System.out.println("flameskull player");
-            giveDamage( 1f );
-            skull.setHasAttacked();
+        public void interactWith( FlameSkull flameSkull )
+        {
+            if ( !flameSkull.hasAttacked )
+            {
+                giveDamage( flameSkull.getDamage() );
+                flameSkull.hasAttacked = true;
+            }
         }
 
         public void interactWith( LogMonster logMonster )

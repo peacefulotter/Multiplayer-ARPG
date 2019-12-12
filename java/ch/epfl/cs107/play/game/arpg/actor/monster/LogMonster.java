@@ -166,8 +166,6 @@ public class LogMonster extends Monster
         timeAttack = 0;
     }
 
-    public void onMove() {}
-
     @Override
     public boolean takeCellSpace()
     {
@@ -243,7 +241,7 @@ public class LogMonster extends Monster
             // if the monster is attacking and a player is right next to him
             if ( state == LogMonsterState.IS_ATTACKING )
             {
-                player.giveDamage( PLAYER_DAMAGE );
+                player.giveDamage( getDamage() );
                 resetAttack();
             }
             // else, the monster saw a player and starts to attack him

@@ -67,6 +67,7 @@ public class MagicProjectile extends Projectile
         @Override
         public void interactWith( DarkLord darkLord )
         {
+            System.out.println("lol");
             darkLord.giveDamage( MAGIC_DAMAGE );
             stopProjectile();
         }

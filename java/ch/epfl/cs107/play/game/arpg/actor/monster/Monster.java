@@ -15,10 +15,10 @@ import java.util.List;
 
 public abstract class Monster extends MovableAreaEntity implements Interactor
 {
-    private final int ANIMATION_DURATION = 10;
-    private final double CRITS_PERCENTAGE = 0.2;
+    private static final float ATTACK_COUNTDOWN = 2f;
+    private static final int ANIMATION_DURATION = 10;
+    private static final double CRITS_PERCENTAGE = 0.2;
 
-    private final Orientation[] orientations;
     private final Sprite critsSprite;
     private final String name;
     private final float maxHealth;
@@ -26,11 +26,13 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     private List<DiscreteCoordinates> currentCells;
     private List<Vulnerabilities> vulnerabilities;
     private Animation[] movementAnimation;
+    private final float inflictDamage;
     private float currentHealth;
+    private float timeAttack;
     private boolean dealtCrits;
+    public boolean hasAttacked;
 
     protected int currentAnimationIndex = 2;
-    protected final float PLAYER_DAMAGE;
     protected Animation deathAnimation;
     protected boolean isDead;
 
@@ -46,9 +48,9 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         currentCells = new ArrayList<>();
         currentCells.add( position );
         isDead = false;
-        PLAYER_DAMAGE = damage;
-        this.orientations = orientations;
-
+        inflictDamage = damage;
+        timeAttack = 0;
+        hasAttacked = false;
         this.vulnerabilities = new ArrayList<>();
         Collections.addAll( this.vulnerabilities, vulnerabilities );
 
@@ -83,6 +85,15 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     {
         if ( !isDead )
         {
+            if ( hasAttacked )
+            {
+                if ( timeAttack > ATTACK_COUNTDOWN )
+                {
+                    hasAttacked = false;
+                    timeAttack = 0;
+                }
+                timeAttack += deltaTime;
+            }
             if ( allowReorientation )
             {
                 Orientation newOrientation = getRandomOrientation();
@@ -118,27 +129,6 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         super.update( deltaTime );
     }
 
-
-    private void changeAnimationIndex( Orientation newOrientation )
-    {
-        switch ( newOrientation )
-        {
-            case UP:
-                currentAnimationIndex = 0;
-                break;
-            case DOWN:
-                currentAnimationIndex = 2;
-                break;
-            case LEFT:
-                currentAnimationIndex = 3;
-                break;
-            case RIGHT:
-                currentAnimationIndex = 1;
-                break;
-        }
-
-    }
-
     @Override
     public void draw( Canvas canvas )
     {
@@ -164,18 +154,36 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         }
     }
 
+
+    private void changeAnimationIndex( Orientation newOrientation )
+    {
+        switch ( newOrientation )
+        {
+            case UP:
+                currentAnimationIndex = 0;
+                break;
+            case DOWN:
+                currentAnimationIndex = 2;
+                break;
+            case LEFT:
+                currentAnimationIndex = 3;
+                break;
+            case RIGHT:
+                currentAnimationIndex = 1;
+                break;
+        }
+
+    }
+
     protected Orientation getRandomOrientation()
     {
         int random = RandomGenerator.getInstance().nextInt( 4 );
         return Orientation.fromInt( random );
     }
 
-    abstract protected void onMove();
-
-    @Override
-    public List<DiscreteCoordinates> getCurrentCells()
+    public float getDamage()
     {
-        return Collections.singletonList( getCurrentMainCellCoordinates() );
+        return inflictDamage;
     }
 
     public void giveDamage( float damage )
@@ -192,6 +200,13 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
             resetMotion();
             isDead = true;
         }
+    }
+
+
+    @Override
+    public List<DiscreteCoordinates> getCurrentCells()
+    {
+        return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
 }

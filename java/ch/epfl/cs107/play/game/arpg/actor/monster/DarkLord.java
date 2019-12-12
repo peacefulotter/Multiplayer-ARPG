@@ -21,9 +21,9 @@ import java.util.Random;
 
 public class DarkLord extends Monster
 {
-    private static final float MIN_SPELL_WAIT_DURATION = 2;
-    private static final float MAX_SPELL_WAIT_DURATION = 4;
-    private static final float FIRESPELL_DAMAGE = 0.5f;
+    private static final float MIN_SPELL_WAIT_DURATION = 1;
+    private static final float MAX_SPELL_WAIT_DURATION = 2;
+    private static final float FIRESPELL_DAMAGE = 0.6f;
     private static final int TELEPORTATION_RADIUS = 7;
     private static final int MAX_TELEPORTATION_TRIES = 10;
     private static final int FOV = 7;
@@ -73,13 +73,10 @@ public class DarkLord extends Monster
         switch ( state )
         {
             case IDLE:
-                //System.out.println("idle");
                 if ( cycleTime >= cycleTimeBound )
                 {
-                    System.out.println("reset");
                     hasTeleported = false;
                     resetCycleTime();
-
                     // instead of switching state depending on a random number
                     // it switches state depending on a boolean
                     if ( random.nextBoolean() )
@@ -94,22 +91,23 @@ public class DarkLord extends Monster
                 cycleTime += deltaTime;
                 super.update( deltaTime );
                 break;
+
             case ATTACKING:
                 finishedSpellAnimation = updateSpellAnimation( deltaTime );
                 if ( finishedSpellAnimation ) { throwMagicFlame(); }
-                System.out.println("attacking");
                 break;
+
             case SUMMONING:
                 finishedSpellAnimation = updateSpellAnimation( deltaTime );
                 if ( finishedSpellAnimation ) { summonFlameSkull(); }
-                System.out.println("summoning");
                 break;
+
             case INVOKE_TP:
                 finishedSpellAnimation = updateSpellAnimation( deltaTime );
                 if ( finishedSpellAnimation ) { state = DarkLordStates.TELEPORTING; }
                 break;
+
             case TELEPORTING:
-                System.out.println("teleporting");
                 teleport();
                 hasTeleported = true;
                 break;
@@ -149,8 +147,6 @@ public class DarkLord extends Monster
         for ( int i = 0; i < 4; i++ )
         {
             Orientation newOrientation = getRandomOrientation();
-            System.out.println(getCurrentCells());
-            System.out.println(getNextCurrentCells());
             boolean isCellAvailable = getOwnerArea().canEnterAreaCells( this, getNextCurrentCells() );
             if ( newOrientation != getOrientation() && isCellAvailable )
             {
@@ -194,30 +190,37 @@ public class DarkLord extends Monster
     private void teleport()
     {
         DiscreteCoordinates currentCell = getCurrentCells().get( 0 );
-        DiscreteCoordinates tpCell;
 
-        int nbTries = 0;
-        boolean canLeave;
         boolean teleported = false;
-        do {
-            canLeave = getOwnerArea().leaveAreaCells( this, Collections.singletonList( currentCell ) );
-            if ( canLeave )
-            {
-                tpCell = new DiscreteCoordinates( getRandomPos(), getRandomPos() );
-                System.out.println(tpCell);
-                System.out.println(getRandomPos());
-                tpCell = currentCell.jump( tpCell.toVector() );
-                teleported = getOwnerArea().enterAreaCells( this, Collections.singletonList( tpCell ) );
-            }
-            System.out.println( canLeave + " " + teleported );
-            nbTries++;
-        } while ( nbTries <= MAX_TELEPORTATION_TRIES && !teleported );
-
+        boolean canLeave = getOwnerArea().leaveAreaCells( this, Collections.singletonList( currentCell ) );
+        if ( canLeave )
+        {
+            teleported = tryTeleportationCells( currentCell );
+        }
         if ( !teleported )
         {
+            setCurrentPosition( currentCell.toVector() );
             getOwnerArea().enterAreaCells(this, Collections.singletonList( currentCell ) );
         }
         state = DarkLordStates.IDLE;
+    }
+
+    private boolean tryTeleportationCells( DiscreteCoordinates origin )
+    {
+        DiscreteCoordinates tpCell;
+        boolean entered;
+        for ( int i = 0; i < MAX_TELEPORTATION_TRIES; i++ )
+        {
+            tpCell = new DiscreteCoordinates( getRandomPos(), getRandomPos() )
+                    .jump ( origin.toVector() );
+            entered = getOwnerArea().enterAreaCells( this, Collections.singletonList( tpCell ) );
+            if ( entered )
+            {
+                setCurrentPosition( tpCell.toVector() );
+                return true;
+            }
+        }
+        return false;
     }
 
     private int getRandomPos()
@@ -234,12 +237,6 @@ public class DarkLord extends Monster
 
 
     @Override
-    protected void onMove()
-    {
-
-    }
-
-    @Override
     public boolean takeCellSpace()
     {
         return !isDead;
@@ -248,7 +245,7 @@ public class DarkLord extends Monster
     @Override
     public boolean isCellInteractable()
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -307,6 +304,7 @@ public class DarkLord extends Monster
                 state = DarkLordStates.INVOKE_TP;
             }
         }
+
     }
 
 }

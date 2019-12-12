@@ -18,7 +18,6 @@ public class FlameSkull extends Monster implements FlyableEntity
     private final float MAX_LIFE_TIME = 15f;
     private final flameSkullHandler handler;
     private float lifeTime;
-    private boolean hasAttacked=false;
 
     public FlameSkull( Area area, DiscreteCoordinates coords )
     {
@@ -51,11 +50,6 @@ public class FlameSkull extends Monster implements FlyableEntity
     public boolean isCellInteractable()
     {
         return (!isDead && !hasAttacked);
-    }
-
-    protected void onMove() { hasAttacked = false; }
-    public void setHasAttacked(){
-        hasAttacked = true;
     }
 
     @Override
@@ -98,7 +92,7 @@ public class FlameSkull extends Monster implements FlyableEntity
         public void interactWith( ARPGPlayer player )
         {
             System.out.println("flameskull damage");
-            player.giveDamage( PLAYER_DAMAGE );
+            player.giveDamage( getDamage() );
         }
 
         @Override
@@ -112,7 +106,7 @@ public class FlameSkull extends Monster implements FlyableEntity
 
             if ( monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
             {
-                monster.giveDamage( PLAYER_DAMAGE );
+                monster.giveDamage( getDamage() );
             }
         }
     }

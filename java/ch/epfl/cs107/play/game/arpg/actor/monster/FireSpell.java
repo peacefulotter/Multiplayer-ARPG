@@ -19,9 +19,10 @@ import java.util.List;
 
 public class FireSpell extends AreaEntity implements Interactor
 {
-    private static final float MIN_LIFE_TIME = 3;
-    private static final float MAX_LIFE_TIME = 5;
+    private static final float MIN_LIFE_TIME = 3f;
+    private static final float MAX_LIFE_TIME = 5f;
     private static final float PROPAGATION_TIME_SPELL = 0.5f;
+    private static final float ATTACK_COUNTDOWN = 1f;
 
     private final float damage;
     private final float lifeTime;
@@ -31,7 +32,9 @@ public class FireSpell extends AreaEntity implements Interactor
 
     private Animation fireSpellAnimation;
     private float fireTimeAlive;
+    private float timeAttack;
     private boolean hasPropagated;
+    public boolean hasAttacked;
 
     /**
      * Default AreaEntity constructor
@@ -50,6 +53,7 @@ public class FireSpell extends AreaEntity implements Interactor
         currentCell.add( position );
         fireTimeAlive = 0;
         hasPropagated = false;
+        timeAttack = 0;
         handler = new FireSpellHandler();
 
         Sprite[] animationSprites = new Sprite[7];
@@ -62,6 +66,15 @@ public class FireSpell extends AreaEntity implements Interactor
     @Override
     public void update(float deltaTime)
     {
+        if ( hasAttacked )
+        {
+            if ( timeAttack > ATTACK_COUNTDOWN )
+            {
+                hasAttacked = false;
+                timeAttack = 0;
+            }
+            timeAttack += deltaTime;
+        }
         if ( !hasPropagated && fireTimeAlive >= PROPAGATION_TIME_SPELL )
         {
             generateFireSpell();
@@ -100,6 +113,8 @@ public class FireSpell extends AreaEntity implements Interactor
     {
         getOwnerArea().unregisterActor( this );
     }
+
+    public float getDamage() { return damage; }
 
 
     @Override
@@ -163,12 +178,6 @@ public class FireSpell extends AreaEntity implements Interactor
     class FireSpellHandler implements ARPGInteractionVisitor
     {
         @Override
-        public void interactWith( ARPGPlayer player )
-        {
-            player.giveDamage( damage );
-        }
-
-        @Override
         public void interactWith( Monster monster )
         {
             if ( monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
@@ -176,8 +185,5 @@ public class FireSpell extends AreaEntity implements Interactor
                 monster.giveDamage( damage );
             }
         }
-
-
     }
-
 }
