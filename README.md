@@ -4,6 +4,7 @@ EPFL - Mini-Project 2
 # todo list
  - [fix] DarkLord tp not working properly (creates empty and non traversable space) 
  - [fix] fire damage player
+ - [fix] Make a interface "Damageable" or something like that for all the entities that can deal damage
  - [fix] flame skull attacking only once
  - [fix] Bomb multiple placement (canHoldDowm - mve to arpgItem)
  - [fix] Player go in both directions 
