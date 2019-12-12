@@ -3,8 +3,10 @@ package ch.epfl.cs107.play.game.arpg.actor.player;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.ARPG;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
+import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
@@ -86,10 +88,11 @@ public class ARPGPlayer extends Player {
         };
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
-        inventory.addItemToInventory(ARPGItem.BOMB, 10);
-        inventory.addItemToInventory(ARPGItem.SWORD);
-        inventory.addItemToInventory(ARPGItem.BOW);
-        inventory.addItemToInventory(ARPGItem.STAFF);
+        inventory.addItemToInventory( ARPGItem.BOMB, 10 );
+        inventory.addItemToInventory( ARPGItem.SWORD );
+        inventory.addItemToInventory( ARPGItem.BOW );
+        inventory.addItemToInventory( ARPGItem.STAFF );
+        inventory.addItemToInventory( ARPGItem.ARROW, 10 );
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
@@ -195,7 +198,10 @@ public class ARPGPlayer extends Player {
             case BOW:
                 if (state == state.IDLE) {
                     state = PlayerStates.ATTACKING_BOW;
-                    getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                    if ( inventory.removeItemFromInventory( (InventoryItem)ARPGItem.ARROW ) )
+                    {
+                        getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                    }
                     currentAnimation = 2;
                 }
             case STAFF:
@@ -389,15 +395,13 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith(FlameSkull skull) {
             System.out.println("flameskull player");
-            giveDamage(1f);
+            giveDamage( 1f );
             skull.setHasAttacked();
         }
 
-        @Override
-        public void interactWith(Monster monster) {
-            if (state.isCloseRangeAttacking()) {
-                monster.giveDamage(getEquippedItem().getDamage(), getEquippedItem().getVuln());
-            }
+        public void interactWith( LogMonster logMonster )
+        {
+            logMonster.giveDamage( getEquippedItem().getDamage() );
         }
     }
 }

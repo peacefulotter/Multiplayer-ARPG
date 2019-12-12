@@ -7,15 +7,16 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
-import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
-import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
+import ch.epfl.cs107.play.game.arpg.actor.monster.*;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.window.Canvas;
 
-public class MagicProjectile extends Projectile{
+public class MagicProjectile extends Projectile
+{
+    private final static float MAGIC_DAMAGE = 1;
     private Animation animation;
     private InteractionHandler interactionHandler;
     /**
@@ -27,42 +28,59 @@ public class MagicProjectile extends Projectile{
      * @param speed
      * @param maxDistance
      */
-    public MagicProjectile(Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance) {
-        super(area, orientation, position, speed, maxDistance);
-        Sprite[] sprites= new Sprite[4];
-        for(int i=0;i<4;i++){
-            sprites[i]=new Sprite("zelda/magicWaterProjectile",1,1,this,new RegionOfInterest(i*32,0,32,32));
+    public MagicProjectile( Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance )
+    {
+        super( area, orientation, position, speed, maxDistance );
+        Sprite[] sprites = new Sprite[4];
+        for ( int i = 0; i < 4; i++ )
+        {
+            sprites[ i ] = new Sprite( "zelda/magicWaterProjectile",1,1,this,new RegionOfInterest(i*32,0,32,32) );
         }
-        animation=new Animation(2,sprites,true);
-        interactionHandler=new InteractionHandler();
+        animation = new Animation( 2, sprites, true );
+        interactionHandler = new InteractionHandler();
     }
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
-        animation.update(deltaTime);
+    public void update( float deltaTime )
+    {
+        super.update( deltaTime );
+        animation.update( deltaTime );
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        animation.draw(canvas);
+    public void draw( Canvas canvas ) {
+        animation.draw( canvas );
     }
 
     @Override
-    public void interactWith(Interactable other) {
-        other.acceptInteraction(interactionHandler);
+    public void interactWith( Interactable other ) {
+        other.acceptInteraction( interactionHandler );
     }
 
     @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
-        ((ARPGInteractionVisitor)v).interactWith(this);
+    public void acceptInteraction( AreaInteractionVisitor v ) {
+        ((ARPGInteractionVisitor)v).interactWith(this );
     }
 
-    class InteractionHandler implements ARPGInteractionVisitor{
+    class InteractionHandler implements ARPGInteractionVisitor
+    {
         @Override
-        public void interactWith(Monster monster) {
-            monster.giveDamage(1f, Vulnerabilities.MAGIC);
+        public void interactWith( DarkLord darkLord )
+        {
+            darkLord.giveDamage( MAGIC_DAMAGE );
             stopProjectile();
+        }
+
+        @Override
+        public void interactWith( FlameSkull flameSkull )
+        {
+            flameSkull.giveDamage( MAGIC_DAMAGE );
+        }
+
+        @Override
+        public void interactWith( FireSpell fireSpell )
+        {
+            fireSpell.blow();
         }
     }
 }

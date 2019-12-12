@@ -38,29 +38,37 @@ public class Inventory
         }
     }
 
-    protected boolean removeItemFromInventory(InventoryItem item){
+    protected boolean removeItemFromInventory( InventoryItem item ){
        return removeItemFromInventory(item, 1);
     }
 
-    protected boolean removeItemFromInventory( InventoryItem item, int amount)
+    protected boolean removeItemFromInventory( InventoryItem item, int amount )
     {
-        int existingAmount=inventory.get(item);
-        if(amount > inventory.get(item)) {
+        int existingAmount = inventory.get( item );
+        if ( amount > inventory.get( item ) )
+        {
             return false;
         }
-        inventory.replace(item, existingAmount-amount);
-        inventoryWeight -= item.getWeight()*amount;
+        inventory.replace(item, existingAmount-amount );
+        inventoryWeight -= item.getWeight() * amount;
         return true;
     }
 
     protected boolean isItemInInventory( InventoryItem item )
     {
-        if(!inventory.contains(item)) return false;
-        return inventory.get(item)>0;
+        if ( !inventory.contains( item ) ) { return false; }
+        return inventory.get( item ) > 0;
     }
-    public int getItem(InventoryItem item){
-        if(inventory.containsKey(item)){
-            return inventory.get(item);
-        }else return 0;
+
+    public int getItem( InventoryItem item )
+    {
+        if ( inventory.containsKey( item ) )
+        {
+            return inventory.get( item );
+        }
+        else
+        {
+            return 0;
+        }
     }
 }

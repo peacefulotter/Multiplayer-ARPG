@@ -16,7 +16,7 @@ public class CastleKey extends CollectibleAreaEntity{
      */
     public CastleKey(Area area, DiscreteCoordinates position) {
         super(area, position);
-        animation= new Animation(1, new Sprite[]{new Sprite("zelda/key",1,1,this)});
+        animation = new Animation(1, new Sprite[]{ new Sprite("zelda/key",1,1,this)});
     }
 
     @Override

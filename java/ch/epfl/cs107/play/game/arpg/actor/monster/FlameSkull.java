@@ -102,14 +102,18 @@ public class FlameSkull extends Monster implements FlyableEntity
         }
 
         @Override
-        public void interactWith(Grass grass)
+        public void interactWith( Grass grass )
         {
             grass.cutGrass();
         }
 
-        public void interactWith( LogMonster logMonster )
+        public void interactWith( Monster monster )
         {
-            logMonster.giveDamage( 1f, Vulnerabilities.FIRE );
+
+            if ( monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
+            {
+                monster.giveDamage( PLAYER_DAMAGE );
+            }
         }
     }
 }

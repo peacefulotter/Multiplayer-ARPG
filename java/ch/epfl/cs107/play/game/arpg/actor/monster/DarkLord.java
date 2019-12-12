@@ -21,8 +21,8 @@ import java.util.Random;
 
 public class DarkLord extends Monster
 {
-    private static final float MIN_SPELL_WAIT_DURATION = 5;
-    private static final float MAX_SPELL_WAIT_DURATION = 10;
+    private static final float MIN_SPELL_WAIT_DURATION = 2;
+    private static final float MAX_SPELL_WAIT_DURATION = 4;
     private static final float FIRESPELL_DAMAGE = 0.5f;
     private static final int TELEPORTATION_RADIUS = 7;
     private static final int MAX_TELEPORTATION_TRIES = 10;
@@ -36,6 +36,7 @@ public class DarkLord extends Monster
     private float cycleTime = 0;
     private float cycleTimeBound = 2;
     private boolean hasTeleported = false;
+    private boolean finishedSpellAnimation;
 
     private enum DarkLordStates {
         IDLE( false ),
@@ -46,9 +47,9 @@ public class DarkLord extends Monster
 
         public final boolean isSpellAnimation;
 
-        DarkLordStates( boolean spellAnimation )
+        DarkLordStates( boolean isSpellAnimation )
         {
-            this.isSpellAnimation = spellAnimation;
+            this.isSpellAnimation = isSpellAnimation;
         }
     }
 
@@ -72,7 +73,7 @@ public class DarkLord extends Monster
         switch ( state )
         {
             case IDLE:
-                System.out.println("idle");
+                //System.out.println("idle");
                 if ( cycleTime >= cycleTimeBound )
                 {
                     System.out.println("reset");
@@ -88,48 +89,24 @@ public class DarkLord extends Monster
                     {
                         state = DarkLordStates.SUMMONING;
                     }
-                    for ( int i = 0; i < 3; i++ )
-                    {
-                        Orientation newOrientation = getRandomOrientation();
-                        boolean isCellAvailable = getOwnerArea().canEnterAreaCells( this, getNextCurrentCells() );
-                        if ( newOrientation != getOrientation() && isCellAvailable )
-                        {
-                            orientate( newOrientation );
-                        }
-                    }
                     orientate( getRandomOrientation() );
                 }
                 cycleTime += deltaTime;
                 super.update( deltaTime );
                 break;
             case ATTACKING:
-                if ( spellAnimation[ currentAnimationIndex ].isCompleted() )
-                {
-                    throwMagicFlame();
-                    spellAnimation[ currentAnimationIndex ].reset();
-                } else {
-                    spellAnimation[ currentAnimationIndex ].update( deltaTime );
-                }
+                finishedSpellAnimation = updateSpellAnimation( deltaTime );
+                if ( finishedSpellAnimation ) { throwMagicFlame(); }
                 System.out.println("attacking");
                 break;
             case SUMMONING:
-                if ( spellAnimation[ currentAnimationIndex ].isCompleted() )
-                {
-                    summonFlameSkull();
-                    spellAnimation[ currentAnimationIndex ].reset();
-                } else {
-                    spellAnimation[ currentAnimationIndex ].update( deltaTime );
-                }
+                finishedSpellAnimation = updateSpellAnimation( deltaTime );
+                if ( finishedSpellAnimation ) { summonFlameSkull(); }
                 System.out.println("summoning");
                 break;
             case INVOKE_TP:
-                if ( spellAnimation[ currentAnimationIndex ].isCompleted() )
-                {
-                    state = DarkLordStates.TELEPORTING;
-                    spellAnimation[ currentAnimationIndex ].reset();
-                } else {
-                    spellAnimation[ currentAnimationIndex ].update( deltaTime );
-                }
+                finishedSpellAnimation = updateSpellAnimation( deltaTime );
+                if ( finishedSpellAnimation ) { state = DarkLordStates.TELEPORTING; }
                 break;
             case TELEPORTING:
                 System.out.println("teleporting");
@@ -155,20 +132,58 @@ public class DarkLord extends Monster
         }
     }
 
+    private boolean updateSpellAnimation( float deltaTime )
+    {
+        if ( spellAnimation[ currentAnimationIndex ].isCompleted() )
+        {
+            spellAnimation[ currentAnimationIndex ].reset();
+            return true;
+        } else {
+            spellAnimation[ currentAnimationIndex ].update( deltaTime );
+            return false;
+        }
+    }
+
+    private boolean changeOrientation()
+    {
+        for ( int i = 0; i < 4; i++ )
+        {
+            Orientation newOrientation = getRandomOrientation();
+            System.out.println(getCurrentCells());
+            System.out.println(getNextCurrentCells());
+            boolean isCellAvailable = getOwnerArea().canEnterAreaCells( this, getNextCurrentCells() );
+            if ( newOrientation != getOrientation() && isCellAvailable )
+            {
+                orientate( newOrientation );
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void throwMagicFlame()
     {
-        getOwnerArea().registerActor(
-                new FireSpell( getOwnerArea(), getOrientation(), getNextCurrentCells().get( 0 ), FIRESPELL_DAMAGE ) );
+        // try to change the darklord orientation to make sure he can throw a firespell
+        boolean isCellAvailable = changeOrientation();
+        FireSpell fireSpell = new FireSpell( getOwnerArea(), getOrientation(), getNextCurrentCells().get( 0 ), FIRESPELL_DAMAGE );
+        if ( !isCellAvailable )
+        {
+            isCellAvailable = getOwnerArea().canEnterAreaCells( fireSpell, getNextCurrentCells() );
+        }
+        if ( isCellAvailable )
+        {
+            getOwnerArea().registerActor( fireSpell );
+        }
+        getOwnerArea().registerActor( fireSpell );
         state = DarkLordStates.IDLE;
     }
 
     private void summonFlameSkull()
     {
         List<DiscreteCoordinates> cells = getFieldOfViewCells();
-        DiscreteCoordinates summonCoords = cells.get( random.nextInt(cells.size() - 1 ) );
-        // CHECK IF SUMMON COORDS CAN BE FILLED WITH A FLAME SKULL
-        FlameSkull flameSkull = new FlameSkull( getOwnerArea(), summonCoords );
-        boolean canSpawn = getOwnerArea().canEnterAreaCells( flameSkull, Collections.singletonList( summonCoords ) );
+        DiscreteCoordinates summonPosition = cells.get( random.nextInt(cells.size() - 1 ) );
+        FlameSkull flameSkull = new FlameSkull( getOwnerArea(), summonPosition );
+        boolean canSpawn = getOwnerArea().canEnterAreaCells( flameSkull, Collections.singletonList( summonPosition ) );
         if ( canSpawn )
         {
             getOwnerArea().registerActor( flameSkull );
@@ -182,18 +197,25 @@ public class DarkLord extends Monster
         DiscreteCoordinates tpCell;
 
         int nbTries = 0;
-        boolean teleported;
+        boolean canLeave;
+        boolean teleported = false;
         do {
-            tpCell = new DiscreteCoordinates( getRandomPos(), getRandomPos() );
-            tpCell = tpCell.jump( currentCell.toVector() );
-            teleported = getOwnerArea().registerActor( new DarkLord( getOwnerArea(), tpCell ) );
+            canLeave = getOwnerArea().leaveAreaCells( this, Collections.singletonList( currentCell ) );
+            if ( canLeave )
+            {
+                tpCell = new DiscreteCoordinates( getRandomPos(), getRandomPos() );
+                System.out.println(tpCell);
+                System.out.println(getRandomPos());
+                tpCell = currentCell.jump( tpCell.toVector() );
+                teleported = getOwnerArea().enterAreaCells( this, Collections.singletonList( tpCell ) );
+            }
+            System.out.println( canLeave + " " + teleported );
             nbTries++;
         } while ( nbTries <= MAX_TELEPORTATION_TRIES && !teleported );
 
-        // if the teleportation worked, unregister the previous darklord
-        if ( teleported )
+        if ( !teleported )
         {
-            getOwnerArea().unregisterActor( this );
+            getOwnerArea().enterAreaCells(this, Collections.singletonList( currentCell ) );
         }
         state = DarkLordStates.IDLE;
     }

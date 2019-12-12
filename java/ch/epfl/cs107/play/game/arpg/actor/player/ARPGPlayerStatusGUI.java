@@ -7,7 +7,8 @@ import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
-public class ARPGPlayerStatusGUI implements Graphics {
+public class ARPGPlayerStatusGUI implements Graphics
+{
     private Vector topLeftAnchor;
     private Vector bottomLeftAnchor;
 
@@ -23,13 +24,13 @@ public class ARPGPlayerStatusGUI implements Graphics {
     private final float gearDisplaySize = 1.5f;
     private final float moneyBackgroundDisplayWidth = 3f;
     private final float moneyBackgroundDisplayHeight = 1.5f;
-    private final float heartsDisplaySize = 1.6f;
     private float digitsSize = .6f;
 
     private ARPGPlayer player;
 
 
-    public ARPGPlayerStatusGUI( ARPGPlayer player, String currentItemSpriteName ) {
+    public ARPGPlayerStatusGUI( ARPGPlayer player, String currentItemSpriteName )
+    {
         this.player = player;
 
         gearDisplay = new ImageGraphics(

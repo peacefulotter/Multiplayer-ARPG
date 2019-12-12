@@ -24,18 +24,20 @@ public class ARPGInventory extends Inventory implements Actor {
     private int inventorySize;
     private Integer itemOrderIndex;
 
-    public ARPGInventory(AreaEntity holder, float maxWeight, int inventorySize, int initialCoins) {
-        super(maxWeight);
-        playerMoney=initialCoins;
+    public ARPGInventory( AreaEntity holder, float maxWeight, int inventorySize, int initialCoins )
+    {
+        super( maxWeight );
+        playerMoney = initialCoins;
         this.holder = holder;
         sprite = new Sprite("zelda/inventory.background", 7f, 10f, this);
-        itemOrder= new InventoryItem[inventorySize];
+        itemOrder = new InventoryItem[ inventorySize ];
         itemOrderIndex = 0;
-        this.inventorySize=inventorySize;
+        this.inventorySize = inventorySize;
 
     }
 
-    public void addMoney(int money) {
+    public void addMoney( int money )
+    {
         playerMoney += money;
         playerFortune += money;
     }
@@ -49,9 +51,9 @@ public class ARPGInventory extends Inventory implements Actor {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        if (isDisplaying) {
-            sprite.draw(canvas);
+    public void draw( Canvas canvas ) {
+        if ( isDisplaying ) {
+            sprite.draw( canvas );
         }
     }
 
@@ -59,32 +61,23 @@ public class ARPGInventory extends Inventory implements Actor {
         isDisplaying = !isDisplaying;
     }
 
-
-    @Override
-    public Transform getTransform() {
-        return null;
-    }
-
-    @Override
-    public Vector getVelocity() {
-        return null;
-    }
-
     @Override
     public boolean addItemToInventory(InventoryItem item) {
         return addItemToInventory(item,1);
     }
 
-
     //adds item to inventory and adds it to first available slot in inventoryOrder
     //if added to inventory but no available slot found it removes it from inventory and returns false
     @Override
-    public boolean addItemToInventory(InventoryItem item, Integer amount) {
+    public boolean addItemToInventory( InventoryItem item, Integer amount )
+    {
         boolean existedBefore = isItemInInventory(item);
         boolean added = super.addItemToInventory(item, amount);
-        boolean addedToOrder=true;
-        if(added && !existedBefore){
-            addedToOrder=false;
+        boolean addedToOrder = true;
+        if ( added && !existedBefore )
+        {
+            playerFortune += item.getPrice();
+            addedToOrder = false;
             for(int i=0; i< inventorySize;i++){
                 if(itemOrder[i]==null){
                     itemOrder[i]=item;
@@ -106,10 +99,11 @@ public class ARPGInventory extends Inventory implements Actor {
     }
 
     @Override
-    public boolean removeItemFromInventory(InventoryItem item, int amount) {
-        boolean removed= super.removeItemFromInventory(item, amount);
-        if(removed){
-            if(inventory.get(item)==0){
+    public boolean removeItemFromInventory( InventoryItem item, int amount ) {
+        boolean removed = super.removeItemFromInventory( item, amount );
+        if ( removed ) {
+            playerFortune -= item.getPrice();
+            if( inventory.get( item ) == 0 ) {
                 for(int i=0; i<inventorySize;i++){
                     if(item==itemOrder[i]){
                         itemOrder[i]=null;
@@ -139,5 +133,15 @@ public class ARPGInventory extends Inventory implements Actor {
 
     public InventoryItem getCurrentItem() {
         return itemOrder[itemOrderIndex];
+    }
+
+    @Override
+    public Transform getTransform() {
+        return null;
+    }
+
+    @Override
+    public Vector getVelocity() {
+        return null;
     }
 }

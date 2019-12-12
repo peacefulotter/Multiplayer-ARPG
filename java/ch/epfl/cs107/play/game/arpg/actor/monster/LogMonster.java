@@ -29,6 +29,7 @@ public class LogMonster extends Monster
     private final logMonsterHandler handler;
     private LogMonsterState state;
 
+    private boolean hasDroppedCoin;
     private float sleepingTime;
     private float sleepingTimeBound;
     private float timeAttack;
@@ -38,10 +39,19 @@ public class LogMonster extends Monster
 
 
     private enum LogMonsterState {
-        IS_IDLE(),
-        IS_SLEEPING(),
-        IS_WAKING(),
-        IS_ATTACKING()
+        IS_IDLE( true, true ),
+        IS_SLEEPING( false, false ),
+        IS_WAKING( false, false ),
+        IS_ATTACKING( false, true );
+
+        public final boolean allowReorientation;
+        public final boolean drawPlayer;
+
+        LogMonsterState( boolean allowReorientation, boolean drawPlayer )
+        {
+            this.allowReorientation = allowReorientation;
+            this.drawPlayer = drawPlayer;
+        }
     }
 
 
@@ -65,6 +75,7 @@ public class LogMonster extends Monster
         handler = new logMonsterHandler();
         state = LogMonsterState.IS_IDLE;
         timeAttack = 0;
+        hasDroppedCoin = false;
     }
 
     @Override
@@ -73,7 +84,6 @@ public class LogMonster extends Monster
         switch( state )
         {
             case IS_IDLE:
-                super.update( deltaTime );
                 if ( random.nextFloat() < 0.005 )
                 {
                     setSleeping();
@@ -104,7 +114,6 @@ public class LogMonster extends Monster
 
             case IS_ATTACKING:
                 super.move( 13 );
-                super.update( deltaTime, false );
                 if ( timeAttack >= MAX_TIME_ATTACK )
                 {
                     resetAttack();
@@ -113,36 +122,35 @@ public class LogMonster extends Monster
                 break;
         }
 
-        if ( isDead )
+        if ( isDead && !hasDroppedCoin )
         {
-            super.update( deltaTime );
             if ( deathAnimation.isCompleted() )
             {
-                System.out.println("coin");
+                hasDroppedCoin = true;
                 getOwnerArea().registerActor(
                         new Coin( getOwnerArea(), getCurrentCells().get(0), 50 ) );
             }
         }
+
+        super.update( deltaTime, state.allowReorientation );
     }
 
     @Override
     public void draw(Canvas canvas)
     {
-        switch( state )
+        if ( !isDead )
         {
-            case IS_WAKING:
-                //wakingAnimation.setAnchor( new Vector( -0.5f, 0 ) );
-                wakingAnimation.draw( canvas );
-                break;
-            case IS_SLEEPING:
-                //sleepingAnimation.setAnchor( new Vector( -0.5f, 0 ) );
-                sleepingAnimation.draw( canvas );
-                break;
-            case IS_IDLE:
-            case IS_ATTACKING:
-                super.draw( canvas );
-                break;
+            switch( state )
+            {
+                case IS_WAKING:
+                    wakingAnimation.draw( canvas );
+                    break;
+                case IS_SLEEPING:
+                    sleepingAnimation.draw( canvas );
+                    break;
+            }
         }
+        super.draw( canvas, state.drawPlayer );
     }
 
     public void setSleeping()
@@ -225,6 +233,7 @@ public class LogMonster extends Monster
     {
         other.acceptInteraction( handler );
     }
+
 
     class logMonsterHandler implements ARPGInteractionVisitor
     {

@@ -49,7 +49,7 @@ public enum ARPGItem implements InventoryItem
         this.spriteName = spriteName;
         this.weight = weight;
         this.price = price;
-        this.equippable=equippable;
+        this.equippable = equippable;
         this.damage = damage;
         this.weaponType = new Vulnerabilities[ weaponType.length ];
         for ( int i = 0; i < weaponType.length; i++ )
