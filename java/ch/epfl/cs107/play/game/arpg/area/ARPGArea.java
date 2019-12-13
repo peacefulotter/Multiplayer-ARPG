@@ -3,19 +3,15 @@ package ch.epfl.cs107.play.game.arpg.area;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
 import ch.epfl.cs107.play.game.arpg.ARPGBehavior;
-import ch.epfl.cs107.play.game.arpg.actor.Grass;
-import ch.epfl.cs107.play.game.tutos.Tuto1;
 import ch.epfl.cs107.play.io.FileSystem;
-import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Image;
 import ch.epfl.cs107.play.window.Window;
 
 public abstract class ARPGArea extends Area
 {
+    private static int SCALE_FACTOR = 15;
     private Window window;
     private ARPGBehavior behavior;
-    protected Grass[] grasses;
-    private static int ScaleFactor = 10;
 
     /**
      * Create the area by adding all its actors
@@ -27,14 +23,12 @@ public abstract class ARPGArea extends Area
     public int getWidth() {
         Image behaviorMap = window.getImage( ResourcePath.getBehaviors(getTitle()), null, false);
         return  behaviorMap.getWidth();
-
     }
 
     @Override
     public int getHeight() {
         Image behaviorMap = window.getImage(ResourcePath.getBehaviors(getTitle()), null, false);
         return  behaviorMap.getHeight();
-
     }
 
 
@@ -54,19 +48,5 @@ public abstract class ARPGArea extends Area
     }
 
     @Override
-    public final float getCameraScaleFactor() {
-        return 15; //getWidth() * 4 / 5;
-    }
-
-    public Grass getGrass( DiscreteCoordinates coords )
-    {
-        for ( Grass g : grasses )
-        {
-            if ( g.getCurrentCells().contains( coords ) )
-            {
-                return g;
-            }
-        }
-        return null;
-    }
+    public final float getCameraScaleFactor() { return SCALE_FACTOR;  }
 }

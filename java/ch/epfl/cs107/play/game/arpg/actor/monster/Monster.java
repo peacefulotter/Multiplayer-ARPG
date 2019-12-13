@@ -186,6 +186,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         return inflictDamage;
     }
 
+
     public void giveDamage( float damage )
     {
         float crits = 1;

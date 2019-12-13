@@ -1,11 +1,12 @@
 package ch.epfl.cs107.play.game.arpg.actor.monster;
 
-import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
+import ch.epfl.cs107.play.game.arpg.actor.projectiles.MagicProjectile;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RandomGenerator;
@@ -26,6 +27,7 @@ public class FireSpell extends AreaEntity implements Interactor
 
     private final float damage;
     private final float lifeTime;
+    private final int force;
     private final Orientation orientation;
     private final List<DiscreteCoordinates> currentCell;
     private final FireSpellHandler handler;
@@ -43,11 +45,12 @@ public class FireSpell extends AreaEntity implements Interactor
      * @param orientation (Orientation): Initial orientation of the entity in the Area. Not null
      * @param position    (DiscreteCoordinate): Initial position of the entity in the Area. Not null
      */
-    public FireSpell(Area area, Orientation orientation, DiscreteCoordinates position, float damage )
+    public FireSpell(Area area, Orientation orientation, DiscreteCoordinates position, float damage, int force )
     {
         super( area, orientation, position );
         this.orientation = orientation;
         this.damage = damage;
+        this.force = force;
         lifeTime = MIN_LIFE_TIME + RandomGenerator.getInstance().nextFloat() * (MAX_LIFE_TIME-MIN_LIFE_TIME);
         currentCell = new ArrayList<>();
         currentCell.add( position );
@@ -75,7 +78,7 @@ public class FireSpell extends AreaEntity implements Interactor
             }
             timeAttack += deltaTime;
         }
-        if ( !hasPropagated && fireTimeAlive >= PROPAGATION_TIME_SPELL )
+        if ( force > 0 && !hasPropagated && fireTimeAlive >= PROPAGATION_TIME_SPELL )
         {
             generateFireSpell();
         }
@@ -101,7 +104,7 @@ public class FireSpell extends AreaEntity implements Interactor
         if ( damage-0.1f <= 0 ) { return; }
 
         DiscreteCoordinates newPosition = getFieldOfViewCells().get( 0 );
-        FireSpell fireSpell = new FireSpell( getOwnerArea(), orientation, newPosition, damage-0.1f );
+        FireSpell fireSpell = new FireSpell( getOwnerArea(), orientation, newPosition, damage, force-1 );
         boolean canSpawn = getOwnerArea().canEnterAreaCells( fireSpell, Collections.singletonList( newPosition ) );
         if ( canSpawn )
         {
@@ -135,7 +138,7 @@ public class FireSpell extends AreaEntity implements Interactor
     @Override
     public boolean wantsCellInteraction()
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -145,7 +148,7 @@ public class FireSpell extends AreaEntity implements Interactor
     }
 
     @Override
-    public void interactWith(Interactable other)
+    public void interactWith( Interactable other )
     {
         other.acceptInteraction( handler );
     }
@@ -159,7 +162,7 @@ public class FireSpell extends AreaEntity implements Interactor
     @Override
     public boolean isCellInteractable()
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -169,7 +172,7 @@ public class FireSpell extends AreaEntity implements Interactor
     }
 
     @Override
-    public void acceptInteraction(AreaInteractionVisitor v)
+    public void acceptInteraction( AreaInteractionVisitor v )
     {
         ((ARPGInteractionVisitor)v).interactWith( this );
     }
@@ -177,13 +180,44 @@ public class FireSpell extends AreaEntity implements Interactor
 
     class FireSpellHandler implements ARPGInteractionVisitor
     {
+
+        @Override
+        public void interactWith( ARPGPlayer player )
+        {
+            if ( !hasAttacked )
+            {
+                player.giveDamage( damage );
+                hasAttacked = true;
+            }
+        }
+
         @Override
         public void interactWith( Monster monster )
         {
-            if ( monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
+            System.out.println("lol");
+            if ( !hasAttacked && monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
             {
+                hasAttacked = true;
                 monster.giveDamage( damage );
             }
+        }
+
+        @Override
+        public void interactWith( Grass grass )
+        {
+            grass.cutGrass();
+        }
+
+        @Override
+        public void interactWith( Arrow arrow )
+        {
+            blow();
+        }
+
+        @Override
+        public void interactWith( MagicProjectile magicProjectile )
+        {
+            blow();
         }
     }
 }

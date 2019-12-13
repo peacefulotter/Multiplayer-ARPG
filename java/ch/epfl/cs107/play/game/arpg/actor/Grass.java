@@ -62,41 +62,36 @@ public class Grass extends AreaEntity {
             grassAnimation.update(deltaTime);
     }
 
-    public void cutGrass() {
-        if (isCut) return;
+    public void cutGrass()
+    {
+        if ( isCut ) { return; }
         isCut = true;
-        if (random.nextBoolean()) {
-            if (random.nextDouble() < .75) {
-                getOwnerArea().registerActor(new Coin(getOwnerArea(), getCurrentMainCellCoordinates(), 50));
+        if (random.nextBoolean() )
+        {
+            if ( random.nextDouble() < .75 )
+            {
+                getOwnerArea().registerActor( new Coin( getOwnerArea(), getCurrentMainCellCoordinates(), 50 ) );
             } else {
-                getOwnerArea().registerActor(new Heart(getOwnerArea(), getCurrentMainCellCoordinates()));
+                getOwnerArea().registerActor( new Heart( getOwnerArea(), getCurrentMainCellCoordinates() ) );
             }
         }
     }
 
 
     @Override
-    public List<DiscreteCoordinates> getCurrentCells() {
-        return currentCells;
-    }
+    public List<DiscreteCoordinates> getCurrentCells() { return currentCells; }
 
     @Override
-    public boolean takeCellSpace() {
-        return !isCut;
-    }
+    public boolean takeCellSpace() { return true; }
 
     @Override
-    public boolean isCellInteractable() {
-        return !isCut;
-    }
+    public boolean isCellInteractable() { return !isCut; }
 
     @Override
-    public boolean isViewInteractable() {
-        return !isCut;
-    }
+    public boolean isViewInteractable() { return !isCut; }
 
     @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
+    public void acceptInteraction( AreaInteractionVisitor v ) {
         ((ARPGInteractionVisitor) v).interactWith(this);
     }
 

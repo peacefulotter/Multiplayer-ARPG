@@ -319,7 +319,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public boolean isCellInteractable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -346,27 +346,20 @@ public class ARPGPlayer extends Player {
             }
         }
 
+        @Override
         public void interactWith(Coin coin) {
             inventory.addMoney(coin.getValue());
             coin.collect();
         }
 
-        public void interactWith(Heart heart) {
+        @Override
+        public void interactWith( Heart heart )
+        {
             hp += 1;
             if (hp > maxHP) {
                 hp = maxHP;
             }
             heart.collect();
-        }
-
-        @Override
-        public void interactWith( FireSpell fireSpell )
-        {
-            if ( !fireSpell.hasAttacked )
-            {
-                giveDamage( fireSpell.getDamage() );
-                fireSpell.hasAttacked = true;
-            }
         }
 
         @Override
@@ -401,18 +394,12 @@ public class ARPGPlayer extends Player {
         }
 
         @Override
-        public void interactWith( FlameSkull flameSkull )
+        public void interactWith( Monster monster )
         {
-            if ( !flameSkull.hasAttacked )
+            if ( monster.getVulnerabilities().contains( getEquippedItem().getVuln() ) )
             {
-                giveDamage( flameSkull.getDamage() );
-                flameSkull.hasAttacked = true;
+                monster.giveDamage( getEquippedItem().getDamage() ) ;
             }
-        }
-
-        public void interactWith( LogMonster logMonster )
-        {
-            logMonster.giveDamage( getEquippedItem().getDamage() );
         }
     }
 }

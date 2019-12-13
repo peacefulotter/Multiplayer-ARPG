@@ -90,29 +90,19 @@ public class Arrow extends Projectile
 
     class ArrowInteractionHandler implements ARPGInteractionVisitor
     {
-        @Override
-        public void interactWith( FlameSkull flameSkull )
-        {
-            flameSkull.giveDamage( ARROW_DAMAGE );
-        }
 
         @Override
-        public void interactWith( LogMonster logMonster )
+        public void interactWith( Monster monster )
         {
-            stopProjectile();
-            logMonster.giveDamage( ARROW_DAMAGE );
-        }
-
-        public void interactWith( DarkLord darkLord )
-        {
-            stopProjectile();
-            darkLord.giveDamage( ARROW_DAMAGE );
-        }
-
-        @Override
-        public void interactWith( FireSpell fireSpell )
-        {
-            fireSpell.blow();
+            if ( monster.getVulnerabilities().contains( Vulnerabilities.LONG_RANGE ) )
+            {
+                monster.giveDamage( ARROW_DAMAGE );
+            }
+            if ( !(monster instanceof FlameSkull) )
+            {
+                System.out.println("stopped");
+                stopProjectile();
+            }
         }
 
         @Override

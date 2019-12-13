@@ -64,24 +64,16 @@ public class MagicProjectile extends Projectile
 
     class InteractionHandler implements ARPGInteractionVisitor
     {
-        @Override
-        public void interactWith( DarkLord darkLord )
-        {
-            System.out.println("lol");
-            darkLord.giveDamage( MAGIC_DAMAGE );
-            stopProjectile();
-        }
 
         @Override
-        public void interactWith( FlameSkull flameSkull )
+        public void interactWith( Monster monster )
         {
-            flameSkull.giveDamage( MAGIC_DAMAGE );
+            monster.giveDamage( MAGIC_DAMAGE );
+            if ( monster instanceof DarkLord )
+            {
+                stopProjectile();
+            }
         }
 
-        @Override
-        public void interactWith( FireSpell fireSpell )
-        {
-            fireSpell.blow();
-        }
     }
 }

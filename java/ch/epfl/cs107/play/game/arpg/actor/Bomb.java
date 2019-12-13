@@ -153,17 +153,12 @@ public class Bomb extends AreaEntity implements Interactor {
         }
 
         @Override
-        public void interactWith( FlameSkull flameSkull )
+        public void interactWith( Monster monster )
         {
-            explode();
-            flameSkull.giveDamage( BOMB_DAMAGE );
-        }
-
-        @Override
-        public void interactWith( LogMonster logMonster )
-        {
-            System.out.println("ouch");
-            logMonster.giveDamage( BOMB_DAMAGE * 2 );
+            if ( monster.getVulnerabilities().contains( Vulnerabilities.CLOSE_RANGE ) )
+            {
+                monster.giveDamage( BOMB_DAMAGE );
+            }
         }
     }
 

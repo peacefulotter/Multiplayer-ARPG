@@ -181,7 +181,7 @@ public class LogMonster extends Monster
     @Override
     public boolean isViewInteractable()
     {
-        return true;
+        return !isDead;
     }
 
     @Override
@@ -215,10 +215,7 @@ public class LogMonster extends Monster
     }
 
     @Override
-    public boolean wantsCellInteraction()
-    {
-        return false;
-    }
+    public boolean wantsCellInteraction() { return false; }
 
     @Override
     public boolean wantsViewInteraction()
@@ -250,6 +247,5 @@ public class LogMonster extends Monster
                 state = LogMonsterState.IS_ATTACKING;
             }
         }
-
     }
 }

@@ -3,12 +3,7 @@ package ch.epfl.cs107.play.game.arpg.inventory;
 import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-
-// todo : ADD ENCHANTMENTS ?
 public enum ARPGItem implements InventoryItem
 {
     ARROW(

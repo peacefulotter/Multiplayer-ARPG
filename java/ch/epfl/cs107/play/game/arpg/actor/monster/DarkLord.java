@@ -24,6 +24,7 @@ public class DarkLord extends Monster
     private static final float MIN_SPELL_WAIT_DURATION = 1;
     private static final float MAX_SPELL_WAIT_DURATION = 2;
     private static final float FIRESPELL_DAMAGE = 0.6f;
+    private static final int FIRESPELL_FORCE = 4;
     private static final int TELEPORTATION_RADIUS = 7;
     private static final int MAX_TELEPORTATION_TRIES = 10;
     private static final int FOV = 7;
@@ -161,7 +162,7 @@ public class DarkLord extends Monster
     {
         // try to change the darklord orientation to make sure he can throw a firespell
         boolean isCellAvailable = changeOrientation();
-        FireSpell fireSpell = new FireSpell( getOwnerArea(), getOrientation(), getNextCurrentCells().get( 0 ), FIRESPELL_DAMAGE );
+        FireSpell fireSpell = new FireSpell( getOwnerArea(), getOrientation(), getNextCurrentCells().get( 0 ), FIRESPELL_DAMAGE, FIRESPELL_FORCE );
         if ( !isCellAvailable )
         {
             isCellAvailable = getOwnerArea().canEnterAreaCells( fireSpell, getNextCurrentCells() );

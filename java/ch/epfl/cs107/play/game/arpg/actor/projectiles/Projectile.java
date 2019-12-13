@@ -81,7 +81,7 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
 
     @Override
     public boolean isCellInteractable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -94,8 +94,4 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
 
     }
 
-    @Override
-    public boolean canFly() {
-        return true;
-    }
 }
