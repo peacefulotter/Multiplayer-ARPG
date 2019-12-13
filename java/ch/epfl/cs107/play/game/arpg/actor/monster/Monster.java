@@ -2,7 +2,6 @@ package ch.epfl.cs107.play.game.arpg.actor.monster;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
-import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RandomGenerator;
@@ -10,28 +9,32 @@ import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public abstract class Monster extends MovableAreaEntity implements Interactor
 {
-    private final int ANIMATION_DURATION = 10;
-    private final double CRITS_PERCENTAGE = 0.2;
-    protected final float PLAYER_DAMAGE;
-    private final Orientation[] orientations;
+    private static final float ATTACK_COUNTDOWN = 2f;
+    private static final int ANIMATION_DURATION = 10;
+    private static final double CRITS_PERCENTAGE = 0.2;
 
+    private final Sprite critsSprite;
     private final String name;
     private final float maxHealth;
-    private float currentHealth;
 
     private List<DiscreteCoordinates> currentCells;
-    protected boolean isDead;
     private List<Vulnerabilities> vulnerabilities;
-    protected Animation deathAnimation;
     private Animation[] movementAnimation;
+    private final float inflictDamage;
+    private float currentHealth;
+    private float timeAttack;
+    private boolean dealtCrits;
+    public boolean hasAttacked;
+
     protected int currentAnimationIndex = 2;
+    protected Animation deathAnimation;
+    protected boolean isDead;
 
     public Monster(
             Area area, DiscreteCoordinates position, Orientation[] orientations,
@@ -45,9 +48,9 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         currentCells = new ArrayList<>();
         currentCells.add( position );
         isDead = false;
-        PLAYER_DAMAGE = damage;
-        this.orientations = orientations;
-
+        inflictDamage = damage;
+        timeAttack = 0;
+        hasAttacked = false;
         this.vulnerabilities = new ArrayList<>();
         Collections.addAll( this.vulnerabilities, vulnerabilities );
 
@@ -61,6 +64,9 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                 nbFrames, 2, 2,
                 this, 32, 32, spriteOffset, orientations);
         movementAnimation = RPGSprite.createAnimations(ANIMATION_DURATION, sprites);
+
+        critsSprite = new Sprite( "custom/crits", 1.5f, 1.5f, this, new RegionOfInterest( 0, 0, 541, 541 ), new Vector( -0.25f, 0.75f ), 1, 1000 );
+        dealtCrits = false;
     }
 
 
@@ -75,11 +81,20 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         update( deltaTime, true );
     }
 
-    public void update(float deltaTime, boolean canMove )
+    public void update(float deltaTime, boolean allowReorientation )
     {
         if ( !isDead )
         {
-            if ( canMove )
+            if ( hasAttacked )
+            {
+                if ( timeAttack > ATTACK_COUNTDOWN )
+                {
+                    hasAttacked = false;
+                    timeAttack = 0;
+                }
+                timeAttack += deltaTime;
+            }
+            if ( allowReorientation )
             {
                 Orientation newOrientation = getRandomOrientation();
                 if ( Math.random() < 0.01 )
@@ -92,7 +107,6 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                     move( ANIMATION_DURATION );
                 }
             }
-
             movementAnimation[currentAnimationIndex].update(deltaTime);
         }
         else if ( !deathAnimation.isCompleted() )
@@ -102,7 +116,42 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
             getOwnerArea().unregisterActor( this );
         }
 
+        if ( dealtCrits )
+        {
+            critsSprite.setAlpha( critsSprite.getAlpha() - 0.01f );
+            if ( critsSprite.getAlpha() <= 0 )
+            {
+                critsSprite.setAlpha( 1 );
+                dealtCrits = false;
+            }
+        }
+
         super.update( deltaTime );
+    }
+
+    @Override
+    public void draw( Canvas canvas )
+    {
+        draw( canvas, true );
+    }
+
+    public void draw( Canvas canvas, boolean drawPlayer )
+    {
+        if ( !isDead )
+        {
+            if ( drawPlayer )
+            {
+                movementAnimation[ currentAnimationIndex ].draw( canvas );
+            }
+            if ( dealtCrits )
+            {
+                critsSprite.draw( canvas );
+            }
+        }
+        else
+        {
+            deathAnimation.draw( canvas );
+        }
     }
 
 
@@ -126,61 +175,39 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 
     }
 
-    // implement this inside subclasses
-    // and then super.draw
-    @Override
-    public void draw( Canvas canvas )
-    {
-        if ( !isDead )
-        {
-            movementAnimation[currentAnimationIndex].draw(canvas);
-        }
-        else
-        {
-            deathAnimation.draw( canvas );
-        }
-    }
-
     protected Orientation getRandomOrientation()
     {
         int random = RandomGenerator.getInstance().nextInt( 4 );
         return Orientation.fromInt( random );
     }
 
-    abstract protected void onMove();
-
-    @Override
-    public List<DiscreteCoordinates> getCurrentCells()
+    public float getDamage()
     {
-        return Collections.singletonList( getCurrentMainCellCoordinates() );
+        return inflictDamage;
     }
 
-    public void giveDamage( float damage, Vulnerabilities ... vuln )
+
+    public void giveDamage( float damage )
     {
-        float crits = ( Math.random() < CRITS_PERCENTAGE ) ? 2 : 1;
-        System.out.println("crits : " + crits);
-        for ( Vulnerabilities v : vuln )
+        float crits = 1;
+        if ( Math.random() < CRITS_PERCENTAGE )
         {
-            // if the monster is vulnerable to the weapon, then
-            // deal *1.5 more damage to him
-            if ( vulnerabilities.contains( vuln ) )
-            {
-                giveDamage( damage * 1.5f * crits );
-                return;
-            }
+            crits = 2;
+            dealtCrits = true;
         }
-        giveDamage( damage * crits );
-    }
-
-    private void giveDamage( float damage )
-    {
-        System.out.println("dealt damage"   );
-        currentHealth -= damage;
+        currentHealth -= damage * crits;
         if ( currentHealth <= 0 )
         {
             resetMotion();
             isDead = true;
         }
+    }
+
+
+    @Override
+    public List<DiscreteCoordinates> getCurrentCells()
+    {
+        return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
 }

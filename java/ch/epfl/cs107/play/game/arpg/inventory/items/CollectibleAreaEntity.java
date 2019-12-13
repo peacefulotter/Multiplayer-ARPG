@@ -11,23 +11,21 @@ import java.util.List;
 
 public abstract class CollectibleAreaEntity extends AreaEntity implements Interactable
 {
-    protected Animation animation;
-    private boolean collected=false;
+    private boolean collected = false;
     /**
      * Default AreaEntity constructor
      *
      * @param area        (Area): Owner area. Not null
      * @param position    (DiscreteCoordinate): Initial position of the entity in the Area. Not null
      */
-    public CollectibleAreaEntity(Area area, DiscreteCoordinates position) {
-        super(area, Orientation.DOWN, position);
+    public CollectibleAreaEntity( Area area, DiscreteCoordinates position )
+    {
+        super( area, Orientation.DOWN, position );
     }
-
-
 
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
-        return new ArrayList<DiscreteCoordinates>(Collections.singleton(getCurrentMainCellCoordinates()));
+        return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
 
@@ -44,16 +42,6 @@ public abstract class CollectibleAreaEntity extends AreaEntity implements Intera
     @Override
     public boolean isViewInteractable() {
         return false;
-    }
-
-    @Override
-    public void draw(Canvas canvas) {
-        animation.draw(canvas);
-    }
-
-    @Override
-    public void update(float deltaTime) {
-        animation.update(deltaTime);
     }
 
     //boolean collected necessary because otherwise item may be collected multiple times before actor is unregistered

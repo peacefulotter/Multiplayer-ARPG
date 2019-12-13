@@ -10,32 +10,35 @@ import ch.epfl.cs107.play.math.Transform;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
-public class ARPGInventory extends Inventory implements Actor {
-    private int playerFortune = 0;
-    private int playerMoney = 0;
+public class ARPGInventory extends Inventory implements Actor
+{
+    private int playerFortune;
+    private int playerMoney;
 
     private Sprite sprite;
     private boolean isDisplaying = false;
 
     private AreaEntity holder;
-    private int coins;
     private InventoryItem[] itemOrder;
 
     private int inventorySize;
     private Integer itemOrderIndex;
 
-    public ARPGInventory(AreaEntity holder, float maxWeight, int inventorySize, int initialCoins) {
-        super(maxWeight);
-        playerMoney=initialCoins;
+    public ARPGInventory( AreaEntity holder, float maxWeight, int inventorySize, int initialCoins )
+    {
+        super( maxWeight );
         this.holder = holder;
-        sprite = new Sprite("zelda/inventory.background", 7f, 10f, this);
-        itemOrder= new InventoryItem[inventorySize];
+        playerFortune = initialCoins;
+        playerMoney = initialCoins;
+        sprite = new Sprite( "zelda/inventory.background", 7f, 10f, this );
+        itemOrder = new InventoryItem[ inventorySize ];
         itemOrderIndex = 0;
-        this.inventorySize=inventorySize;
+        this.inventorySize = inventorySize;
 
     }
 
-    public void addMoney(int money) {
+    public void addMoney( int money )
+    {
         playerMoney += money;
         playerFortune += money;
     }
@@ -49,9 +52,10 @@ public class ARPGInventory extends Inventory implements Actor {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        if (isDisplaying) {
-            sprite.draw(canvas);
+    public void draw( Canvas canvas )
+    {
+        if ( isDisplaying ) {
+            sprite.draw( canvas );
         }
     }
 
@@ -59,32 +63,23 @@ public class ARPGInventory extends Inventory implements Actor {
         isDisplaying = !isDisplaying;
     }
 
-
     @Override
-    public Transform getTransform() {
-        return null;
+    public boolean addItemToInventory( InventoryItem item ) {
+        return addItemToInventory( item,1 );
     }
-
-    @Override
-    public Vector getVelocity() {
-        return null;
-    }
-
-    @Override
-    public boolean addItemToInventory(InventoryItem item) {
-        return addItemToInventory(item,1);
-    }
-
 
     //adds item to inventory and adds it to first available slot in inventoryOrder
     //if added to inventory but no available slot found it removes it from inventory and returns false
     @Override
-    public boolean addItemToInventory(InventoryItem item, Integer amount) {
+    public boolean addItemToInventory( InventoryItem item, Integer amount )
+    {
         boolean existedBefore = isItemInInventory(item);
         boolean added = super.addItemToInventory(item, amount);
-        boolean addedToOrder=true;
-        if(added && !existedBefore){
-            addedToOrder=false;
+        boolean addedToOrder = true;
+        if ( added && !existedBefore )
+        {
+            playerFortune += item.getPrice();
+            addedToOrder = false;
             for(int i=0; i< inventorySize;i++){
                 if(itemOrder[i]==null){
                     itemOrder[i]=item;
@@ -101,19 +96,26 @@ public class ARPGInventory extends Inventory implements Actor {
     }
 
     @Override
-    public boolean removeItemFromInventory(InventoryItem item) {
-        return removeItemFromInventory(item, 1);
+    public boolean removeItemFromInventory( InventoryItem item )
+    {
+        return removeItemFromInventory( item, 1 );
     }
 
     @Override
-    public boolean removeItemFromInventory(InventoryItem item, int amount) {
-        boolean removed= super.removeItemFromInventory(item, amount);
-        if(removed){
-            if(inventory.get(item)==0){
-                for(int i=0; i<inventorySize;i++){
-                    if(item==itemOrder[i]){
-                        itemOrder[i]=null;
-                        getNextItem(1);
+    public boolean removeItemFromInventory( InventoryItem item, int amount )
+    {
+        boolean removed = super.removeItemFromInventory( item, amount );
+        if ( removed )
+        {
+            playerFortune -= item.getPrice();
+            if ( inventory.get( item ) == 0 )
+            {
+                for ( int i = 0; i < inventorySize; i++ )
+                {
+                    if ( item == itemOrder[ i ] )
+                    {
+                        itemOrder[ i ] = null;
+                        getNextItem( 1 );
                     }
                 }
             }
@@ -121,23 +123,43 @@ public class ARPGInventory extends Inventory implements Actor {
         return removed;
     }
 
-    public InventoryItem getNextItem(int direction){
-        int searchIndex=itemOrderIndex;
-        for(int i=0; i<inventorySize;i++){
-            searchIndex+=direction;
-            if(searchIndex>=inventorySize) searchIndex-=inventorySize;
-            if(searchIndex<0) searchIndex+=inventorySize;
-            if(itemOrder[searchIndex]!=null){
-                itemOrderIndex=searchIndex;
+    public InventoryItem getNextItem( int direction )
+    {
+        int searchIndex = itemOrderIndex;
+        for ( int i = 0; i < inventorySize; i++ )
+        {
+            searchIndex += direction;
+            if ( searchIndex >= inventorySize )
+            {
+                searchIndex -= inventorySize;
+            }
+            if ( searchIndex < 0 )
+            {
+                searchIndex += inventorySize;
+            }
+            if ( itemOrder[ searchIndex ] != null )
+            {
+                itemOrderIndex = searchIndex;
                 break;
             }
         }
 
-        return itemOrder[itemOrderIndex];
+        return itemOrder[ itemOrderIndex ];
     }
 
 
-    public InventoryItem getCurrentItem() {
-        return itemOrder[itemOrderIndex];
+    public InventoryItem getCurrentItem()
+    {
+        return itemOrder[ itemOrderIndex ];
+    }
+
+    @Override
+    public Transform getTransform() {
+        return null;
+    }
+
+    @Override
+    public Vector getVelocity() {
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
@@ -18,7 +19,6 @@ public class FlameSkull extends Monster implements FlyableEntity
     private final float MAX_LIFE_TIME = 15f;
     private final flameSkullHandler handler;
     private float lifeTime;
-    private boolean hasAttacked=false;
 
     public FlameSkull( Area area, DiscreteCoordinates coords )
     {
@@ -51,11 +51,6 @@ public class FlameSkull extends Monster implements FlyableEntity
     public boolean isCellInteractable()
     {
         return (!isDead && !hasAttacked);
-    }
-
-    protected void onMove() { hasAttacked = false; }
-    public void setHasAttacked(){
-        hasAttacked = true;
     }
 
     @Override
@@ -94,22 +89,37 @@ public class FlameSkull extends Monster implements FlyableEntity
         other.acceptInteraction( handler );
     }
 
-    class flameSkullHandler implements ARPGInteractionVisitor {
+
+    class flameSkullHandler implements ARPGInteractionVisitor
+    {
+        @Override
         public void interactWith( ARPGPlayer player )
         {
-            System.out.println("flameskull damage");
-            player.giveDamage( PLAYER_DAMAGE );
+            if ( !hasAttacked )
+            {
+                player.giveDamage( getDamage() );
+            }
         }
 
         @Override
-        public void interactWith(Grass grass)
+        public void interactWith( Grass grass )
         {
             grass.cutGrass();
         }
 
-        public void interactWith( LogMonster logMonster )
+        @Override
+        public void interactWith( Monster monster )
         {
-            logMonster.giveDamage( 1f, Vulnerabilities.FIRE );
+            if ( !hasAttacked && monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
+            {
+                monster.giveDamage( getDamage() );
+            }
+        }
+
+        @Override
+        public void interactWith( Bomb bomb )
+        {
+            bomb.explode();
         }
     }
 }

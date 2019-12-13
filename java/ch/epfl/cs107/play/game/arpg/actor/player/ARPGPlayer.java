@@ -3,10 +3,9 @@ package ch.epfl.cs107.play.game.arpg.actor.player;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.ARPG;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
-import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
-import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
-import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
+import ch.epfl.cs107.play.game.arpg.actor.monster.*;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.MagicProjectile;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
@@ -82,10 +81,11 @@ public class ARPGPlayer extends Player {
         };
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
-        inventory.addItemToInventory(ARPGItem.BOMB, 10);
-        inventory.addItemToInventory(ARPGItem.SWORD);
-        inventory.addItemToInventory(ARPGItem.BOW);
-        inventory.addItemToInventory(ARPGItem.STAFF);
+        inventory.addItemToInventory( ARPGItem.BOMB, 10 );
+        inventory.addItemToInventory( ARPGItem.SWORD );
+        inventory.addItemToInventory( ARPGItem.BOW );
+        inventory.addItemToInventory( ARPGItem.STAFF );
+        inventory.addItemToInventory( ARPGItem.ARROW, 10 );
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
@@ -194,7 +194,10 @@ public class ARPGPlayer extends Player {
             case BOW:
                 if (state == state.IDLE) {
                     state = PlayerStates.ATTACKING_BOW;
-                    getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                    if ( inventory.removeItemFromInventory( (InventoryItem)ARPGItem.ARROW ) )
+                    {
+                        getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                    }
                     currentAnimation = 2;
                 }
             case STAFF:
@@ -316,7 +319,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public boolean isCellInteractable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -343,12 +346,15 @@ public class ARPGPlayer extends Player {
             }
         }
 
+        @Override
         public void interactWith(Coin coin) {
             inventory.addMoney(coin.getValue());
             coin.collect();
         }
 
-        public void interactWith(Heart heart) {
+        @Override
+        public void interactWith( Heart heart )
+        {
             hp += 1;
             if (hp > maxHP) {
                 hp = maxHP;
@@ -357,46 +363,42 @@ public class ARPGPlayer extends Player {
         }
 
         @Override
-        public void interactWith(CastleKey key) {
-            inventory.addItemToInventory(ARPGItem.CASTLE_KEY);
+        public void interactWith( CastleKey key )
+        {
+            inventory.addItemToInventory( ARPGItem.CASTLE_KEY );
             key.collect();
         }
 
         @Override
-        public void interactWith(CastleDoor door) {
-            if (!door.isOpen() && inventory.getCurrentItem() == ARPGItem.CASTLE_KEY) {
+        public void interactWith( CastleDoor door )
+        {
+            if ( !door.isOpen() && inventory.getCurrentItem() == ARPGItem.CASTLE_KEY )
+            {
                 door.openDoor();
-            } else if (door.isOpen()) {
+            } else if ( door.isOpen() )
+            {
                 door.passDoor();
-                setIsPassingADoor(door);
+                setIsPassingADoor( door );
             } else {
-                System.out.println("You need the key");
+                System.out.println( "You need the key" );
             }
         }
 
         @Override
-        public void interactWith(Grass grass) {
-            if (state.isCloseRangeAttacking()) {
+        public void interactWith( Grass grass )
+        {
+            if ( state.isCloseRangeAttacking() )
+            {
                 grass.cutGrass();
             }
         }
 
-
-        /* PLAYER SHOULDNT INTERACT WITH FLAMESKULL
-         -> FLAMESKULL SHOULD INTERACT WITH PLAYER
-         */
-
         @Override
-        public void interactWith(FlameSkull skull) {
-            System.out.println("flameskull player");
-            giveDamage(1f);
-            skull.setHasAttacked();
-        }
-
-        @Override
-        public void interactWith(Monster monster) {
-            if (state.isCloseRangeAttacking()) {
-                monster.giveDamage(getEquippedItem().getDamage(), getEquippedItem().getVuln());
+        public void interactWith( Monster monster )
+        {
+            if ( monster.getVulnerabilities().contains( getEquippedItem().getVuln() ) )
+            {
+                monster.giveDamage( getEquippedItem().getDamage() ) ;
             }
         }
     }

@@ -116,17 +116,18 @@ public abstract class Area implements Playable {
      * @param a (Actor): the actor to register, not null
      * @return (boolean): true if the actor is correctly registered
      */
-    public final boolean registerActor(Actor a){
-        //  finer Area strategies can be implemented here if wanted
-        if(a instanceof  Interactable){
-            if(canEnterAreaCells((Interactable) a, Collections.singletonList(new DiscreteCoordinates((int)a.getPosition().x,(int)a.getPosition().y)))){
-                return registeredActors.add(a);
-            }
-            else{
-                return false;
-            }
-        }else{
-            return registeredActors.add(a);
+    public final boolean registerActor( Actor a )
+     {
+        if (
+                a instanceof Interactable &&
+                !canEnterAreaCells( (Interactable) a, Collections.singletonList(new DiscreteCoordinates((int)a.getPosition().x,(int)a.getPosition().y)))
+        )
+        {
+            return false;
+        }
+        else
+        {
+            return registeredActors.add( a );
         }
     }
 

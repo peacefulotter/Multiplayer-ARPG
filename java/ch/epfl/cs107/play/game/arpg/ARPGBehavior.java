@@ -98,9 +98,11 @@ public class ARPGBehavior extends AreaBehavior
             {
                 return type.isWalkable || type.isFlyable;
             }
-            for ( Interactable occupant : entities ) {
-                if ( occupant.takeCellSpace() ) return false;
+            if ( entity.takeCellSpace() && hasNonTraversableContent() )
+            {
+                return false;
             }
+
             return type.isWalkable;
         }
 

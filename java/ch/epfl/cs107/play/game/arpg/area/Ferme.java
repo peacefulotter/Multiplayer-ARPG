@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.game.arpg.area;
 import ch.epfl.cs107.play.game.areagame.actor.Background;
 import ch.epfl.cs107.play.game.areagame.actor.Foreground;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.arpg.actor.monster.FireSpell;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
 import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
@@ -42,10 +43,19 @@ public class Ferme extends ARPGArea
                 Orientation.DOWN,
                 new DiscreteCoordinates(13, 0 ),
                 new DiscreteCoordinates( 14, 0 ) ) );
-        registerActor(new Coin(this, new DiscreteCoordinates(10,10), 50));
-        registerActor(new Heart(this,  new DiscreteCoordinates(9,10)));
+        registerActor( new Door(
+                "custom/House",
+                new DiscreteCoordinates( 14, 2 ),
+                Logic.TRUE,
+                this,
+                Orientation.UP,
+                new DiscreteCoordinates( 6, 11 ) ) );
+        registerActor( new Coin(this, new DiscreteCoordinates(10,10), 50));
+        registerActor( new Heart(this,  new DiscreteCoordinates(9,10)));
         registerActor( new FlameSkull( this, new DiscreteCoordinates( 2, 15 ) ));
         registerActor( new LogMonster( this, new DiscreteCoordinates( 8, 8 ) ));
+        registerActor( new FireSpell( this, Orientation.DOWN, new DiscreteCoordinates( 10, 9 ), 0.6f, 4 ) );
+        registerActor( new FireSpell( this, Orientation.DOWN, new DiscreteCoordinates( 9, 9 ), 0.6f, 7 ) );
     }
 
     @Override

@@ -77,7 +77,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
-        return new ArrayList<DiscreteCoordinates>(Collections.singleton(getCurrentMainCellCoordinates()));
+        return Collections.singletonList( getCurrentMainCellCoordinates() );
     }
 
     @Override
@@ -87,7 +87,7 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public boolean isCellInteractable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -153,17 +153,12 @@ public class Bomb extends AreaEntity implements Interactor {
         }
 
         @Override
-        public void interactWith( FlameSkull flameSkull )
+        public void interactWith( Monster monster )
         {
-            explode();
-            flameSkull.giveDamage( BOMB_DAMAGE, Vulnerabilities.CLOSE_RANGE );
-        }
-
-        @Override
-        public void interactWith( LogMonster logMonster )
-        {
-            System.out.println("ouch");
-            logMonster.giveDamage( 1f, Vulnerabilities.CLOSE_RANGE );
+            if ( monster.getVulnerabilities().contains( Vulnerabilities.CLOSE_RANGE ) )
+            {
+                monster.giveDamage( BOMB_DAMAGE );
+            }
         }
     }
 
