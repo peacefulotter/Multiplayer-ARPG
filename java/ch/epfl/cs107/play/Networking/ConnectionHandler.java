@@ -84,15 +84,15 @@ public class ConnectionHandler implements Runnable {
         }
     }
     private void parsePacket(byte[] data){
-        String message=new String(data).trim();
+        String message = new String(data).trim();
         if(message.length()<2) return;
-        PacketTypes type= Packet.lookupPacket(message.substring(0,2));
+        PacketTypes type = Packet.lookupPacket(message.substring(0,2));
         switch(type){
             default:
             case INVALID:
                 break;
             case SPAWN:
-                Packet00Spawn spawnPacket= new Packet00Spawn(data);
+                Packet00Spawn spawnPacket = new Packet00Spawn(data);
                 game.spawnObject(spawnPacket);
                 break;
             case LOGIN:

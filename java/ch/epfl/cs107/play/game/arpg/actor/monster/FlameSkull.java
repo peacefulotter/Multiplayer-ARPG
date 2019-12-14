@@ -74,7 +74,7 @@ public class FlameSkull extends Monster implements FlyableEntity
     @Override
     public boolean wantsCellInteraction()
     {
-        return true;
+        return (!isDead && !hasAttacked);
     }
 
     @Override
@@ -95,10 +95,8 @@ public class FlameSkull extends Monster implements FlyableEntity
         @Override
         public void interactWith( ARPGPlayer player )
         {
-            if ( !hasAttacked )
-            {
-                player.giveDamage( getDamage() );
-            }
+            player.giveDamage( getDamage() );
+            hasAttacked = true;
         }
 
         @Override
@@ -110,9 +108,10 @@ public class FlameSkull extends Monster implements FlyableEntity
         @Override
         public void interactWith( Monster monster )
         {
-            if ( !hasAttacked && monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
+            if ( monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
             {
                 monster.giveDamage( getDamage() );
+                hasAttacked = true;
             }
         }
 
