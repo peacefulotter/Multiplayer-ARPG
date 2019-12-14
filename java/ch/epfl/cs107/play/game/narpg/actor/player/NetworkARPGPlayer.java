@@ -17,6 +17,7 @@ import java.util.Random;
 
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
     private Connection connection;
+    private Area currentArea;
     private int id;
     private boolean clientAuthority;
     /**
@@ -28,6 +29,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      */
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
         super(area, orientation, coordinates);
+        this.currentArea =  area;
         this.connection = connection;
         this.id = IdGenerator.generateId();
         this.clientAuthority=clientAuthority;
@@ -44,7 +46,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 else if ( keyboard.get( keyboard.DOWN ).isDown() ) { moved = Orientation.DOWN; }
                 else if ( keyboard.get( keyboard.LEFT ).isDown() ) { moved = Orientation.LEFT; }
                 else if ( keyboard.get( keyboard.RIGHT ).isDown() ) { moved = Orientation.RIGHT; }
-                else if ( keyboard.get( keyboard.E ).isPressed() ) { useItem(); }
+                else if ( keyboard.get( keyboard.SPACE ).isPressed() ) { useItem(); }
             }
             if ( moved != null ) {
                 Packet02Move packet = new Packet02Move( id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION );
@@ -62,7 +64,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         switch ( getEquippedItem() )
         {
             case BOMB:
-                Packet00Spawn packet = new Packet00Spawn( NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), getOwnerArea() );
+                Packet00Spawn packet = new Packet00Spawn( NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), currentArea );
                 packet.writeData( connection );
                 break;
         }
@@ -94,7 +96,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public Packet00Spawn getSpawnPacket() {
-        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(),getCurrentCells().get(0),getOwnerArea());
+        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(),getCurrentCells().get(0), currentArea);
     }
 
     @Override

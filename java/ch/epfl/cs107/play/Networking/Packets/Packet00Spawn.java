@@ -46,8 +46,9 @@ public class Packet00Spawn extends Packet {
     public Area getArea() {
         return area;
     }
+
     public DiscreteCoordinates getDiscreteCoordinate(){
-        return new DiscreteCoordinates(startX,startY);
+        return new DiscreteCoordinates(startX, startY);
     }
 
 

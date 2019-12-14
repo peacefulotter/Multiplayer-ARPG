@@ -9,20 +9,25 @@ import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet01Login;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.ARPG;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkedBomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
+import ch.epfl.cs107.play.game.narpg.areas.NFerme;
+import ch.epfl.cs107.play.game.rpg.RPG;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class NARPG extends ARPG {
+public class NARPG extends AreaGame
+{
     private List<NetworkARPGPlayer> players = new ArrayList<NetworkARPGPlayer>();
     private List<NetworkEntity> networkEntities = new ArrayList<>();
     private Connection connection;
@@ -34,6 +39,16 @@ public class NARPG extends ARPG {
         this.connection=connection;
     }
 
+    @Override
+    public String getTitle()
+    {
+        return "ZeldIC - Multiplayer";
+    }
+
+    protected void createAreas()
+    {
+        new NFerme();
+    }
 
     @Override
     public boolean begin(Window window, FileSystem fileSystem) {
@@ -42,9 +57,11 @@ public class NARPG extends ARPG {
             Area area = setCurrentArea("zelda/Ferme", true);
             if(!isServer){
                 ((Client) connection).login();
-                var player = new NetworkARPGPlayer(getCurrentArea(), Orientation.DOWN, new DiscreteCoordinates(6, 10), connection,true);
-                initPlayer(player);
-                new Packet00Spawn(player.getId(), NetworkEntities.PLAYER, player.getOrientation(),player.getCurrentCells().get(0),getCurrentArea()).writeData(connection);
+                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection,true);
+                //initPlayer(player);
+                getCurrentArea().registerActor(player);
+                getCurrentArea().setViewCandidate(player);
+                player.getSpawnPacket().writeData( connection );
                 players.add(player);
                 networkEntities.add(player);
             }
@@ -56,7 +73,7 @@ public class NARPG extends ARPG {
 
 
     public void moveObject(Packet02Move packet){
-        System.out.println(packet.getObjectId());
+        //System.out.println(packet.getObjectId());
         for(NetworkEntity p: networkEntities){
             if(p.isMovable() && packet.getObjectId()==p.getId()){
                 if(p instanceof NetworkARPGPlayer){
@@ -71,26 +88,38 @@ public class NARPG extends ARPG {
         }
     }
 
-    public boolean spawnObject(Packet00Spawn packet){
+    public boolean spawnObject( Packet00Spawn packet ) {
         System.out.println("spawnobject in NARPG");
         NetworkEntities object = packet.getObject();
-        if(object==NetworkEntities.PLAYER){
-            for(NetworkARPGPlayer p : players){
-                if(p.getId()==packet.getObjectId()){
-                    return false;
+        Area area = packet.getArea();
+        if ( area == null ) { area = getCurrentArea(); }
+        switch ( object )
+        {
+            case PLAYER:
+                for (NetworkARPGPlayer p : players)
+                {
+                    if (p.getId() == packet.getObjectId())
+                    {
+                        return false;
+                    }
                 }
-            }
-            var newPlayer = new NetworkARPGPlayer(getCurrentArea(),packet.getOrientation(),packet.getDiscreteCoordinate(),connection, false);
-            newPlayer.setId(packet.getObjectId());
-            players.add(newPlayer);
-            networkEntities.add(newPlayer);
-            getCurrentArea().registerActor(newPlayer);
-            return true;
-
+                var newPlayer = new NetworkARPGPlayer(area, packet.getOrientation(),
+                        packet.getDiscreteCoordinate(), connection, false);
+                newPlayer.setId(packet.getObjectId());
+                players.add(newPlayer);
+                networkEntities.add(newPlayer);
+                area.registerActor(newPlayer);
+                break;
+            case BOMB:
+                NetworkedBomb newBomb = new NetworkedBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),
+                        connection);
+                networkEntities.add( newBomb );
+                area.registerActor( newBomb );
+                break;
         }
-        if(object==NetworkEntities.BOMB) new NetworkedBomb(getCurrentArea(),packet.getOrientation(),packet.getDiscreteCoordinate(),connection);
         return  true;
-    };
+    }
+
     public void login(long mainId){
         for(NetworkEntity p: networkEntities){
             var packet = p.getSpawnPacket();
@@ -100,6 +129,6 @@ public class NARPG extends ARPG {
 
     @Override
     public void update(float deltaTime) {
-        getCurrentArea().update(deltaTime);
+        super.update(deltaTime);
     }
 }

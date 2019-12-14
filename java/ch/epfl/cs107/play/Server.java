@@ -57,7 +57,7 @@ public class Server implements Connection {
 
     @Override
     public void sendDataTo(long connectionId,byte[] data) {
-        System.out.println(connectionId);
+        //System.out.println(connectionId);
         for(ConnectionHandler c : connections){
             if(c.getConnectionId()==connectionId){
                 c.sendData(data);
