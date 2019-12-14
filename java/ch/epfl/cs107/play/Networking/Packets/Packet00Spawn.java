@@ -15,6 +15,7 @@ public class Packet00Spawn extends Packet {
     private int startX;
     private int startY;
     private Area area;
+
     public Packet00Spawn(byte[] data) {
         super(00, data);
         String[] dataArray = readData(data).split(",");

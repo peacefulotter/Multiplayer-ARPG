@@ -39,18 +39,33 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         if(!connection.isServer() && clientAuthority){
             Keyboard keyboard = getOwnerArea().getKeyboard();
             Orientation moved=null;
-            if(connection !=null){
-                if(keyboard.get(keyboard.UP).isDown()) moved=Orientation.UP;
-                else if(keyboard.get(keyboard.DOWN).isDown()) moved=Orientation.DOWN;
-                else if(keyboard.get(keyboard.LEFT).isDown()) moved=Orientation.LEFT;
-                else if(keyboard.get(keyboard.RIGHT).isDown()) moved=Orientation.RIGHT;
+            if ( connection != null ) {
+                if ( keyboard.get(keyboard.UP).isDown() ) { moved = Orientation.UP; }
+                else if ( keyboard.get( keyboard.DOWN ).isDown() ) { moved = Orientation.DOWN; }
+                else if ( keyboard.get( keyboard.LEFT ).isDown() ) { moved = Orientation.LEFT; }
+                else if ( keyboard.get( keyboard.RIGHT ).isDown() ) { moved = Orientation.RIGHT; }
+                else if ( keyboard.get( keyboard.E ).isPressed() ) { useItem(); }
             }
-            if(moved!=null){
-                Packet02Move packet = new Packet02Move(id,moved,getCurrentMainCellCoordinates(),ANIMATION_DURATION);
-                packet.writeData(connection);
+            if ( moved != null ) {
+                Packet02Move packet = new Packet02Move( id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION );
+                packet.writeData( connection );
             }
         }
         super.update(deltaTime);
+    }
+
+
+
+    private void useItem()
+    {
+        System.out.println("useditem");
+        switch ( getEquippedItem() )
+        {
+            case BOMB:
+                Packet00Spawn packet = new Packet00Spawn( NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), getOwnerArea() );
+                packet.writeData( connection );
+                break;
+        }
     }
 
     public void updatePlayerState(Orientation orientation){

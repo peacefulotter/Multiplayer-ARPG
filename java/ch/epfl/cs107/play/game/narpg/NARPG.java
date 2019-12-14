@@ -72,6 +72,7 @@ public class NARPG extends ARPG {
     }
 
     public boolean spawnObject(Packet00Spawn packet){
+        System.out.println("spawnobject in NARPG");
         NetworkEntities object = packet.getObject();
         if(object==NetworkEntities.PLAYER){
             for(NetworkARPGPlayer p : players){

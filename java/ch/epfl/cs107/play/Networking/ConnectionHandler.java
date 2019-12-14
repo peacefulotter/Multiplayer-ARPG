@@ -11,6 +11,7 @@ import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 
 public class ConnectionHandler implements Runnable {
