@@ -11,8 +11,8 @@ public class NFerme extends ARPGArea
     @Override
     protected void createArea()
     {
-        new Background( this );
-        new Foreground( this );
+        registerActor(new Background( this ));
+        registerActor(new Foreground( this ));
         registerActor( new LogMonster( this, new DiscreteCoordinates( 8, 8 ) ) );
     }
 
