@@ -50,7 +50,7 @@ public class ARPG extends RPG {
     }
 
     @Override
-    public void update( float deltaTime )
+    public void update( float deltaTime)
     {
         if ( player.isPassingADoor() )
         {

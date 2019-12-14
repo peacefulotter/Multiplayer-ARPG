@@ -21,7 +21,7 @@ public class Client extends Play implements Connection {
                 NARPG game = new NARPG(false, this);
                 connection = new ConnectionHandler(incoming, game, false, this, mainId);
                 Thread connectionThread = new Thread(connection);
-                Thread GameThread = new Thread(new ThreadedPlay(game));
+                Thread GameThread = new Thread(new ThreadedPlay(game,false));
                 connectionThread.start();
                 GameThread.start();
                 connected=true;

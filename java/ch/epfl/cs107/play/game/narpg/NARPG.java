@@ -96,4 +96,9 @@ public class NARPG extends ARPG {
             packet.writeData(connection);
         }
     }
+
+    @Override
+    public void update(float deltaTime) {
+        getCurrentArea().update(deltaTime);
+    }
 }

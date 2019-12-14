@@ -54,6 +54,8 @@ public final class SwingWindow extends Node implements Window {
 	private Button focus;
 	private final MouseProxy mouseProxy;
 	private final KeyboardProxy keyboardProxy;
+	//
+	private final boolean headless;
 	
 	// Define mouse manager
 	private final class MouseProxy extends MouseAdapter implements Mouse {
@@ -158,9 +160,11 @@ public final class SwingWindow extends Node implements Window {
 	 * @param fileSystem (FileSystem): source used to load images
 	 * @param width (int): width in pixel of the window
 	 * @param height (int): height in pixel of the window
+	 * @param headless (boolean): boolean to choose if the swing window will be headless(without display)
 	 */
-	public SwingWindow(String title, FileSystem fileSystem, int width, int height) {
-
+	public SwingWindow(String title, FileSystem fileSystem, int width, int height, boolean headless) {
+		//set headless boolean
+		this.headless=headless;
 		// Prepare image and sound loader
 		this.fileSystem = fileSystem;
 		images = new HashMap<>();
@@ -175,21 +179,6 @@ public final class SwingWindow extends Node implements Window {
 		canvas.setIgnoreRepaint(true);
 		canvas.setBackground(Color.BLACK);
 
-		// Create Swing frame
-		frame = new JFrame(title);
-		frame.add(canvas);
-		focus = new Button(false);
-
-		// Handle close request
-		final WindowAdapter windowAdapter = new WindowAdapter() {
-
-			@Override
-			public void windowClosing(WindowEvent we) {
-				closeRequested = true;
-			}
-		};
-		frame.addWindowListener(windowAdapter);
-
 		// Create mouse manager
 		mouseProxy = new MouseProxy();
 		canvas.addMouseListener(mouseProxy);
@@ -199,14 +188,36 @@ public final class SwingWindow extends Node implements Window {
 		keyboardProxy = new KeyboardProxy();
 		canvas.addKeyListener(keyboardProxy);
 
-		// Show frame
-		frame.pack();
-		frame.setSize(width, height);
-		frame.setResizable(true);
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		if(!headless){
+			// Create Swing frame
+			frame = new JFrame(title);
+			frame.add(canvas);
+			focus = new Button(false);
+
+			// Handle close request
+			final WindowAdapter windowAdapter = new WindowAdapter() {
+
+				@Override
+				public void windowClosing(WindowEvent we) {
+					closeRequested = true;
+				}
+			};
+			frame.addWindowListener(windowAdapter);
+			// Show frame
+			frame.pack();
+			frame.setSize(width, height);
+			frame.setResizable(true);
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+		}else{
+			frame=null;
+		}
 
 	}
+	public SwingWindow(String title, FileSystem fileSystem, int width, int height) {
+		this(title,fileSystem,width,height,false);
+	};
 
 	@Override
 	public Button getFocus() {
@@ -230,6 +241,8 @@ public final class SwingWindow extends Node implements Window {
 
 	@Override
 	public void update() {
+	    //dont need to update if headless;
+		if(headless) return;
 		// Compute viewport metrics
 		final int width = canvas.getWidth();
 		final int height = canvas.getHeight();
@@ -319,6 +332,7 @@ public final class SwingWindow extends Node implements Window {
 	@Override
 	public void dispose() {
 		playSound(null, false,0.0f, false, false, true);
+		if(!headless)
 		frame.dispose();
 	}
 

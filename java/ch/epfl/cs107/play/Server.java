@@ -15,7 +15,7 @@ public class Server implements Connection {
 
     public Server(int port) {
         NARPG game = new NARPG(true,this);
-        Thread GameThread = new Thread(new ThreadedPlay(game));
+        Thread GameThread = new Thread(new ThreadedPlay(game, true));
         GameThread.start();
         try {
             ServerSocket server = new ServerSocket(port);

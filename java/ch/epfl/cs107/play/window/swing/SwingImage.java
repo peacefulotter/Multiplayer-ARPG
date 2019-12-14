@@ -31,10 +31,10 @@ public final class SwingImage implements Image {
 		// http://stackoverflow.com/questions/196890/java2d-performance-issues
 		// http://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage
 		// http://stackoverflow.com/questions/148478/java-2d-drawing-optimal-performance
-		
-		// Get system graphical configuration
-		final GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-		
+
+        //check if headless
+        final boolean isHeadless= GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance();
+
 		// Get image size
 		int width = image.getWidth(null);
 		int height = image.getHeight(null);
@@ -44,9 +44,15 @@ public final class SwingImage implements Image {
 		    height = Math.min(height, roi.h);
         }
 
-		// Create optimized buffered image
-		this.image = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-		
+        if(!isHeadless){
+            // Get system graphical configuration
+            GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+            // Create optimized buffered image
+            this.image = config.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+        }else{
+            this.image=new BufferedImage(width,height,Transparency.TRANSLUCENT);
+        }
+
 		// Draw original image in buffer
 		final Graphics2D graphics = this.image.createGraphics();
 		if(roi == null) {

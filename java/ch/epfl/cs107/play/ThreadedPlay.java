@@ -1,6 +1,7 @@
 package ch.epfl.cs107.play;
 
 import ch.epfl.cs107.play.game.Game;
+import ch.epfl.cs107.play.game.narpg.NARPG;
 import ch.epfl.cs107.play.io.DefaultFileSystem;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.io.ResourceFileSystem;
@@ -22,19 +23,19 @@ public class ThreadedPlay implements Runnable {
     private final FileSystem fileSystem;
     private final Game game;
     private final Window window;
-    private Dimension screenSize;
+    private boolean isServer;
+    private boolean runGame;
 
-    public ThreadedPlay(Game game) {
-
+    public ThreadedPlay(NARPG game, boolean isServer) {
+        this.isServer=isServer;
         // Define cascading file system
         fileSystem = new ResourceFileSystem(DefaultFileSystem.INSTANCE);
         // Create a demo game and initialize corresponding texts
         XMLTexts.initialize(fileSystem, "strings/icmon_fr.xml");
         this.game=game;
-        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         // get the screen size so that the window is matching the display
-        // Use Swing display
-        window = new SwingWindow(game.getTitle(), fileSystem, 550, 550);
+        // Use Swing displayGame
+        window = new SwingWindow(game.getTitle(), fileSystem, 550, 550,isServer);
         //Recorder recorder = new Recorder(window);
         //RecordReplayer replayer = new RecordReplayer(window); // not used in this project
     }
@@ -56,7 +57,7 @@ public class ThreadedPlay implements Runnable {
                 final float frameDuration = ONE_SEC / game.getFrameRate();
 
                 // Run until the user try to close the window
-                while (!window.isCloseRequested()) {
+                while (!window.isCloseRequested() && !runGame) {
 
                     // Compute time interval
                     lastTime = currentTime;
@@ -88,7 +89,6 @@ public class ThreadedPlay implements Runnable {
         } finally {
             // Release resources
             window.dispose();
-
         }
     }
 }
