@@ -47,8 +47,11 @@ public abstract class Packet {
     public abstract byte[] getData();
 
     public static enum PacketTypes {
-        INVALID(-1), SPAWN(00), LOGIN(01),
-        UPDATE(10),MOVE(02);
+        INVALID(-1),
+        SPAWN(00),
+        LOGIN(01),
+        MOVE(02),
+        UPDATE(10);
 
         private int packetID;
 

@@ -4,18 +4,24 @@ import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 
 public enum NetworkEntities {
     PLAYER(001, NetworkARPGPlayer.class),
-    BOMB(002,NetworkedBomb.class);
+    BOMB(002, NetworkedBomb.class),
+    GRASS( 003, NetworkGrass.class );
+
     private final int classId;
     private final Class<?> value;
-    NetworkEntities(int classId, Class<?> value){
-        this.classId=classId;
-        this.value=value;
-    };
+
+    NetworkEntities( int classId, Class value )
+    {
+        this.classId = classId;
+        this.value = value;
+    }
 
     public int getClassId() {
         return classId;
     }
-    public Class<?> getValue(){ return value;}
+
+    public Class<?> getValue() { return value;}
+
     public static NetworkEntities lookUpEntity(int classId){
         for(NetworkEntities e : NetworkEntities.values()){
             if(e.classId==classId){
@@ -24,5 +30,6 @@ public enum NetworkEntities {
         }
         return null;
     }
+
     public static int getValue;
 }

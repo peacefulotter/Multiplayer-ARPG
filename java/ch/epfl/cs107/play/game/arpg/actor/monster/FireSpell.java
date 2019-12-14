@@ -194,7 +194,6 @@ public class FireSpell extends AreaEntity implements Interactor
         @Override
         public void interactWith( Monster monster )
         {
-            System.out.println("lol");
             if ( !hasAttacked && monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
             {
                 hasAttacked = true;

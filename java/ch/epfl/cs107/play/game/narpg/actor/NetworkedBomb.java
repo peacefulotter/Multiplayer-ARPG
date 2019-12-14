@@ -8,6 +8,8 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
+import java.sql.SQLOutput;
+
 public class NetworkedBomb extends Bomb implements NetworkEntity {
     public NetworkedBomb(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection) {
         super(area, orientation, position);
@@ -15,7 +17,7 @@ public class NetworkedBomb extends Bomb implements NetworkEntity {
 
     @Override
     public int getId() {
-        return 0;
+        return NetworkEntities.BOMB.getClassId();
     }
 
     @Override
@@ -30,6 +32,7 @@ public class NetworkedBomb extends Bomb implements NetworkEntity {
 
     @Override
     public Packet00Spawn getSpawnPacket() {
+        System.out.println("spanw packet bomb");
         return null;
     }
 }

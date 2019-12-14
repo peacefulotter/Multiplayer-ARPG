@@ -29,7 +29,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
         super(area, orientation, coordinates);
         this.connection = connection;
-        this.id= IdGenerator.generateId();
+        this.id = IdGenerator.generateId();
         this.clientAuthority=clientAuthority;
         if(!clientAuthority) unReactive=true;
     }
