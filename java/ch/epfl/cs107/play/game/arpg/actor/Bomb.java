@@ -155,7 +155,7 @@ public class Bomb extends AreaEntity implements Interactor {
         @Override
         public void interactWith( Monster monster )
         {
-            if ( monster.getVulnerabilities().contains( Vulnerabilities.CLOSE_RANGE ) )
+            if ( monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
             {
                 monster.giveDamage( BOMB_DAMAGE );
             }
