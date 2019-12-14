@@ -17,7 +17,7 @@ public class Client extends Play implements Connection {
         boolean connected = false;
         while (!connected) {
             try {
-                Socket incoming = new Socket("localhost", port);
+                Socket incoming = new Socket("epflmp2.me", port);
                 NARPG game = new NARPG(false, this);
                 connection = new ConnectionHandler(incoming, game, false, this, mainId);
                 Thread connectionThread = new Thread(connection);

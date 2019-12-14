@@ -100,7 +100,6 @@ public class Arrow extends Projectile
             }
             if ( !(monster instanceof FlameSkull) )
             {
-                System.out.println("stopped");
                 stopProjectile();
             }
         }
