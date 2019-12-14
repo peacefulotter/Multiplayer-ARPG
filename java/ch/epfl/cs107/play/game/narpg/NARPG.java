@@ -46,7 +46,7 @@ public class NARPG extends AreaGame
 
     protected void createAreas()
     {
-        new NFerme();
+        addArea(new NFerme());
     }
 
     @Override
