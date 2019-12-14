@@ -396,6 +396,8 @@ public class ARPGPlayer extends Player {
         @Override
         public void interactWith( Monster monster )
         {
+            System.out.println(monster.getVulnerabilities());
+            System.out.println(getEquippedItem().getVuln());
             if ( monster.getVulnerabilities().contains( getEquippedItem().getVuln() ) )
             {
                 monster.giveDamage( getEquippedItem().getDamage() ) ;

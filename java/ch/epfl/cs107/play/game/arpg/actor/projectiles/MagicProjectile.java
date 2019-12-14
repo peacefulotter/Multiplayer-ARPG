@@ -68,7 +68,10 @@ public class MagicProjectile extends Projectile
         @Override
         public void interactWith( Monster monster )
         {
-            monster.giveDamage( MAGIC_DAMAGE );
+            if ( monster.getVulnerabilities().contains( Vulnerabilities.MAGIC ) )
+            {
+                monster.giveDamage( MAGIC_DAMAGE );
+            }
             if ( monster instanceof DarkLord )
             {
                 stopProjectile();

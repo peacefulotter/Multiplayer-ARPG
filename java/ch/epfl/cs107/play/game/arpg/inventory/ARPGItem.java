@@ -24,7 +24,7 @@ public enum ARPGItem implements InventoryItem
             false, 0 ),
     STAFF( "Magic Wand", "zelda/staff_water.icon",
             2f, 10,
-            true, 1.5f, Vulnerabilities.MAGIC, Vulnerabilities.LONG_RANGE ),
+            true, 1.5f, Vulnerabilities.MAGIC ),
     SWORD(
             "Sword", "zelda/sword.icon",
             1f, 10,
@@ -36,9 +36,14 @@ public enum ARPGItem implements InventoryItem
     protected int price;
     private boolean equippable;
     private float damage;
-    private Vulnerabilities[] weaponType;
+    private Vulnerabilities weaponType;
 
-    ARPGItem( String name, String spriteName, float weight, int price, boolean equipable, float damage, Vulnerabilities ... weaponType )
+    ARPGItem( String name, String spriteName, float weight, int price, boolean equippable, float damage )
+    {
+        this( name, spriteName, weight, price, equippable, damage, null );
+    }
+
+    ARPGItem( String name, String spriteName, float weight, int price, boolean equipable, float damage, Vulnerabilities weaponType )
     {
         this.name = name;
         this.spriteName = spriteName;
@@ -46,11 +51,7 @@ public enum ARPGItem implements InventoryItem
         this.price = price;
         this.equippable = equippable;
         this.damage = damage;
-        this.weaponType = new Vulnerabilities[ weaponType.length ];
-        for ( int i = 0; i < weaponType.length; i++ )
-        {
-            this.weaponType[ i ] = weaponType[ i ];
-        }
+        this.weaponType = weaponType;
     }
 
     @Override
@@ -82,5 +83,5 @@ public enum ARPGItem implements InventoryItem
 
     public float getDamage() { return damage; }
 
-    public Vulnerabilities[] getVuln() { return weaponType; }
+    public Vulnerabilities getVuln() { return weaponType; }
 }
