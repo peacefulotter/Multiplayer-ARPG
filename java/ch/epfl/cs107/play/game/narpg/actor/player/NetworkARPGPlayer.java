@@ -4,15 +4,19 @@ import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
+import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Keyboard;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
@@ -29,6 +33,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      */
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
         super(area, orientation, coordinates);
+        handler=new NetworkARPGLPlayerHandler();
         this.currentArea =  area;
         this.connection = connection;
         this.id = IdGenerator.generateId();
@@ -115,7 +120,24 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.id=objectId;
     }
 
+
     public boolean isClientAuthority() {
         return clientAuthority;
+    }
+    class NetworkARPGLPlayerHandler extends ARPGPlayerHandler{
+        @Override
+        public void interactWith(Coin coin) {
+            coin.collect();
+            HashMap<String,String> changeMap= new HashMap();
+            changeMap.put("playerMoney",String.valueOf(getMoney()+50));
+            var updatePacket= new Packet03Update(getId(),changeMap);
+            updatePacket.writeData(connection);
+        }
+    }
+    public void sePlayerMoney(String amount){
+        inventory.setMoney(Integer.parseInt(amount));
+    }
+    public String getPlayerMoney(){
+        return String.valueOf(inventory.getMoney());
     }
 }

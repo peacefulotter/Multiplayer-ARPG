@@ -4,10 +4,7 @@ import ch.epfl.cs107.play.Client;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
-import ch.epfl.cs107.play.Networking.Packets.Packet;
-import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
-import ch.epfl.cs107.play.Networking.Packets.Packet01Login;
-import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
+import ch.epfl.cs107.play.Networking.Packets.*;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -20,7 +17,9 @@ import ch.epfl.cs107.play.game.rpg.RPG;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
+import org.apache.commons.beanutils.BeanUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +32,10 @@ public class NARPG extends AreaGame
     private Connection connection;
     private boolean isServer;
 
-    public NARPG(boolean isServer,Connection connection) {
+    public NARPG(boolean isServer, Connection connection) {
         super();
         this.isServer = isServer;
-        this.connection=connection;
+        this.connection = connection;
     }
 
     @Override
@@ -71,18 +70,28 @@ public class NARPG extends AreaGame
 
     }
 
+    public void updateState(Packet03Update update) {
+        var entity= findEntity(update.getObjectId());
+        try {
+            System.out.println(update.getBeanMap());
+            BeanUtils.populate(entity,update.getBeanMap());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
-    public void moveObject(Packet02Move packet){
-        //System.out.println(packet.getObjectId());
-        for(NetworkEntity p: networkEntities){
-            if(p.isMovable() && packet.getObjectId()==p.getId()){
-                if(p instanceof NetworkARPGPlayer){
-                    if(!((NetworkARPGPlayer) p).isClientAuthority()){
-                        ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),packet.getSpeed(),packet.getStart());
+    public void moveObject(Packet02Move packet) {
+        for (NetworkEntity p : networkEntities) {
+            if (p.isMovable() && packet.getObjectId() == p.getId()) {
+                if (p instanceof NetworkARPGPlayer) {
+                    if (!((NetworkARPGPlayer) p).isClientAuthority()) {
+                        ((MovableNetworkEntity) p).networkMove(packet.getOrientation(), packet.getSpeed(), packet.getStart());
                     }
                     return;
                 }
-                ((MovableNetworkEntity)p).networkMove(packet.getOrientation(),packet.getSpeed(),packet.getStart());
+                ((MovableNetworkEntity) p).networkMove(packet.getOrientation(), packet.getSpeed(), packet.getStart());
 
             }
         }
@@ -130,5 +139,11 @@ public class NARPG extends AreaGame
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+    }
+    public NetworkEntity findEntity(int objectId){
+        for(NetworkEntity e: networkEntities){
+            if(e.getId()==objectId) return e;
+        }
+        return null;
     }
 }

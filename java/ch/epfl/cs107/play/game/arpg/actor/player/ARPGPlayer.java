@@ -35,7 +35,8 @@ import java.util.List;
 public class ARPGPlayer extends Player {
     /// Animation duration in frame number
     protected final static int ANIMATION_DURATION = 8;
-    private final ARPGPlayerHandler handler;
+    //not final because might be changed in networkARPGPlayer
+    protected ARPGPlayerHandler handler;
     protected boolean unReactive = false;
     private PlayerStates state;
     private float hp;
@@ -45,7 +46,7 @@ public class ARPGPlayer extends Player {
     private int currentAnimationIndex = 2;
     private boolean wantsInteraction = false;
     private ARPGItem currentItem;
-    private ARPGInventory inventory;
+    protected ARPGInventory inventory;
     private ARPGPlayerStatusGUI playerGUI;
     private Vector dashStartingPos;
     private Animation dashAnimation;
@@ -338,7 +339,7 @@ public class ARPGPlayer extends Player {
         other.acceptInteraction(handler);
     }
 
-    class ARPGPlayerHandler implements ARPGInteractionVisitor {
+    protected class ARPGPlayerHandler implements ARPGInteractionVisitor {
         @Override
         public void interactWith(Door door) {
             if (door.isOpen()) {

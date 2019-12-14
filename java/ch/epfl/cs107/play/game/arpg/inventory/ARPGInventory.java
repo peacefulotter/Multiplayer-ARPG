@@ -42,6 +42,11 @@ public class ARPGInventory extends Inventory implements Actor
         playerMoney += money;
         playerFortune += money;
     }
+    public void setMoney(int money){
+        int difference= money-playerMoney;
+        playerMoney +=difference;
+        playerFortune+=money;
+    }
 
     public int getMoney() {
         return playerMoney;
