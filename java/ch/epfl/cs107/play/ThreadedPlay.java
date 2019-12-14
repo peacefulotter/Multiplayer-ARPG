@@ -24,7 +24,7 @@ public class ThreadedPlay implements Runnable {
     private final Game game;
     private final Window window;
     private boolean isServer;
-    private boolean runGame;
+    private boolean stopGame;
 
     public ThreadedPlay(NARPG game, boolean isServer) {
         this.isServer=isServer;
@@ -35,7 +35,13 @@ public class ThreadedPlay implements Runnable {
         this.game=game;
         // get the screen size so that the window is matching the display
         // Use Swing displayGame
-        window = new SwingWindow(game.getTitle(), fileSystem, 550, 550,isServer);
+        boolean testing = Boolean.parseBoolean(System.getProperty("testing"));
+        if(testing){
+            System.setProperty("java.awt.headless","false");
+            window = new SwingWindow(game.getTitle(), fileSystem, 550, 550,false);
+        }else{
+            window = new SwingWindow(game.getTitle(), fileSystem, 550, 550,isServer);
+        }
         //Recorder recorder = new Recorder(window);
         //RecordReplayer replayer = new RecordReplayer(window); // not used in this project
     }
@@ -57,7 +63,7 @@ public class ThreadedPlay implements Runnable {
                 final float frameDuration = ONE_SEC / game.getFrameRate();
 
                 // Run until the user try to close the window
-                while (!window.isCloseRequested() && !runGame) {
+                while (!window.isCloseRequested() && !stopGame) {
 
                     // Compute time interval
                     lastTime = currentTime;
@@ -88,6 +94,7 @@ public class ThreadedPlay implements Runnable {
 
         } finally {
             // Release resources
+            System.out.println("closing");
             window.dispose();
         }
     }
