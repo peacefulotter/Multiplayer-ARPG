@@ -18,15 +18,6 @@ public class NetworkBomb extends Bomb implements NetworkEntity {
         return NetworkEntities.BOMB.getClassId();
     }
 
-    @Override
-    public void setPosition(DiscreteCoordinates position) {
-
-    }
-
-    @Override
-    public void setOrientation(Orientation orientation) {
-
-    }
 
     @Override
     public Packet00Spawn getSpawnPacket() {

@@ -30,17 +30,6 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity
         return NetworkEntities.STAFF.getClassId();
     }
 
-    @Override
-    public void setPosition(DiscreteCoordinates position)
-    {
-
-    }
-
-    @Override
-    public void setOrientation(Orientation orientation)
-    {
-
-    }
 
     @Override
     public Packet00Spawn getSpawnPacket()

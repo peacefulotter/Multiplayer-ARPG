@@ -14,12 +14,12 @@ public class Client extends Play implements Connection {
     private final String username;
     private ConnectionHandler connection;
 
-    public Client(int port, String username) {
+    public Client(String adress, int port, String username) {
         boolean connected = false;
         this.username=username;
         while (!connected) {
             try {
-                Socket incoming = new Socket("localhost", port);
+                Socket incoming = new Socket(adress, port);
                 NARPG game = new NARPG(false, this);
                 connection = new ConnectionHandler(incoming, game, false, this, mainId,username);
                 Thread connectionThread = new Thread(connection);
@@ -35,9 +35,10 @@ public class Client extends Play implements Connection {
     }
 
     public static void main(String[] args) {
-        int port = Integer.parseInt(args[0]);
-        String username = args[1];
-        new Client(port,username);
+        String address=args[0];
+        int port = Integer.parseInt(args[1]);
+        String username = args[2];
+        new Client(address,port,username);
     }
 
     @Override

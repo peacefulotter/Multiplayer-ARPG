@@ -27,18 +27,6 @@ public class NetworkHeart extends Heart implements NetworkEntity
     }
 
     @Override
-    public void setPosition(DiscreteCoordinates position)
-    {
-
-    }
-
-    @Override
-    public void setOrientation(Orientation orientation)
-    {
-
-    }
-
-    @Override
     public Packet00Spawn getSpawnPacket()
     {
         return null;
