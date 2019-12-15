@@ -194,6 +194,7 @@ public class ARPGPlayer extends Player {
                 currentAnimation = 1;
                 break;
             case BOW:
+                System.out.println("shooting");
                 if (inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW)) {
                     state = PlayerStates.ATTACKING_BOW;
                     getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));

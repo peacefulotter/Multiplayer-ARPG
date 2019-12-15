@@ -17,19 +17,19 @@ public class ConnectionHandler implements Runnable {
     private BufferedReader in;
     private Connection connection;
     private long connectionId;
+    private String username;
 
-    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection,long connectionId) {
-        this.socket = socket;
-        this.isServer = isServer;
-        this.game = arpg;
-        this.connection=connection;
-        this.connectionId=connectionId;
-    }
-    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection) {
+    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection, long connectionId, String username) {
         this.socket = socket;
         this.isServer = isServer;
         this.game = arpg;
         this.connection = connection;
+        this.connectionId = connectionId;
+        this.username = username;
+    }
+
+    public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection) {
+        this(socket, arpg, isServer, connection, 0l, "");
     }
 
     public long getConnectionId() {
@@ -47,9 +47,6 @@ public class ConnectionHandler implements Runnable {
         }
     }
 
-    public void sendData(String data) {
-        sendData(data.getBytes());
-    }
 
     public void sendData(byte[] data) {
         try {
@@ -76,13 +73,14 @@ public class ConnectionHandler implements Runnable {
             parsePacket(data);
         }
     }
-    private void parsePacket(byte[] data){
+
+    private void parsePacket(byte[] data) {
         String message = new String(data).trim();
-        if(message.length()<2) return;
-        PacketTypes type = Packet.lookupPacket(message.substring(0,2));
+        if (message.length() < 2) return;
+        PacketTypes type = Packet.lookupPacket(message.substring(0, 2));
         //boolean which decides if data will be sent back to all the clients
-        boolean sendDataBackToAll= true;
-        switch(type){
+        boolean sendDataBackToAll = true;
+        switch (type) {
             default:
             case INVALID:
                 break;
@@ -92,9 +90,9 @@ public class ConnectionHandler implements Runnable {
                 break;
             case LOGIN:
                 Packet01Login loginPacket = new Packet01Login(data);
-                connectionId=loginPacket.getConnectionId();
+                connectionId = loginPacket.getConnectionId();
                 game.login(loginPacket.getConnectionId());
-                sendDataBackToAll=false;
+                sendDataBackToAll = false;
                 break;
             case MOVE:
                 Packet02Move movePacket = new Packet02Move(data);
@@ -105,7 +103,7 @@ public class ConnectionHandler implements Runnable {
                 game.updateObject(updatePacket);
                 break;
         }
-        if(isServer && sendDataBackToAll){
+        if (isServer && sendDataBackToAll) {
             connection.sendData(data);
         }
 

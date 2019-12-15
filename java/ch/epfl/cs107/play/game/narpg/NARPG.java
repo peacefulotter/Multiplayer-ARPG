@@ -7,6 +7,7 @@ import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
+import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -23,6 +24,7 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -59,7 +61,8 @@ public class NARPG extends AreaGame
             Area area = setCurrentArea("custom/Arena", true);
             if (!isServer) {
                 ((Client) connection).login();
-                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true);
+                String username= ((Client) connection).getUsername();
+                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true,username);
                 area.registerActor( player );
                 area.setViewCandidate( player );
                 player.getSpawnPacket().writeData(connection);
@@ -74,17 +77,10 @@ public class NARPG extends AreaGame
 
     public void updateObject(Packet03Update update) {
         var entity = findEntity(update.getObjectId());
-        try {
-            System.out.println(update.getBeanMap());
-            BeanUtils.populate(entity, update.getBeanMap());
-            System.out.println(entity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        entity.updateState(update.getUpdateMap());
     }
 
     public void moveObject(Packet02Move packet) {
-        System.out.println(networkEntities.size());
         for (NetworkEntity p : networkEntities) {
             if (p.isMovable() && packet.getObjectId() == p.getId()) {
                 if (p instanceof NetworkARPGPlayer) {
@@ -101,11 +97,7 @@ public class NARPG extends AreaGame
 
     public boolean spawnObject(Packet00Spawn packet) {
         NetworkEntities object = packet.getObject();
-        Area area = packet.getArea();
-        System.out.println(packet.getObjectId());
-        if (area == null) {
-            area = getCurrentArea();
-        }
+        Area area=getCurrentArea();
         switch (object) {
             case PLAYER:
                 for (NetworkARPGPlayer p : players)
@@ -120,8 +112,9 @@ public class NARPG extends AreaGame
                 newPlayer.setId(packet.getObjectId());
                 players.add(newPlayer);
                 networkEntities.add(newPlayer);
+                System.out.println(packet.getInitialState());
+                newPlayer.updateState(packet.getInitialState());
                 boolean registered = getCurrentArea().registerActor(newPlayer);
-                System.out.println(registered);
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
             case BOMB:
@@ -149,11 +142,9 @@ public class NARPG extends AreaGame
     }
 
     @Override
-    public void update( float deltaTime )
-    {
-        super.update( deltaTime );
-        for ( NetworkEntity e : leftToRegister )
-        {
+    public void update( float deltaTime ) {
+        super.update(deltaTime);
+        for (NetworkEntity e : leftToRegister) {
             if (getCurrentArea().registerActor(e)) {
                 leftToRegister.remove(e);
                 return;

@@ -2,6 +2,12 @@ package ch.epfl.cs107.play.Networking.Packets;
 
 import ch.epfl.cs107.play.Networking.Connection;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 public abstract class Packet {
     public byte packetId;
     protected int objectId;
@@ -36,6 +42,21 @@ public abstract class Packet {
     }
 
     public abstract void writeData(Connection connection);
+
+    //converting string of a HashMap to an actual hash map as seen here : https://stackoverflow.com/questions/3957094/convert-hashmap-tostring-back-to-hashmap-in-java
+    public static HashMap<String,String> getHashMapFromString(String hashMapString){
+        Properties props = new Properties();
+        try {
+            props.load(new StringReader(hashMapString.substring(1, hashMapString.length() - 1).replace(", ", "\n")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        var hashMap = new HashMap<String, String>();
+        for (Map.Entry<Object, Object> e : props.entrySet()) {
+            hashMap.put((String) e.getKey(), (String) e.getValue());
+        }
+        return hashMap;
+    }
 
     public void writeData(Connection connection, long connectionId){
         connection.sendDataTo(connectionId,getData());

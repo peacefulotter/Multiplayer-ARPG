@@ -11,15 +11,17 @@ import java.util.Random;
 
 public class Client extends Play implements Connection {
     private final static long mainId = new Random().nextLong();
+    private final String username;
     private ConnectionHandler connection;
 
-    public Client(int port) {
+    public Client(int port, String username) {
         boolean connected = false;
+        this.username=username;
         while (!connected) {
             try {
                 Socket incoming = new Socket("localhost", port);
                 NARPG game = new NARPG(false, this);
-                connection = new ConnectionHandler(incoming, game, false, this, mainId);
+                connection = new ConnectionHandler(incoming, game, false, this, mainId,username);
                 Thread connectionThread = new Thread(connection);
                 Thread GameThread = new Thread(new ThreadedPlay(game,false));
                 connectionThread.start();
@@ -34,7 +36,8 @@ public class Client extends Play implements Connection {
 
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
-        new Client(port);
+        String username = args[1];
+        new Client(port,username);
     }
 
     @Override
@@ -51,7 +54,11 @@ public class Client extends Play implements Connection {
     }
 
     public void login(){
-        var loginPacket = new Packet01Login(mainId);
+        var loginPacket = new Packet01Login(mainId,username);
         loginPacket.writeData(this);
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

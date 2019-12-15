@@ -6,6 +6,7 @@ import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
+import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
@@ -16,9 +17,14 @@ import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkCoin;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.TextAlign;
+import ch.epfl.cs107.play.math.Vector;
+import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
+import java.awt.*;
 import java.util.HashMap;
+import java.util.Map;
 
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
     private Connection connection;
@@ -28,6 +34,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private String playerMoney;
     private PlayerStates state;
     private final NetworkARPGPlayerHandler handler;
+    private TextGraphics usernameText;
 
     /**
      * Default Player constructor
@@ -36,7 +43,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      * @param orientation (Orientation): Initial player orientation, not null
      * @param coordinates (Coordinates): Initial position, not null
      */
-    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
+    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, String username) {
         super(area, orientation, coordinates);
         this.handler = new NetworkARPGPlayerHandler();
         this.currentArea = area;
@@ -45,10 +52,18 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.clientAuthority = clientAuthority;
         this.state = PlayerStates.IDLE;
         if (!clientAuthority) unReactive = true;
-    }
 
+        usernameText= new TextGraphics(username,.8f,Color.WHITE,Color.BLACK,.1f,true,false,new Vector(+.4f,+1.5f), TextAlign.Horizontal.CENTER,null,1f,10000);
+        usernameText.setParent(this);
+    }
+    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
+        this(area,orientation,coordinates,connection,clientAuthority,"");
+    }
     @Override
     public void update(float deltaTime) {
+        var updateMap=new HashMap<String,String>();
+        updateMap.put("username",usernameText.getText());
+        new Packet03Update(getId(),updateMap);
         if (!connection.isServer() && clientAuthority) {
             Keyboard keyboard = getOwnerArea().getKeyboard();
             Orientation moved = null;
@@ -74,25 +89,35 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         super.update(deltaTime);
     }
 
+    @Override
+    public void updateState(HashMap<String, String> updateMap) {
+        for(Map.Entry<String,String> entry : updateMap.entrySet() ){
+            switch (entry.getKey()){
+                case "username":
+                    usernameText.setText(entry.getValue());
+            }
+        }
+    }
+
+    @Override
     protected void useItem() {
         switch ( getEquippedItem() ) {
             case BOMB:
                 new Packet00Spawn(
-                        NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), currentArea
+                        NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0)
                 ).writeData( connection );
                 break;
             case SWORD:
                 super.useItem();
-                System.out.println(state);
                 break;
             case BOW:
                 new Packet00Spawn(
-                        NetworkEntities.BOW.getClassId(), NetworkEntities.BOW, getOrientation(), getNextCurrentCells().get(0), currentArea
+                        NetworkEntities.BOW.getClassId(), NetworkEntities.BOW, getOrientation(), getNextCurrentCells().get(0)
                 ).writeData( connection );
                 break;
             case STAFF:
                 new Packet00Spawn(
-                        NetworkEntities.STAFF.getClassId(), NetworkEntities.STAFF, getOrientation(), getNextCurrentCells().get(0), currentArea
+                        NetworkEntities.STAFF.getClassId(), NetworkEntities.STAFF, getOrientation(), getNextCurrentCells().get(0)
                 ).writeData( connection );
                 break;
         }
@@ -123,7 +148,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public Packet00Spawn getSpawnPacket() {
-        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0), currentArea);
+        HashMap initalState=new HashMap();
+        initalState.put("username",usernameText.getText());
+        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0),initalState);
     }
 
     @Override
@@ -146,10 +173,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         return clientAuthority;
     }
 
-    public void setPlayerMoney(String playerMoney) {
-        this.playerMoney = playerMoney;
-        inventory.addMoney(Integer.parseInt(playerMoney)-inventory.getMoney());
-    }
 
     class NetworkARPGPlayerHandler implements NARPGInteractionVisitor
     {
@@ -176,5 +199,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         {
             heart.collect();
         }
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+        usernameText.draw(canvas);
     }
 }
