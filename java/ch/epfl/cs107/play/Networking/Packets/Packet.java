@@ -1,8 +1,6 @@
 package ch.epfl.cs107.play.Networking.Packets;
 
-import ch.epfl.cs107.play.Client;
 import ch.epfl.cs107.play.Networking.Connection;
-import ch.epfl.cs107.play.Server;
 
 public abstract class Packet {
     public byte packetId;

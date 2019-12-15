@@ -58,9 +58,8 @@ public class NARPG extends AreaGame
             if (!isServer) {
                 ((Client) connection).login();
                 var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true);
-                //initPlayer(player);
-                getCurrentArea().registerActor(player);
-                getCurrentArea().setViewCandidate(player);
+                area.registerActor( player );
+                area.setViewCandidate( player );
                 player.getSpawnPacket().writeData(connection);
                 players.add(player);
                 networkEntities.add(player);
@@ -71,15 +70,13 @@ public class NARPG extends AreaGame
 
     }
 
-    public void updateState(Packet03Update update) {
+    public void updateObject(Packet03Update update) {
         var entity = findEntity(update.getObjectId());
         try {
             System.out.println(update.getBeanMap());
             BeanUtils.populate(entity, update.getBeanMap());
             System.out.println(entity);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
@@ -152,18 +149,6 @@ public class NARPG extends AreaGame
             if (getCurrentArea().registerActor(e)) {
                 leftToRegister.remove(e);
                 return;
-            }
-        }
-        for ( NetworkEntity entity : networkEntities )
-        {
-            System.out.println("entity update");
-            System.out.println(entity);
-            //entity.update( deltaTime );
-            // get the updtated monsters
-            // send to player
-            for ( NetworkARPGPlayer player : players )
-            {
-
             }
         }
     }

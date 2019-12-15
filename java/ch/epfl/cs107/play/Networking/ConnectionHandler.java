@@ -3,7 +3,6 @@ package ch.epfl.cs107.play.Networking;
 
 import ch.epfl.cs107.play.Networking.Packets.*;
 import ch.epfl.cs107.play.Networking.Packets.Packet.PacketTypes;
-import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
@@ -102,8 +101,8 @@ public class ConnectionHandler implements Runnable {
                 game.moveObject(movePacket);
                 break;
             case UPDATE:
-                Packet03Update updatePacket= new Packet03Update(data);
-                game.updateState(updatePacket);
+                Packet03Update updatePacket = new Packet03Update(data);
+                game.updateObject(updatePacket);
                 break;
         }
         if(isServer && sendDataBackToAll){

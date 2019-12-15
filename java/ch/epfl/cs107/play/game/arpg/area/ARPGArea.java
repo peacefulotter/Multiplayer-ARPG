@@ -9,7 +9,7 @@ import ch.epfl.cs107.play.window.Window;
 
 public abstract class ARPGArea extends Area
 {
-    private static int SCALE_FACTOR = 16;
+    private static int SCALE_FACTOR = 15;
     private Window window;
     private ARPGBehavior behavior;
 

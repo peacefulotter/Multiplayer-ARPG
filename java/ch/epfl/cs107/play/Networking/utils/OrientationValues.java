@@ -2,7 +2,11 @@ package ch.epfl.cs107.play.Networking.utils;
 
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 public enum OrientationValues {
-    UP(0, Orientation.UP), DOWN(1, Orientation.DOWN), LEFT(2, Orientation.LEFT), RIGHT(3, Orientation.RIGHT);
+    UP(0, Orientation.UP),
+    DOWN(1, Orientation.DOWN),
+    LEFT(2, Orientation.LEFT),
+    RIGHT(3, Orientation.RIGHT);
+
     private int value;
     private Orientation orientation;
 

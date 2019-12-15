@@ -9,15 +9,13 @@ import ch.epfl.cs107.play.Networking.utils.IdGenerator;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
+import ch.epfl.cs107.play.game.arpg.actor.player.PlayerStates;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Keyboard;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
     private Connection connection;
@@ -25,6 +23,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private int id;
     private boolean clientAuthority;
     private String playerMoney;
+    private PlayerStates state;
 
     /**
      * Default Player constructor
@@ -40,6 +39,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.connection = connection;
         this.id = IdGenerator.generateId();
         this.clientAuthority = clientAuthority;
+        this.state = PlayerStates.IDLE;
         if (!clientAuthority) unReactive = true;
     }
 
@@ -69,12 +69,20 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         super.update(deltaTime);
     }
 
-    private void useItem() {
-        switch (getEquippedItem()) {
+    protected void useItem() {
+        switch ( getEquippedItem() ) {
             case BOMB:
-                Packet00Spawn packet = new Packet00Spawn(NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), currentArea);
-                packet.writeData(connection);
+                new Packet00Spawn(
+                        NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), currentArea
+                ).writeData(connection);
                 break;
+            case SWORD:
+                super.useItem();
+                System.out.println(state);
+            case BOW:
+                new Packet00Spawn(
+                        NetworkEntities.ARROW.getClassId(), NetworkEntities.ARROW, getOrientation(), getNextCurrentCells().get(0), currentArea
+                ).writeData( connection );
         }
     }
 
@@ -85,6 +93,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     public void setId(int objectId) {
         this.id = objectId;
+    }
+
+    public void setState(PlayerStates state)
+    {
+        this.state = state;
     }
 
     @Override

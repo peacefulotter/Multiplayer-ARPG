@@ -1,21 +1,22 @@
 package ch.epfl.cs107.play.game.arpg.actor.player;
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.*;
+import ch.epfl.cs107.play.game.areagame.actor.Animation;
+import ch.epfl.cs107.play.game.areagame.actor.Interactable;
+import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.ARPG;
+import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.CastleDoor;
-import ch.epfl.cs107.play.game.arpg.actor.monster.*;
+import ch.epfl.cs107.play.game.arpg.actor.Grass;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.MagicProjectile;
-import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
-import ch.epfl.cs107.play.game.arpg.actor.Bomb;
-import ch.epfl.cs107.play.game.arpg.actor.Grass;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
 import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
 import ch.epfl.cs107.play.game.arpg.inventory.items.CastleKey;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
-import ch.epfl.cs107.play.game.arpg.inventory.items.CollectibleAreaEntity;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
@@ -171,9 +172,9 @@ public class ARPGPlayer extends Player {
         }
     }
 
-    private void useItem() {
+    protected void useItem() {
         currentItem = getEquippedItem();
-        if (currentItem == null) return;
+        if (state != state.IDLE || currentItem == null ) { return; }
         switch (currentItem) {
             case BOMB:
                 //checks if key was just pressed as we want to prevent bom spamming
@@ -188,27 +189,21 @@ public class ARPGPlayer extends Player {
                 }
                 break;
             case SWORD:
-                if (state == state.IDLE) {
-                    wantsInteraction = true;
-                    state = PlayerStates.ATTACKING_SWORD;
-                    currentAnimation = 1;
-                }
+                wantsInteraction = true;
+                state = PlayerStates.ATTACKING_SWORD;
+                currentAnimation = 1;
                 break;
             case BOW:
-                if (state == state.IDLE) {
-                    if (inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW)) {
-                        state = PlayerStates.ATTACKING_BOW;
-                        getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
-                        currentAnimation = 2;
-                    }
+                if (inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW)) {
+                    state = PlayerStates.ATTACKING_BOW;
+                    getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                    currentAnimation = 2;
                 }
                 break;
             case STAFF:
-                if (state == state.IDLE) {
-                    state = PlayerStates.ATTACKING_STAFF;
-                    getOwnerArea().registerActor(new MagicProjectile(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
-                    currentAnimation = 3;
-                }
+                state = PlayerStates.ATTACKING_STAFF;
+                getOwnerArea().registerActor(new MagicProjectile(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                currentAnimation = 3;
                 break;
         }
     }
