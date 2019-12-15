@@ -1,13 +1,12 @@
 package ch.epfl.cs107.play.game.narpg.actor;
 
-import ch.epfl.cs107.play.game.narpg.actor.monster.NetworkLogMonster;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
+import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 
 public enum NetworkEntities {
     PLAYER(001, NetworkARPGPlayer.class ),
     BOMB(002, NetworkBomb.class ),
-    GRASS( 003, NetworkGrass.class ),
-    LOG_MONSTER( 004, NetworkLogMonster.class );
+    HEART( 003, NetworkHeart.class );
 
     private final int classId;
     private final Class<?> value;

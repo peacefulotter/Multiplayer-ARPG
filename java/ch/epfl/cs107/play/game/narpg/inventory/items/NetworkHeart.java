@@ -1,23 +1,29 @@
-package ch.epfl.cs107.play.game.narpg.actor;
+package ch.epfl.cs107.play.game.narpg.inventory.items;
 
 import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.arpg.actor.Grass;
+import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
-public class NetworkGrass extends Grass implements NetworkEntity
+public class NetworkHeart extends Heart implements NetworkEntity
 {
-    public NetworkGrass( Area area, Orientation orientation, DiscreteCoordinates position )
+    /**
+     * Default AreaEntity constructor
+     *
+     * @param area     (Area): Owner area. Not null
+     * @param position (DiscreteCoordinate): Initial position of the entity in the Area. Not null
+     */
+    public NetworkHeart( Area area, DiscreteCoordinates position )
     {
-        super(area, orientation, position);
+        super( area, position );
     }
 
     @Override
     public int getId()
     {
-        return NetworkEntities.GRASS.getClassId();
+        return 0;
     }
 
     @Override

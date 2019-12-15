@@ -13,7 +13,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
-import ch.epfl.cs107.play.game.narpg.areas.NFerme;
+import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
@@ -47,14 +47,14 @@ public class NARPG extends AreaGame
 
     protected void createAreas()
     {
-        addArea( new NFerme( isServer ) );
+        addArea( new NetworkArena( connection, isServer ) );
     }
 
     @Override
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {
             createAreas();
-            Area area = setCurrentArea("zelda/Ferme", true);
+            Area area = setCurrentArea("custom/Arena", true);
             if (!isServer) {
                 ((Client) connection).login();
                 var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true);
