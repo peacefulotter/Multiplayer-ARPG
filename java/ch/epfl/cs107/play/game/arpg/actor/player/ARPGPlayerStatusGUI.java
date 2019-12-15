@@ -65,6 +65,7 @@ public class ARPGPlayerStatusGUI implements Graphics
         float height = canvas.getScaledHeight();
         topLeftAnchor = canvas.getTransform().getOrigin().sub( new Vector(width / 2, (-height / 2) + gearDisplaySize ) );
         bottomLeftAnchor = canvas.getTransform().getOrigin().sub( new Vector(width / 2, height / 2 ) );
+        setItemSprite(player.getEquippedItem().getSpriteName());
 
         gearDisplay.setAnchor( topLeftAnchor );
         gearDisplay.draw( canvas );

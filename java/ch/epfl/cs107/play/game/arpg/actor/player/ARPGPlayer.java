@@ -38,6 +38,7 @@ public class ARPGPlayer extends Player {
     //not final because might be changed in networkARPGPlayer
     protected ARPGPlayerHandler handler;
     protected boolean unReactive = false;
+    protected ARPGInventory inventory;
     private PlayerStates state;
     private float hp;
     private int maxHP = 5;
@@ -46,7 +47,6 @@ public class ARPGPlayer extends Player {
     private int currentAnimationIndex = 2;
     private boolean wantsInteraction = false;
     private ARPGItem currentItem;
-    protected ARPGInventory inventory;
     private ARPGPlayerStatusGUI playerGUI;
     private Vector dashStartingPos;
     private Animation dashAnimation;
@@ -82,11 +82,11 @@ public class ARPGPlayer extends Player {
         };
 
         inventory = new ARPGInventory(this, 100, 10, 1234);
-        inventory.addItemToInventory( ARPGItem.BOMB, 10 );
-        inventory.addItemToInventory( ARPGItem.SWORD );
-        inventory.addItemToInventory( ARPGItem.BOW );
-        inventory.addItemToInventory( ARPGItem.STAFF );
-        inventory.addItemToInventory( ARPGItem.ARROW, 10 );
+        inventory.addItemToInventory(ARPGItem.BOMB, 10);
+        inventory.addItemToInventory(ARPGItem.SWORD);
+        inventory.addItemToInventory(ARPGItem.BOW);
+        inventory.addItemToInventory(ARPGItem.STAFF);
+        inventory.addItemToInventory(ARPGItem.ARROW, 20);
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
@@ -175,14 +175,15 @@ public class ARPGPlayer extends Player {
         if (currentItem == null) return;
         switch (currentItem) {
             case BOMB:
+                //checks if key was just pressed as we want to prevent bom spamming
+                if(!getOwnerArea().getKeyboard().get(PlayerInput.USE_ITEM.getKeyCode()).isPressed()) return;
+                //handles adding a bomb to the area and removing it from inventory
                 DiscreteCoordinates bombCoordinates = getFieldOfViewCells().get(0);
                 if (isDisplacementOccurs()) bombCoordinates = bombCoordinates.jump(getOrientation().toVector());
                 boolean registeredActor = getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, bombCoordinates));
                 if (registeredActor) {
-                    boolean removed = inventory.removeItemFromInventory(ARPGItem.BOMB);
-                    if (removed) {
-                        playerGUI.setItemSprite(inventory.getCurrentItem().getSpriteName());
-                    }
+                    inventory.removeItemFromInventory(ARPGItem.BOMB);
+
                 }
                 break;
             case SWORD:
@@ -194,19 +195,20 @@ public class ARPGPlayer extends Player {
                 break;
             case BOW:
                 if (state == state.IDLE) {
-                    state = PlayerStates.ATTACKING_BOW;
-                    if ( inventory.removeItemFromInventory( (InventoryItem)ARPGItem.ARROW ) )
-                    {
+                    if (inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW)) {
+                        state = PlayerStates.ATTACKING_BOW;
                         getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
+                        currentAnimation = 2;
                     }
-                    currentAnimation = 2;
                 }
+                break;
             case STAFF:
                 if (state == state.IDLE) {
                     state = PlayerStates.ATTACKING_STAFF;
                     getOwnerArea().registerActor(new MagicProjectile(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
                     currentAnimation = 3;
                 }
+                break;
         }
     }
 
@@ -354,8 +356,7 @@ public class ARPGPlayer extends Player {
         }
 
         @Override
-        public void interactWith( Heart heart )
-        {
+        public void interactWith(Heart heart) {
             hp += 1;
             if (hp > maxHP) {
                 hp = maxHP;
@@ -364,42 +365,34 @@ public class ARPGPlayer extends Player {
         }
 
         @Override
-        public void interactWith( CastleKey key )
-        {
-            inventory.addItemToInventory( ARPGItem.CASTLE_KEY );
+        public void interactWith(CastleKey key) {
+            inventory.addItemToInventory(ARPGItem.CASTLE_KEY);
             key.collect();
         }
 
         @Override
-        public void interactWith( CastleDoor door )
-        {
-            if ( !door.isOpen() && inventory.getCurrentItem() == ARPGItem.CASTLE_KEY )
-            {
+        public void interactWith(CastleDoor door) {
+            if (!door.isOpen() && inventory.getCurrentItem() == ARPGItem.CASTLE_KEY) {
                 door.openDoor();
-            } else if ( door.isOpen() )
-            {
+            } else if (door.isOpen()) {
                 door.passDoor();
-                setIsPassingADoor( door );
+                setIsPassingADoor(door);
             } else {
-                System.out.println( "You need the key" );
+                System.out.println("You need the key");
             }
         }
 
         @Override
-        public void interactWith( Grass grass )
-        {
-            if ( state.isCloseRangeAttacking() )
-            {
+        public void interactWith(Grass grass) {
+            if (state.isCloseRangeAttacking()) {
                 grass.cutGrass();
             }
         }
 
         @Override
-        public void interactWith( Monster monster )
-        {
-            if ( monster.getVulnerabilities().contains( getEquippedItem().getVuln() ) )
-            {
-                monster.giveDamage( getEquippedItem().getDamage() ) ;
+        public void interactWith(Monster monster) {
+            if (monster.getVulnerabilities().contains(getEquippedItem().getVuln())) {
+                monster.giveDamage(getEquippedItem().getDamage());
             }
         }
     }

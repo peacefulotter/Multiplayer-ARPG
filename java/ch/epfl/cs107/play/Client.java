@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.util.Random;
 
 public class Client extends Play implements Connection {
-    private final long mainId = new Random().nextLong();
+    private final static long mainId = new Random().nextLong();
     private ConnectionHandler connection;
 
     public Client(int port) {

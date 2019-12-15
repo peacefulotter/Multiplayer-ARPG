@@ -8,7 +8,6 @@ import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 
 
 public class ConnectionHandler implements Runnable {
@@ -68,6 +67,7 @@ public class ConnectionHandler implements Runnable {
         boolean done = false;
         while (!done) { //in = new BufferedReader(new
             // InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
+            System.out.println("listening");
             DataInputStream dis = new DataInputStream(inStream);
             int len = dis.readInt();
             byte[] data = new byte[len];
@@ -75,9 +75,6 @@ public class ConnectionHandler implements Runnable {
                 dis.readFully(data);
             }
 
-            if (isServer) {
-                ((Server)connection).sendDataToAllClients(data);
-            }
             parsePacket(data);
         }
     }
@@ -85,6 +82,8 @@ public class ConnectionHandler implements Runnable {
         String message = new String(data).trim();
         if(message.length()<2) return;
         PacketTypes type = Packet.lookupPacket(message.substring(0,2));
+        //boolean which decides if data will be sent back to all the clients
+        boolean sendDataBackToAll= true;
         switch(type){
             default:
             case INVALID:
@@ -95,7 +94,9 @@ public class ConnectionHandler implements Runnable {
                 break;
             case LOGIN:
                 Packet01Login loginPacket = new Packet01Login(data);
+                connectionId=loginPacket.getConnectionId();
                 game.login(loginPacket.getConnectionId());
+                sendDataBackToAll=false;
                 break;
             case MOVE:
                 Packet02Move movePacket = new Packet02Move(data);
@@ -105,6 +106,9 @@ public class ConnectionHandler implements Runnable {
                 Packet03Update updatePacket= new Packet03Update(data);
                 game.updateState(updatePacket);
                 break;
+        }
+        if(isServer && sendDataBackToAll){
+            connection.sendData(data);
         }
 
     }

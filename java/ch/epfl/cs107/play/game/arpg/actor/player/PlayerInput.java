@@ -8,6 +8,7 @@ public enum PlayerInput {
     SHOW_INV(Keyboard.I, false),
     NEXT_ITEM(Keyboard.TAB, false),
     USE_ITEM(Keyboard.SPACE, true),
+    ATTACK(Keyboard.SPACE,true),
     DASH(Keyboard.A,false);
 
     private final int keyCode;

@@ -28,6 +28,8 @@ public class NARPG extends AreaGame
 {
     private List<NetworkARPGPlayer> players = new ArrayList<NetworkARPGPlayer>();
     private List<NetworkEntity> networkEntities = new ArrayList<>();
+    //store items that couldn't be registered and register as soon as possible;
+    private List<NetworkEntity> leftToRegister = new ArrayList<>();
     private Connection connection;
     private boolean isServer;
 
@@ -53,13 +55,13 @@ public class NARPG extends AreaGame
         if (super.begin(window, fileSystem)) {
             createAreas();
             Area area = setCurrentArea("zelda/Ferme", true);
-            if(!isServer){
+            if (!isServer) {
                 ((Client) connection).login();
-                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection,true);
+                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true);
                 //initPlayer(player);
                 getCurrentArea().registerActor(player);
                 getCurrentArea().setViewCandidate(player);
-                player.getSpawnPacket().writeData( connection );
+                player.getSpawnPacket().writeData(connection);
                 players.add(player);
                 networkEntities.add(player);
             }
@@ -70,10 +72,11 @@ public class NARPG extends AreaGame
     }
 
     public void updateState(Packet03Update update) {
-        var entity= findEntity(update.getObjectId());
+        var entity = findEntity(update.getObjectId());
         try {
             System.out.println(update.getBeanMap());
-            BeanUtils.populate(entity,update.getBeanMap());
+            BeanUtils.populate(entity, update.getBeanMap());
+            System.out.println(entity);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -82,6 +85,7 @@ public class NARPG extends AreaGame
     }
 
     public void moveObject(Packet02Move packet) {
+        System.out.println(networkEntities.size());
         for (NetworkEntity p : networkEntities) {
             if (p.isMovable() && packet.getObjectId() == p.getId()) {
                 if (p instanceof NetworkARPGPlayer) {
@@ -96,13 +100,14 @@ public class NARPG extends AreaGame
         }
     }
 
-    public boolean spawnObject( Packet00Spawn packet ) {
-        System.out.println("spawnobject in NARPG");
+    public boolean spawnObject(Packet00Spawn packet) {
         NetworkEntities object = packet.getObject();
         Area area = packet.getArea();
-        if ( area == null ) { area = getCurrentArea(); }
-        switch ( object )
-        {
+        System.out.println(packet.getObjectId());
+        if (area == null) {
+            area = getCurrentArea();
+        }
+        switch (object) {
             case PLAYER:
                 for (NetworkARPGPlayer p : players)
                 {
@@ -116,7 +121,9 @@ public class NARPG extends AreaGame
                 newPlayer.setId(packet.getObjectId());
                 players.add(newPlayer);
                 networkEntities.add(newPlayer);
-                area.registerActor(newPlayer);
+                boolean registered = getCurrentArea().registerActor(newPlayer);
+                System.out.println(registered);
+                if (!registered) leftToRegister.add(newPlayer);
                 break;
             case BOMB:
                 NetworkedBomb newBomb = new NetworkedBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),
@@ -124,12 +131,14 @@ public class NARPG extends AreaGame
                 networkEntities.add( newBomb );
                 area.registerActor( newBomb );
                 break;
+
         }
-        return  true;
+
+        return true;
     }
 
-    public void login(long mainId){
-        for(NetworkEntity p: networkEntities){
+    public void login(long mainId) {
+        for (NetworkEntity p : networkEntities) {
             var packet = p.getSpawnPacket();
             packet.writeData(connection);
         }
@@ -138,10 +147,17 @@ public class NARPG extends AreaGame
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+        for (NetworkEntity e : leftToRegister) {
+            if (getCurrentArea().registerActor(e)) {
+                leftToRegister.remove(e);
+                return;
+            }
+        }
     }
-    public NetworkEntity findEntity(int objectId){
-        for(NetworkEntity e: networkEntities){
-            if(e.getId()==objectId) return e;
+
+    public NetworkEntity findEntity(int objectId) {
+        for (NetworkEntity e : networkEntities) {
+            if (e.getId() == objectId) return e;
         }
         return null;
     }

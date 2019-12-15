@@ -199,11 +199,6 @@ public abstract class MovableAreaEntity extends AreaEntity {
     /// MovableAreaEntity extends AreaEntity
     @Override
     protected boolean orientate(Orientation orientation) {
-        // Allow reorientation only if no displacement is occurring or if abort current move (opposite orientation)
-    	if(getOrientation().opposite().equals(orientation)) {
-    		if(abortCurrentMove())
-    			return super.orientate(orientation);
-    	}
         return !displacementOccurs && super.orientate(orientation);
     }
     protected  boolean orientate(Orientation orientation, boolean force){

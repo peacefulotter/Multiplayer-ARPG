@@ -41,6 +41,7 @@ public class Server implements Connection {
 
     public void sendDataToAllClients(byte[] data) {
         for (ConnectionHandler c : connections) {
+            System.out.println(c.getConnectionId());
             c.sendData(data);
         }
     }

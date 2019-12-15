@@ -39,6 +39,10 @@ public abstract class Packet {
 
     public abstract void writeData(Connection connection);
 
+    public void writeData(Connection connection, long connectionId){
+        connection.sendDataTo(connectionId,getData());
+    }
+
     public String readData(byte[] data) {
         String message = new String(data).trim();
         return message.substring(2);
