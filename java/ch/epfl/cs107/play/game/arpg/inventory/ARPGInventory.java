@@ -142,7 +142,7 @@ public class ARPGInventory extends Inventory implements Actor
             {
                 searchIndex += inventorySize;
             }
-            if ( itemOrder[ searchIndex ] != null )
+            if ( itemOrder[ searchIndex ] != null && ((ARPGItem)itemOrder[searchIndex]).isEquippable() )
             {
                 itemOrderIndex = searchIndex;
                 break;
