@@ -67,7 +67,6 @@ public class ConnectionHandler implements Runnable {
         boolean done = false;
         while (!done) { //in = new BufferedReader(new
             // InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
-            System.out.println("listening");
             DataInputStream dis = new DataInputStream(inStream);
             int len = dis.readInt();
             byte[] data = new byte[len];

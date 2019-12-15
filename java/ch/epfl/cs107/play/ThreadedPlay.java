@@ -36,12 +36,14 @@ public class ThreadedPlay implements Runnable {
         // get the screen size so that the window is matching the display
         // Use Swing displayGame
         boolean testing = Boolean.parseBoolean(System.getProperty("testing"));
-        if(testing){
+        boolean headless=false;
+        if(testing || !isServer){
             System.setProperty("java.awt.headless","false");
-            window = new SwingWindow(game.getTitle(), fileSystem, 550, 550,false);
-        }else{
-            window = new SwingWindow(game.getTitle(), fileSystem, 550, 550,isServer);
+        }else if(isServer){
+            System.setProperty("java.awt.headless","true");
+            headless=true;
         }
+        window = new SwingWindow(game.getTitle(), fileSystem, 550, 550,headless);
         //Recorder recorder = new Recorder(window);
         //RecordReplayer replayer = new RecordReplayer(window); // not used in this project
     }
