@@ -24,6 +24,8 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private Area currentArea;
     private int id;
     private boolean clientAuthority;
+    private String playerMoney;
+
     /**
      * Default Player constructor
      *
@@ -33,61 +35,56 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      */
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
         super(area, orientation, coordinates);
-        handler=new NetworkARPGLPlayerHandler();
-        this.currentArea =  area;
+        handler = new NetworkARPGLPlayerHandler();
+        this.currentArea = area;
         this.connection = connection;
         this.id = IdGenerator.generateId();
-        this.clientAuthority=clientAuthority;
-        if(!clientAuthority) unReactive=true;
+        this.clientAuthority = clientAuthority;
+        if (!clientAuthority) unReactive = true;
     }
 
     @Override
     public void update(float deltaTime) {
-        if(!connection.isServer() && clientAuthority){
+        if (!connection.isServer() && clientAuthority) {
             Keyboard keyboard = getOwnerArea().getKeyboard();
-            Orientation moved=null;
-            if ( connection != null ) {
-                if ( keyboard.get(keyboard.UP).isDown() ) { moved = Orientation.UP; }
-                else if ( keyboard.get( keyboard.DOWN ).isDown() ) { moved = Orientation.DOWN; }
-                else if ( keyboard.get( keyboard.LEFT ).isDown() ) { moved = Orientation.LEFT; }
-                else if ( keyboard.get( keyboard.RIGHT ).isDown() ) { moved = Orientation.RIGHT; }
-                else if ( keyboard.get( keyboard.SPACE ).isPressed() ) { useItem(); }
+            Orientation moved = null;
+            if (connection != null) {
+                if (keyboard.get(keyboard.LEFT).isDown()) {
+                    moved = Orientation.LEFT;
+                } else if (keyboard.get(keyboard.UP).isDown()) {
+                    moved = Orientation.UP;
+                } else if (keyboard.get(keyboard.RIGHT).isDown()) {
+                    moved = Orientation.RIGHT;
+                } else if (keyboard.get(keyboard.DOWN).isDown()) {
+                    moved = Orientation.DOWN;
+                } else if (keyboard.get(keyboard.SPACE).isPressed()) {
+                    useItem();
+                }
             }
-            if ( moved != null ) {
-                Packet02Move packet = new Packet02Move( id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION );
-                packet.writeData( connection );
+            if (moved != null) {
+                Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
+                packet.writeData(connection);
             }
         }
         super.update(deltaTime);
     }
 
-
-
-    private void useItem()
-    {
-        System.out.println("useditem");
-        switch ( getEquippedItem() )
-        {
+    private void useItem() {
+        switch (getEquippedItem()) {
             case BOMB:
-                Packet00Spawn packet = new Packet00Spawn( NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), currentArea );
-                packet.writeData( connection );
+                Packet00Spawn packet = new Packet00Spawn(NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), currentArea);
+                packet.writeData(connection);
                 break;
         }
     }
 
-    public void updatePlayerState(Orientation orientation){
-        setAnimationByOrientation(orientation);
-        if(orientation==getOrientation()){
-            move(8);
-        }else{
-            orientate(orientation);
-        }
-    }
-
-
     @Override
     public int getId() {
         return this.id;
+    }
+
+    public void setId(int objectId) {
+        this.id = objectId;
     }
 
     @Override
@@ -101,43 +98,42 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public Packet00Spawn getSpawnPacket() {
-        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(),getCurrentCells().get(0), currentArea);
+        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0), currentArea);
     }
 
     @Override
-    public void networkMove(Orientation orientation, int speed, DiscreteCoordinates startPosition) {
-        if(!isDisplacementOccurs()){
+    public void networkMove(Packet02Move movePacket) {
+        Orientation orientation = movePacket.getOrientation();
+        int speed = movePacket.getSpeed();
+        DiscreteCoordinates startPosition = movePacket.getStart();
+        if (!isDisplacementOccurs() || isTargetReached()) {
             super.orientate(orientation);
-            getOwnerArea().leaveAreaCells(this,getCurrentCells());
-            getOwnerArea().enterAreaCells(this,getCurrentCells());
+            getOwnerArea().leaveAreaCells(this, getCurrentCells());
+            getOwnerArea().enterAreaCells(this, getCurrentCells());
             setCurrentPosition(startPosition.toVector());
             setAnimationByOrientation(orientation);
             move(speed);
         }
-    }
 
-    public void setId(int objectId) {
-        this.id=objectId;
     }
-
 
     public boolean isClientAuthority() {
         return clientAuthority;
     }
-    class NetworkARPGLPlayerHandler extends ARPGPlayerHandler{
+
+    public void setPlayerMoney(String playerMoney) {
+        this.playerMoney = playerMoney;
+        inventory.addMoney(Integer.parseInt(playerMoney)-inventory.getMoney());
+    }
+
+    class NetworkARPGLPlayerHandler extends ARPGPlayerHandler {
         @Override
         public void interactWith(Coin coin) {
             coin.collect();
-            HashMap<String,String> changeMap= new HashMap();
-            changeMap.put("playerMoney",String.valueOf(getMoney()+50));
-            var updatePacket= new Packet03Update(getId(),changeMap);
+            HashMap<String, String> changeMap = new HashMap();
+            changeMap.put("playerMoney", String.valueOf(getMoney() + 50));
+            var updatePacket = new Packet03Update(getId(), changeMap);
             updatePacket.writeData(connection);
         }
-    }
-    public void sePlayerMoney(String amount){
-        inventory.setMoney(Integer.parseInt(amount));
-    }
-    public String getPlayerMoney(){
-        return String.valueOf(inventory.getMoney());
     }
 }

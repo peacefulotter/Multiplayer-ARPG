@@ -102,6 +102,15 @@ public class ARPGPlayer extends Player {
                 return;
             }
         }
+        // display animation if player is moving
+        if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
+            animations[currentAnimation][currentAnimationIndex].update(deltaTime);
+            if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationIndex].isCompleted()) {
+                state = PlayerStates.IDLE;
+                animations[currentAnimation][currentAnimationIndex].reset();
+                setAnimationByOrientation(getOrientation());
+            }
+        }
         if (unReactive) {
             super.update(deltaTime);
             return;
@@ -113,15 +122,7 @@ public class ARPGPlayer extends Player {
 
         wantsInteraction = false;
 
-        // display animation if player is moving
-        if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
-            animations[currentAnimation][currentAnimationIndex].update(deltaTime);
-            if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationIndex].isCompleted()) {
-                state = PlayerStates.IDLE;
-                animations[currentAnimation][currentAnimationIndex].reset();
-                setAnimationByOrientation(getOrientation());
-            }
-        }
+
         for (PlayerInput input : PlayerInput.values()) {
             boolean reactToInput = false;
             if (input.getCanHoldDown() && keyboard.get(input.getKeyCode()).isDown()) reactToInput = true;

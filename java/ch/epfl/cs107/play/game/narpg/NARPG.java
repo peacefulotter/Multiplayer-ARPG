@@ -90,11 +90,11 @@ public class NARPG extends AreaGame {
             if (p.isMovable() && packet.getObjectId() == p.getId()) {
                 if (p instanceof NetworkARPGPlayer) {
                     if (!((NetworkARPGPlayer) p).isClientAuthority()) {
-                        ((MovableNetworkEntity) p).networkMove(packet.getOrientation(), packet.getSpeed(), packet.getStart());
+                        ((MovableNetworkEntity) p).networkMove(packet);
                     }
                     return;
                 }
-                ((MovableNetworkEntity) p).networkMove(packet.getOrientation(), packet.getSpeed(), packet.getStart());
+                ((MovableNetworkEntity) p).networkMove(packet);
 
             }
         }
