@@ -1,9 +1,6 @@
 package ch.epfl.cs107.play.Networking.Packets;
 
 import ch.epfl.cs107.play.Networking.Connection;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.ConvertUtilsBean;
 
 import java.io.IOException;
 import java.io.StringReader;

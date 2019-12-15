@@ -4,29 +4,28 @@ import ch.epfl.cs107.play.Client;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
-import ch.epfl.cs107.play.Networking.Packets.*;
-import ch.epfl.cs107.play.game.actor.Actor;
+import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
+import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
+import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.arpg.ARPG;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkedBomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.areas.NFerme;
-import ch.epfl.cs107.play.game.rpg.RPG;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class NARPG extends AreaGame {
+public class NARPG extends AreaGame
+{
     private List<NetworkARPGPlayer> players = new ArrayList<NetworkARPGPlayer>();
     private List<NetworkEntity> networkEntities = new ArrayList<>();
     //store items that couldn't be registered and register as soon as possible;
@@ -41,12 +40,14 @@ public class NARPG extends AreaGame {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle()
+    {
         return "ZeldIC - Multiplayer";
     }
 
-    protected void createAreas() {
-        addArea(new NFerme());
+    protected void createAreas()
+    {
+        addArea( new NFerme() );
     }
 
     @Override
@@ -76,7 +77,6 @@ public class NARPG extends AreaGame {
             System.out.println(update.getBeanMap());
             BeanUtils.populate(entity, update.getBeanMap());
             System.out.println(entity);
-            ;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -109,8 +109,10 @@ public class NARPG extends AreaGame {
         }
         switch (object) {
             case PLAYER:
-                for (NetworkARPGPlayer p : players) {
-                    if (p.getId() == packet.getObjectId()) {
+                for (NetworkARPGPlayer p : players)
+                {
+                    if (p.getId() == packet.getObjectId())
+                    {
                         return false;
                     }
                 }
@@ -126,8 +128,8 @@ public class NARPG extends AreaGame {
             case BOMB:
                 NetworkedBomb newBomb = new NetworkedBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),
                         connection);
-                networkEntities.add(newBomb);
-                area.registerActor(newBomb);
+                networkEntities.add( newBomb );
+                area.registerActor( newBomb );
                 break;
 
         }

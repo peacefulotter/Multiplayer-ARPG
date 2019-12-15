@@ -15,7 +15,7 @@ public class NFerme extends ARPGArea
         registerActor(new Background( this ));
         registerActor(new Foreground( this ));
         registerActor( new LogMonster( this, new DiscreteCoordinates( 8, 8 ) ) );
-        registerActor(new Coin(this,new DiscreteCoordinates(10,10),50));
+        registerActor( new Coin( this, new DiscreteCoordinates( 9, 11 ), 50 ) );
     }
 
     @Override
