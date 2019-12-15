@@ -8,10 +8,13 @@ import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.player.PlayerStates;
-import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
+import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
+import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkCoin;
+import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Keyboard;
 
@@ -24,6 +27,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private boolean clientAuthority;
     private String playerMoney;
     private PlayerStates state;
+    private final NetworkARPGPlayerHandler handler;
 
     /**
      * Default Player constructor
@@ -34,7 +38,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      */
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
         super(area, orientation, coordinates);
-        handler = new NetworkARPGLPlayerHandler();
+        this.handler = new NetworkARPGPlayerHandler();
         this.currentArea = area;
         this.connection = connection;
         this.id = IdGenerator.generateId();
@@ -57,14 +61,15 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     moved = Orientation.RIGHT;
                 } else if (keyboard.get(keyboard.DOWN).isDown()) {
                     moved = Orientation.DOWN;
-                } else if (keyboard.get(keyboard.SPACE).isPressed()) {
+                } else if ( keyboard.get( keyboard.SPACE ).isPressed() ) {
                     useItem();
                 }
+                if (moved != null) {
+                    Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
+                    packet.writeData(connection);
+                }
             }
-            if (moved != null) {
-                Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
-                packet.writeData(connection);
-            }
+
         }
         super.update(deltaTime);
     }
@@ -74,15 +79,22 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
             case BOMB:
                 new Packet00Spawn(
                         NetworkEntities.BOMB.getClassId(), NetworkEntities.BOMB, Orientation.DOWN, getNextCurrentCells().get(0), currentArea
-                ).writeData(connection);
+                ).writeData( connection );
                 break;
             case SWORD:
                 super.useItem();
                 System.out.println(state);
+                break;
             case BOW:
                 new Packet00Spawn(
-                        NetworkEntities.ARROW.getClassId(), NetworkEntities.ARROW, getOrientation(), getNextCurrentCells().get(0), currentArea
+                        NetworkEntities.BOW.getClassId(), NetworkEntities.BOW, getOrientation(), getNextCurrentCells().get(0), currentArea
                 ).writeData( connection );
+                break;
+            case STAFF:
+                new Packet00Spawn(
+                        NetworkEntities.STAFF.getClassId(), NetworkEntities.STAFF, getOrientation(), getNextCurrentCells().get(0), currentArea
+                ).writeData( connection );
+                break;
         }
     }
 
@@ -139,14 +151,30 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         inventory.addMoney(Integer.parseInt(playerMoney)-inventory.getMoney());
     }
 
-    class NetworkARPGLPlayerHandler extends ARPGPlayerHandler {
+    class NetworkARPGPlayerHandler implements NARPGInteractionVisitor
+    {
+
         @Override
-        public void interactWith(Coin coin) {
+        public void interactWith( NetworkARPGPlayer player )
+        {
+            if ( getEquippedItem().getVuln() == Vulnerabilities.CLOSE_RANGE )
+            {
+                player.giveDamage( getEquippedItem().getDamage() );
+            }
+        }
+
+        @Override
+        public void interactWith( NetworkCoin coin ) {
             coin.collect();
             HashMap<String, String> changeMap = new HashMap();
             changeMap.put("playerMoney", String.valueOf(getMoney() + 50));
             var updatePacket = new Packet03Update(getId(), changeMap);
             updatePacket.writeData(connection);
+        }
+
+        public void interactWith( NetworkHeart heart )
+        {
+            heart.collect();
         }
     }
 }

@@ -3,12 +3,14 @@ package ch.epfl.cs107.play.game.narpg.actor;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 import ch.epfl.cs107.play.game.narpg.projectiles.NetworkArrow;
+import ch.epfl.cs107.play.game.narpg.projectiles.NetworkMagic;
 
 public enum NetworkEntities {
     PLAYER(001, NetworkARPGPlayer.class ),
-    BOMB(002, NetworkBomb.class ),
+    BOMB(  002, NetworkBomb.class ),
     HEART( 003, NetworkHeart.class ),
-    ARROW( 004, NetworkArrow.class );
+    BOW( 004, NetworkArrow.class ),
+    STAFF( 005, NetworkMagic.class );
 
     private final int classId;
     private final Class<?> value;

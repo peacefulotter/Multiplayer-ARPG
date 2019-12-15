@@ -14,6 +14,8 @@ import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
+import ch.epfl.cs107.play.game.narpg.projectiles.NetworkArrow;
+import ch.epfl.cs107.play.game.narpg.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
@@ -123,11 +125,17 @@ public class NARPG extends AreaGame
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
             case BOMB:
-                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),
-                        connection);
+                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate() );
                 networkEntities.add( newBomb );
                 area.registerActor( newBomb );
                 break;
+            case BOW:
+                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8 );
+                area.registerActor( newArrow );
+                break;
+            case STAFF:
+                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8 );
+                area.registerActor( newMagic );
         }
 
         return true;
