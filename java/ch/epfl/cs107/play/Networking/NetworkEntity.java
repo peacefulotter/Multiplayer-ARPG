@@ -7,8 +7,8 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
 public interface NetworkEntity extends Actor {
     int getId();
-    void setPosition(DiscreteCoordinates position);
-    void setOrientation(Orientation orientation);
-    default boolean isMovable(){return false;};
+    void setPosition( DiscreteCoordinates position );
+    void setOrientation( Orientation orientation );
+    default boolean isMovable() { return false; }
     Packet00Spawn getSpawnPacket();
 }

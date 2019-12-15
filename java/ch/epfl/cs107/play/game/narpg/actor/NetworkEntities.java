@@ -5,7 +5,7 @@ import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 
 public enum NetworkEntities {
     PLAYER(001, NetworkARPGPlayer.class ),
-    BOMB(002, NetworkedBomb.class ),
+    BOMB(002, NetworkBomb.class ),
     GRASS( 003, NetworkGrass.class ),
     LOG_MONSTER( 004, NetworkLogMonster.class );
 

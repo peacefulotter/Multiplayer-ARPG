@@ -8,8 +8,8 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
-public class NetworkedBomb extends Bomb implements NetworkEntity {
-    public NetworkedBomb(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection) {
+public class NetworkBomb extends Bomb implements NetworkEntity {
+    public NetworkBomb(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection) {
         super(area, orientation, position);
     }
 

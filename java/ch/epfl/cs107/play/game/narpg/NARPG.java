@@ -11,7 +11,7 @@ import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
-import ch.epfl.cs107.play.game.narpg.actor.NetworkedBomb;
+import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.areas.NFerme;
 import ch.epfl.cs107.play.io.FileSystem;
@@ -47,7 +47,7 @@ public class NARPG extends AreaGame
 
     protected void createAreas()
     {
-        addArea( new NFerme() );
+        addArea( new NFerme( isServer ) );
     }
 
     @Override
@@ -126,12 +126,11 @@ public class NARPG extends AreaGame
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
             case BOMB:
-                NetworkedBomb newBomb = new NetworkedBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),
+                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),
                         connection);
                 networkEntities.add( newBomb );
                 area.registerActor( newBomb );
                 break;
-
         }
 
         return true;
@@ -145,12 +144,26 @@ public class NARPG extends AreaGame
     }
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
-        for (NetworkEntity e : leftToRegister) {
+    public void update( float deltaTime )
+    {
+        super.update( deltaTime );
+        for ( NetworkEntity e : leftToRegister )
+        {
             if (getCurrentArea().registerActor(e)) {
                 leftToRegister.remove(e);
                 return;
+            }
+        }
+        for ( NetworkEntity entity : networkEntities )
+        {
+            System.out.println("entity update");
+            System.out.println(entity);
+            //entity.update( deltaTime );
+            // get the updtated monsters
+            // send to player
+            for ( NetworkARPGPlayer player : players )
+            {
+
             }
         }
     }

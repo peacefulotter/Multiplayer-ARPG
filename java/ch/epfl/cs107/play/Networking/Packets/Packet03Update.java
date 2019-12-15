@@ -1,6 +1,10 @@
 package ch.epfl.cs107.play.Networking.Packets;
 
 import ch.epfl.cs107.play.Networking.Connection;
+import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
+import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -12,8 +16,14 @@ public class Packet03Update extends Packet {
     private final static int packetId = 03;
     private HashMap beanMap = new HashMap();
 
-    public Packet03Update(int objectId, HashMap beanMap) {
-        super(packetId, objectId);
+    public Packet03Update( int objectId, HashMap beanMap )
+    {
+        super( packetId, objectId );
+        this.beanMap = beanMap;
+    }
+
+    public Packet03Update( int objectId, NetworkEntities networkEntity, Orientation orientation, DiscreteCoordinates startPosition, Area area ) {
+        super( packetId, objectId );
         this.beanMap = beanMap;
     }
 

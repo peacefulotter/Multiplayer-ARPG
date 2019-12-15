@@ -38,7 +38,7 @@ public class LogMonster extends Monster
     private Animation wakingAnimation;
 
 
-    private enum LogMonsterState {
+    protected enum LogMonsterState {
         IS_IDLE( true, true ),
         IS_SLEEPING( false, false ),
         IS_WAKING( false, false ),
@@ -53,6 +53,9 @@ public class LogMonster extends Monster
             this.drawPlayer = drawPlayer;
         }
     }
+
+
+    protected LogMonsterState getState() { return state; }
 
 
     public LogMonster(Area area, DiscreteCoordinates coords )
