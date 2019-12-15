@@ -4,23 +4,22 @@ import ch.epfl.cs107.play.Client;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
-import ch.epfl.cs107.play.Networking.Packets.*;
+import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
+import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
+import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.arpg.ARPG;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkedBomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.areas.NFerme;
-import ch.epfl.cs107.play.game.rpg.RPG;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class NARPG extends AreaGame
 
     protected void createAreas()
     {
-        addArea(new NFerme());
+        addArea( new NFerme() );
     }
 
     @Override
