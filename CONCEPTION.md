@@ -38,7 +38,7 @@ im leftToRegister
 All network entities implement either NetworkEntity or MovableNetworkEntity, which extends
 NetworkEntity which itself extends Actor. All NetworkEntity's have an id that is assumed 
 to be unique (hopefully, no checks are made).
-##### NetworkARPGPlayer
+#### NetworkARPGPlayer
 NetworkARPGLPlayer is the most complicated of all the networked entities, as it needs
 to take into account player input and send it to the server. It extends ARPGPlayer and
 implements MovableNetworkEntity
@@ -50,16 +50,16 @@ NetworkARPGLPlayer also has an additional TextGraphics property which displays t
 controlling client's username.
 
 To avoid sending too many update packets, changes in state are stored in queuedUpdates
-###### update(float deltaTime)
+##### update(float deltaTime)
 queuedUpdates will be emptied once every update by sending a corresponding Packet03Update
 next, if client has clientAuthority over this instance it will react to client input
 and send corresponding packets.
 
 calls super.update() at the end
-###### useItem()
+##### useItem()
 ARPGPlayer's useItem is overriden to spawn corresponding network entitis instead of the
 normal ones. Ex spawn networkedBomb instead of Bomb
-###### NetworkMove(Packet02Move movePacket)
+##### NetworkMove(Packet02Move movePacket)
 teleports the player
 
 ## Movement
