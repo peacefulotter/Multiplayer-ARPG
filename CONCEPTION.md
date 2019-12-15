@@ -1,3 +1,22 @@
+# Game
+
+## Movement
+#### Dash
+[PRESS A] : the player makes a dash (moves quickly and forward by a couple of cells)
+
+## Area
+#### House Background
+The player can enter inside the house at the spawn
+   - file is located at images/backgrounds/custom/House.png
+#### House Behavior
+The house has walls thanks to the House Behavior Image
+   - file is located at images/behaviors/custom/House.png
+
+## Inventory items
+#### Mouse Wheel
+Added the mouse wheel to switch items (using tab still works)
+
+
 # Multiplayer
 ## General architecture
 ### Game thread
@@ -61,17 +80,5 @@ ARPGPlayer's useItem is overriden to spawn corresponding network entitis instead
 normal ones. Ex spawn networkedBomb instead of Bomb
 ##### NetworkMove(Packet02Move movePacket)
 teleports the player
-
-## Movement
- - dash [PRESS A] : the player makes a dash (move quickly and forward by a couple of cells)
-
-## Area
- - House : the player can enter inside the house at the spawn
-   - file is located at images/backgrounds/custom/House.png
- - House Behavior : the house has walls thanks to the House Behavior Image
-   - file is located at images/behaviors/custom/House.png
-
-## Inventory items
- - Added the mouse wheel to switch items (using tab still works)
 
 
