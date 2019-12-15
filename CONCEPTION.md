@@ -1,9 +1,7 @@
 # Game
-
 ## Movement
 #### Dash
 [PRESS A] : the player makes a dash (moves quickly and forward by a couple of cells)
-
 ## Area
 #### House Background
 The player can enter inside the house at the spawn
@@ -11,10 +9,10 @@ The player can enter inside the house at the spawn
 #### House Behavior
 The house has walls thanks to the House Behavior Image
    - file is located at images/behaviors/custom/House.png
-
 ## Inventory items
 #### Mouse Wheel
 Added the mouse wheel to switch items (using tab still works)
+
 
 
 # Multiplayer
