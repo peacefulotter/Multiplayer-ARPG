@@ -49,5 +49,15 @@ systemctl stop serversservice
 ```
 
 ##Client
-The client connects
-
+The client connects to the tcp server by using the address, the port and username as program arguments
+#####Connecting to our remote server
+To connect to our remote server use the following program arguments:
+```shell script
+epflmp2.me 4000 <your_chosen_username>
+```
+#####Connecting to your local server
+To connect to your own local server use the following program arguments:
+```shell script
+localhost <your_chosen_port> <your_chosen_username>
+```
+##Multiplayer gameplay
