@@ -20,7 +20,7 @@ public class Packet00Spawn extends Packet {
 
     public Packet00Spawn(byte[] data) {
         super(00, data);
-        String[] dataArray = readData(data).split(",");
+        String[] dataArray = readData(data).split(";");
         this.object = NetworkEntities.lookUpEntity(Integer.parseInt(dataArray[1]));
         this.orientation= OrientationValues.getOrientationByValue(Integer.parseInt(dataArray[2]));
         this.startX=Integer.parseInt(dataArray[3]);
@@ -64,8 +64,8 @@ public class Packet00Spawn extends Packet {
 
     @Override
     public byte[] getData() {
-        return ("00" + objectId + ","+object.getClassId()+","+ OrientationValues.getOrientationValue(orientation) + "," + this.startX+","
-                + this.startY+","+initialState.toString()).getBytes();
+        return ("00" + objectId + ";"+object.getClassId()+";"+ OrientationValues.getOrientationValue(orientation) + ";" + this.startX+";"
+                + this.startY+";"+initialState.toString()).getBytes();
     }
 
 }

@@ -122,17 +122,18 @@ public class NARPG extends AreaGame
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
             case BOMB:
-                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate());
+                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),packet.getInitialState());
                 networkEntities.add( newBomb );
                 area.registerActor( newBomb );
                 break;
             case BOW:
-                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8,packet.getInitialState());
+                System.out.println(packet.getInitialState());
+                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection,packet.getInitialState());
                 networkEntities.add( newArrow );
                 area.registerActor( newArrow );
                 break;
             case STAFF:
-                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8, connection, 0 );
+                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection, packet.getInitialState());
                 networkEntities.add( newMagic );
                 area.registerActor( newMagic );
         }

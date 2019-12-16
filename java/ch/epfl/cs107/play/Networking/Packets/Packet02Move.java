@@ -23,7 +23,7 @@ public class Packet02Move extends Packet {
 
     public Packet02Move(byte[] data) {
         super(02, data);
-        String[] dataArray = readData(data).split(",");
+        String[] dataArray = readData(data).split("|");
         this.orientation = OrientationValues.getOrientationByValue(Integer.parseInt(dataArray[1]));
         this.startX = Integer.parseInt(dataArray[2]);
         this.startY = Integer.parseInt(dataArray[3]);
@@ -49,10 +49,10 @@ public class Packet02Move extends Packet {
 
     @Override
     public byte[] getData() {
-        return ("02" + this.objectId + ","
-                + OrientationValues.getOrientationValue(this.orientation) + ","
-                + this.startX + ","
-                + this.startY + "," + this.speed).getBytes();
+        return ("02" + this.objectId + ";"
+                + OrientationValues.getOrientationValue(this.orientation) + ";"
+                + this.startX + ";"
+                + this.startY + ";" + this.speed).getBytes();
     }
 
 
