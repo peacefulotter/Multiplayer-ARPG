@@ -59,7 +59,7 @@ public class NARPG extends AreaGame
             if ( !isServer ) {
                 ((Client) connection).login();
                 String username= ((Client) connection).getUsername();
-                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true,username);
+                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true,username,0);
                 area.registerActor( player );
                 area.setViewCandidate( player );
                 player.getSpawnPacket().writeData(connection);
@@ -109,7 +109,6 @@ public class NARPG extends AreaGame
                 newPlayer.setId(packet.getObjectId());
                 players.add(newPlayer);
                 networkEntities.add(newPlayer);
-                //System.out.println(packet.getInitialState());
                 boolean registered = getCurrentArea().registerActor(newPlayer);
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
@@ -119,7 +118,6 @@ public class NARPG extends AreaGame
                 area.registerActor( newBomb );
                 break;
             case BOW:
-                System.out.println(packet.getInitialState());
                 NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection,packet.getInitialState());
                 networkEntities.add( newArrow );
                 area.registerActor( newArrow );
