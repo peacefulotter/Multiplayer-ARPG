@@ -1,4 +1,4 @@
-package ch.epfl.cs107.play.game.narpg.projectiles;
+package ch.epfl.cs107.play.game.narpg.actor.projectiles;
 
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
@@ -16,10 +16,11 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
 import java.util.HashMap;
 
-public class NetworkMagic extends MagicProjectile implements NetworkEntity
+public class NetworkMagic extends MagicProjectile implements NetworkEntity,NetworkProjectile
 {
     private final static float MAGIC_DAMAGE = 0.5f;
     private final Connection connection;
+    private final int spawnedBy;
     /**
      * Default MovableAreaEntity constructor
      *
@@ -29,11 +30,12 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity
      * @param speed
      * @param maxDistance
      */
-    public NetworkMagic(Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance, Connection connection )
+    public NetworkMagic(Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance, Connection connection ,int spawnedBy)
     {
         super(area, orientation, position, speed, maxDistance);
         this.connection = connection;
         handler = new NetworkMagicHandler();
+        this.spawnedBy=spawnedBy;
     }
 
     @Override
@@ -47,6 +49,11 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity
     public Packet00Spawn getSpawnPacket()
     {
         return null;
+    }
+
+    @Override
+    public void updateState(HashMap<String, String> updateMap) {
+
     }
 
 
@@ -68,19 +75,18 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity
         }
     }
 
+    @Override
+    public int getSpawnerId() {
+        return spawnedBy;
+    }
+
     class NetworkMagicHandler implements NARPGInteractionVisitor
     {
         @Override
         public void interactWith( NetworkARPGPlayer player )
         {
             // check server and send packet update
-            System.out.println(player);
             player.giveDamage( MAGIC_DAMAGE );
-            HashMap<String, String> updateMap = new HashMap<>();
-            updateMap.put( "hp", String.valueOf(player.getHp()));
-            Packet03Update packetUpdate = new Packet03Update( player.getId(), updateMap );
-            packetUpdate.writeData( connection );
-            System.out.println(player.getHp());
             stopProjectile();
         }
     }

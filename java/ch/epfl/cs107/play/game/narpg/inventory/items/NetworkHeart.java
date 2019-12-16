@@ -7,6 +7,8 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
+import java.util.HashMap;
+
 public class NetworkHeart extends Heart implements NetworkEntity
 {
     /**
@@ -30,5 +32,10 @@ public class NetworkHeart extends Heart implements NetworkEntity
     public Packet00Spawn getSpawnPacket()
     {
         return null;
+    }
+
+    @Override
+    public void updateState(HashMap<String, String> updateMap) {
+
     }
 }

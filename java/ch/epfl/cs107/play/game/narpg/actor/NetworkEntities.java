@@ -2,8 +2,8 @@ package ch.epfl.cs107.play.game.narpg.actor;
 
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
-import ch.epfl.cs107.play.game.narpg.projectiles.NetworkArrow;
-import ch.epfl.cs107.play.game.narpg.projectiles.NetworkMagic;
+import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
+import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 
 public enum NetworkEntities {
     PLAYER(001, NetworkARPGPlayer.class ),

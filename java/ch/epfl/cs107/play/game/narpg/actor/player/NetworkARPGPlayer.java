@@ -15,6 +15,7 @@ import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.player.PlayerStates;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
+import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkCoin;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
@@ -33,7 +34,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private Area currentArea;
     private int id;
     private final boolean clientAuthority;
-    private PlayerStates state;
     private TextGraphics usernameText;
     private HashMap<String, String> queuedUpdates;
 
@@ -53,13 +53,16 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.id = IdGenerator.generateId();
         this.clientAuthority = clientAuthority;
         this.state = PlayerStates.IDLE;
-        if (!clientAuthority) unReactive = true;
-
+        if (!clientAuthority){
+            unReactive = true;
+        }
+        if(username==null) username="";
         usernameText = new TextGraphics(username,.5f,Color.WHITE,Color.BLACK,.005f,true,false,new Vector(+.4f,+1.5f), TextAlign.Horizontal.CENTER,null,1f,10000);
         usernameText.setParent(this);
     }
-    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
-        this(area,orientation,coordinates,connection,clientAuthority,"");
+
+    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String,String> initialState) {
+        this(area,orientation,coordinates,connection,clientAuthority,initialState.get("username"));
     }
 
     @Override
@@ -123,6 +126,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     protected void useItem() {
+        if(state!=PlayerStates.IDLE) return;
         switch ( getEquippedItem() ) {
             case BOMB:
                 new Packet00Spawn(
@@ -133,14 +137,15 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 super.useItem();
                 break;
             case BOW:
-                new Packet00Spawn(
-                        NetworkEntities.BOW.getClassId(), NetworkEntities.BOW, getOrientation(), getNextCurrentCells().get(0)
-                ).writeData( connection );
+                setState(PlayerStates.ATTACKING_BOW);
+                currentAnimation=2;
                 break;
             case STAFF:
+                setState(PlayerStates.ATTACKING_STAFF);
                 new Packet00Spawn(
-                        NetworkEntities.STAFF.getClassId(), NetworkEntities.STAFF, getOrientation(), getNextCurrentCells().get(0)
+                        NetworkEntities.STAFF.getClassId(), NetworkEntities.STAFF, getOrientation(), getCurrentMainCellCoordinates().jump((getOrientation().toVector()))
                 ).writeData( connection );
+                currentAnimation=3;
                 break;
         }
     }

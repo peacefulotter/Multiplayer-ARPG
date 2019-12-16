@@ -14,13 +14,14 @@ import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
-import ch.epfl.cs107.play.game.narpg.projectiles.NetworkArrow;
-import ch.epfl.cs107.play.game.narpg.projectiles.NetworkMagic;
+import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
+import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -104,27 +105,26 @@ public class NARPG extends AreaGame
                     }
                 }
                 var newPlayer = new NetworkARPGPlayer(area, packet.getOrientation(),
-                        packet.getDiscreteCoordinate(), connection, false);
+                        packet.getDiscreteCoordinate(), connection, false, packet.getInitialState());
                 newPlayer.setId(packet.getObjectId());
                 players.add(newPlayer);
                 networkEntities.add(newPlayer);
                 //System.out.println(packet.getInitialState());
-                newPlayer.updateState(packet.getInitialState());
                 boolean registered = getCurrentArea().registerActor(newPlayer);
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
             case BOMB:
-                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate() );
+                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate());
                 networkEntities.add( newBomb );
                 area.registerActor( newBomb );
                 break;
             case BOW:
-                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8 );
+                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8,packet.getInitialState());
                 networkEntities.add( newArrow );
                 area.registerActor( newArrow );
                 break;
             case STAFF:
-                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8, connection );
+                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8, connection, 0 );
                 networkEntities.add( newMagic );
                 area.registerActor( newMagic );
         }

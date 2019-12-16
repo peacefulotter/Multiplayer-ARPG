@@ -44,11 +44,11 @@ public class ARPGPlayer extends Player {
     protected float hp;
     private static final int maxHP = 5;
     private Animation[][] animations;
-    private int currentAnimation = 0;
+    protected int currentAnimation = 0;
     private int currentAnimationIndex = 2;
     private boolean wantsInteraction = false;
     private ARPGItem currentItem;
-    private ARPGPlayerStatusGUI playerGUI;
+    protected final ARPGPlayerStatusGUI playerGUI;
     private Vector dashStartingPos;
     private Animation dashAnimation;
 
@@ -99,12 +99,11 @@ public class ARPGPlayer extends Player {
             } else {
                 dashAnimation.update(deltaTime);
                 move(5);
-                super.update(deltaTime);
-                return;
             }
         }
         // display animation if player is moving
         if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
+            System.out.println(currentAnimation);
             animations[currentAnimation][currentAnimationIndex].update(deltaTime);
             if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationIndex].isCompleted()) {
                 state = PlayerStates.IDLE;
@@ -220,7 +219,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public void draw(Canvas canvas) {
-        playerGUI.draw(canvas);
+        if(!unReactive)playerGUI.draw(canvas);
         if (state == PlayerStates.IS_DASHING) {
             dashAnimation.setAnchor(dashStartingPos.sub(getCurrentCells().get(0).toVector()));
             dashAnimation.draw(canvas);

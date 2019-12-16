@@ -9,6 +9,8 @@ import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
+import java.util.HashMap;
+
 public class NetworkBomb extends Bomb implements NetworkEntity {
     public NetworkBomb(Area area, Orientation orientation, DiscreteCoordinates position ) {
         super(area, orientation, position);
@@ -24,6 +26,11 @@ public class NetworkBomb extends Bomb implements NetworkEntity {
     @Override
     public Packet00Spawn getSpawnPacket() {
         return null;
+    }
+
+    @Override
+    public void updateState(HashMap<String, String> updateMap) {
+
     }
 
     class NetworkBombHandler implements NARPGInteractionVisitor

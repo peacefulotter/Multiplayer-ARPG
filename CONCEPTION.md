@@ -17,7 +17,8 @@ Added the mouse wheel to switch items (using tab still works)
 
 # Multiplayer
 ## General architecture
-### Game thread
+    
+## Game thread
 Both the server and the client have their own game thread that runs the runnable ThreadedPlay, this is so that we 
 don't have to worry about our socket communication blocking the game.
 ### NARPG
@@ -76,7 +77,23 @@ calls super.update() at the end
 ##### useItem()
 ARPGPlayer's useItem is overriden to spawn corresponding network entitis instead of the
 normal ones. Ex spawn networkedBomb instead of Bomb
-##### NetworkMove(Packet02Move movePacket)
-teleports the player
+######NetworkMove(Packet02Move movePacket)
+As by the MovableNetworkEntity this allows the server to move the entity.
+######NetworkARPGPlayerHandler 
+NetworkARPGPlayer has it's own interaction handler that also implements NARPGInteractionVisitor
+ as the interactions with networked versions of the main game differ from the single-player version.
+
+
+## Movement
+ - dash [PRESS A] : the player makes a dash (move quickly and forward by a couple of cells)
+
+## Area
+ - House : the player can enter inside the house at the spawn
+   - file is located at images/backgrounds/custom/House.png
+ - House Behavior : the house has walls thanks to the House Behavior Image
+   - file is located at images/behaviors/custom/House.png
+
+## Inventory items
+ - Added the mouse wheel to switch items (using tab still works)
 
 

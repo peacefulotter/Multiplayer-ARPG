@@ -7,6 +7,8 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
+import java.util.HashMap;
+
 public class NetworkCoin extends Coin implements NetworkEntity
 {
     /**
@@ -33,5 +35,10 @@ public class NetworkCoin extends Coin implements NetworkEntity
     public Packet00Spawn getSpawnPacket()
     {
         return null;
+    }
+
+    @Override
+    public void updateState(HashMap<String, String> updateMap) {
+
     }
 }

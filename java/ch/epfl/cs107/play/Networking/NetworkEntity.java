@@ -10,5 +10,5 @@ public interface NetworkEntity extends Actor
     int getId();
     default boolean isMovable() { return false; }
     Packet00Spawn getSpawnPacket();
-    default void updateState(HashMap<String,String> updateMap){};
+    void updateState(HashMap<String,String> updateMap);
 }
