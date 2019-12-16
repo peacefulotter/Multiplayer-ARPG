@@ -1,9 +1,7 @@
 package ch.epfl.cs107.play;
 
 import ch.epfl.cs107.play.game.Game;
-import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.arpg.ARPG;
-import ch.epfl.cs107.play.game.tutos.Tuto2;
 import ch.epfl.cs107.play.io.DefaultFileSystem;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.io.ResourceFileSystem;

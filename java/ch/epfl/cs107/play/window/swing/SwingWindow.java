@@ -1,32 +1,25 @@
 package ch.epfl.cs107.play.window.swing;
 
 import ch.epfl.cs107.play.io.FileSystem;
-import ch.epfl.cs107.play.math.*;
+import ch.epfl.cs107.play.math.Shape;
 import ch.epfl.cs107.play.math.Vector;
+import ch.epfl.cs107.play.math.*;
+import ch.epfl.cs107.play.window.Button;
+import ch.epfl.cs107.play.window.Image;
+import ch.epfl.cs107.play.window.Window;
 import ch.epfl.cs107.play.window.*;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.PointerInfo;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferStrategy;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.*;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.*;
 
 /**
  * Swing implementation of window context.
@@ -198,7 +191,7 @@ public final class SwingWindow extends Node implements Window {
 			final WindowAdapter windowAdapter = new WindowAdapter() {
 
 				@Override
-				public void windowClosing(WindowEvent we) {
+				public void windowClosing( WindowEvent we ) {
 					closeRequested = true;
 				}
 			};

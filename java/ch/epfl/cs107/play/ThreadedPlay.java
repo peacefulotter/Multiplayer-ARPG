@@ -1,6 +1,5 @@
 package ch.epfl.cs107.play;
 
-import ch.epfl.cs107.play.game.Game;
 import ch.epfl.cs107.play.game.narpg.NARPG;
 import ch.epfl.cs107.play.io.DefaultFileSystem;
 import ch.epfl.cs107.play.io.FileSystem;
@@ -8,8 +7,6 @@ import ch.epfl.cs107.play.io.ResourceFileSystem;
 import ch.epfl.cs107.play.io.XMLTexts;
 import ch.epfl.cs107.play.window.Window;
 import ch.epfl.cs107.play.window.swing.SwingWindow;
-
-import java.awt.*;
 
 public class ThreadedPlay implements Runnable {
 
@@ -21,7 +18,7 @@ public class ThreadedPlay implements Runnable {
 
 
     private final FileSystem fileSystem;
-    private final Game game;
+    private final NARPG game;
     private final Window window;
     private boolean isServer;
     private boolean stopGame;
@@ -97,6 +94,7 @@ public class ThreadedPlay implements Runnable {
         } finally {
             // Release resources
             System.out.println("closing");
+            game.unloadPlayer();
             window.dispose();
         }
     }

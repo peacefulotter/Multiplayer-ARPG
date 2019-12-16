@@ -13,15 +13,14 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
-import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
+import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -33,6 +32,7 @@ public class NARPG extends AreaGame
     private List<NetworkEntity> leftToRegister = new ArrayList<>();
     private Connection connection;
     private final boolean isServer;
+    private NetworkARPGPlayer player;
 
     public NARPG(boolean isServer, Connection connection) {
         super();
@@ -52,24 +52,32 @@ public class NARPG extends AreaGame
     }
 
     @Override
-    public boolean begin(Window window, FileSystem fileSystem) {
-        if (super.begin(window, fileSystem)) {
+    public boolean begin( Window window, FileSystem fileSystem )
+    {
+        if ( super.begin( window, fileSystem ) ) {
             createAreas();
-            Area area = setCurrentArea("custom/Arena", true);
+            Area area = setCurrentArea( "custom/Arena", true );
             if ( !isServer ) {
                 ((Client) connection).login();
-                String username= ((Client) connection).getUsername();
-                var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true,username);
+                String username = ((Client) connection).getUsername();
+                player = new NetworkARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true, username );
                 area.registerActor( player );
                 area.setViewCandidate( player );
-                player.getSpawnPacket().writeData(connection);
-                players.add(player);
-                networkEntities.add(player);
+                player.getSpawnPacket().writeData( connection );
+                players.add( player );
+                networkEntities.add( player );
             }
             return true;
         }
         return false;
+    }
 
+    public void unloadPlayer()
+    {
+        if ( player == null || getCurrentArea() == null ) { return; }
+        getCurrentArea().unregisterActor( player );
+        networkEntities.remove( player );
+        players.remove( player );
     }
 
     public void updateObject(Packet03Update update) {
@@ -141,7 +149,9 @@ public class NARPG extends AreaGame
 
     @Override
     public void update( float deltaTime ) {
-        for (NetworkEntity e : leftToRegister) {
+        // register the entities that still need to be registered
+        for (NetworkEntity e : leftToRegister)
+        {
             if (getCurrentArea().registerActor(e)) {
                 leftToRegister.remove(e);
                 return;
