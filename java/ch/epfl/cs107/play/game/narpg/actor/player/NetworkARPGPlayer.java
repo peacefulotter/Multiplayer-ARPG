@@ -32,10 +32,10 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private Connection connection;
     private Area currentArea;
     private int id;
-    private boolean clientAuthority;
-    private String playerMoney;
+    private final boolean clientAuthority;
     private PlayerStates state;
     private TextGraphics usernameText;
+    private HashMap<String, String> queuedUpdates;
 
     /**
      * Default Player constructor
@@ -46,7 +46,8 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      */
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, String username) {
         super(area, orientation, coordinates);
-        handler = new NetworkARPGPlayerHandler();
+        this.handler = new NetworkARPGPlayerHandler();
+        this.queuedUpdates = new HashMap<String, String>();
         this.currentArea = area;
         this.connection = connection;
         this.id = IdGenerator.generateId();
@@ -64,12 +65,16 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     @Override
     public void update(float deltaTime)
     {
-        var updateMap = new HashMap<String,String>();
-        updateMap.put( "username", usernameText.getText() );
-        new Packet03Update( getId(), updateMap );
+        //var updateMap = new HashMap<String,String>();
+        //updateMap.put( "username", usernameText.getText() );
+        //new Packet03Update( getId(), updateMap );
 
-        if ( !connection.isServer() && clientAuthority )
-        {
+        if(!queuedUpdates.isEmpty()){
+            var updatePacket= new Packet03Update(id, queuedUpdates);
+            queuedUpdates = new HashMap<String,String>();
+        }
+
+        if (!connection.isServer() && clientAuthority) {
             Keyboard keyboard = getOwnerArea().getKeyboard();
             Orientation moved = null;
             if (connection != null) {
@@ -163,14 +168,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.state = state;
     }
 
-    @Override
-    public void setPosition(DiscreteCoordinates position) {
-    }
-
-    @Override
-    public void setOrientation(Orientation orientation) {
-        orientate(orientation);
-    }
 
     @Override
     public Packet00Spawn getSpawnPacket() {
@@ -186,9 +183,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         DiscreteCoordinates startPosition = movePacket.getStart();
         if (!isDisplacementOccurs() || isTargetReached()) {
             super.orientate(orientation);
-            getOwnerArea().leaveAreaCells(this, getCurrentCells());
-            getOwnerArea().enterAreaCells(this, getCurrentCells());
-            setCurrentPosition(startPosition.toVector());
+            if(getPosition()!=startPosition.toVector()){
+                getOwnerArea().leaveAreaCells(this, getCurrentCells());
+                getOwnerArea().enterAreaCells(this, getCurrentCells());
+                setCurrentPosition(startPosition.toVector());
+            }
             setAnimationByOrientation(orientation);
             move(speed);
         }
@@ -236,15 +235,16 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         @Override
         public void interactWith( NetworkCoin coin ) {
             coin.collect();
-            HashMap<String, String> changeMap = new HashMap();
-            changeMap.put("playerMoney", String.valueOf(getMoney() + coin.getValue()));
-            var updatePacket = new Packet03Update(getId(), changeMap);
-            updatePacket.writeData(connection);
+            queuedUpdates.put("money",String.valueOf(inventory.getMoney()+50));
         }
 
         public void interactWith( NetworkHeart heart )
         {
-            heart.collect();
+            hp++;
+            if(hp>getMaxHP()){
+                hp=getMaxHP();
+            }
+            queuedUpdates.put("hp",String.valueOf(hp));
         }
     }
 }

@@ -40,9 +40,9 @@ public class ARPGPlayer extends Player {
     protected ARPGInteractionVisitor handler;
     protected boolean unReactive = false;
     protected ARPGInventory inventory;
-    private PlayerStates state;
+    protected PlayerStates state;
     protected float hp;
-    private int maxHP = 5;
+    private static final int maxHP = 5;
     private Animation[][] animations;
     private int currentAnimation = 0;
     private int currentAnimationIndex = 2;
@@ -177,11 +177,12 @@ public class ARPGPlayer extends Player {
         if (state != state.IDLE || currentItem == null ) { return; }
         switch (currentItem) {
             case BOMB:
-                //checks if key was just pressed as we want to prevent bom spamming
-                if(!getOwnerArea().getKeyboard().get(PlayerInput.USE_ITEM.getKeyCode()).isPressed()) return;
                 //handles adding a bomb to the area and removing it from inventory
                 DiscreteCoordinates bombCoordinates = getFieldOfViewCells().get(0);
-                if (isDisplacementOccurs()) bombCoordinates = bombCoordinates.jump(getOrientation().toVector());
+                if ( isDisplacementOccurs() )
+                {
+                    bombCoordinates = bombCoordinates.jump( getOrientation().toVector() );
+                }
                 boolean registeredActor = getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, bombCoordinates));
                 if (registeredActor) {
                     inventory.removeItemFromInventory(ARPGItem.BOMB);
@@ -194,7 +195,7 @@ public class ARPGPlayer extends Player {
                 currentAnimation = 1;
                 break;
             case BOW:
-                if (inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW)) {
+                if ( inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW) ) {
                     state = PlayerStates.ATTACKING_BOW;
                     getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
                     currentAnimation = 2;

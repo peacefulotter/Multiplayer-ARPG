@@ -31,7 +31,7 @@ public class NARPG extends AreaGame
     //store items that couldn't be registered and register as soon as possible;
     private List<NetworkEntity> leftToRegister = new ArrayList<>();
     private Connection connection;
-    private boolean isServer;
+    private final boolean isServer;
 
     public NARPG(boolean isServer, Connection connection) {
         super();
@@ -132,7 +132,7 @@ public class NARPG extends AreaGame
         return true;
     }
 
-    public void login(long mainId) {
+    public void login() {
         for (NetworkEntity p : networkEntities) {
             var packet = p.getSpawnPacket();
             packet.writeData(connection);
@@ -155,5 +155,10 @@ public class NARPG extends AreaGame
             if (e.getId() == objectId) return e;
         }
         return null;
+    }
+
+    @Override
+    public void end() {
+        super.end();
     }
 }

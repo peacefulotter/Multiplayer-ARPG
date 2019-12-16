@@ -64,6 +64,7 @@ public class ConnectionHandler implements Runnable {
         while (!done) { //in = new BufferedReader(new
             // InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
             DataInputStream dis = new DataInputStream(inStream);
+
             int len = dis.readInt();
             byte[] data = new byte[len];
             if (len > 0) {
@@ -91,7 +92,7 @@ public class ConnectionHandler implements Runnable {
             case LOGIN:
                 Packet01Login loginPacket = new Packet01Login(data);
                 connectionId = loginPacket.getConnectionId();
-                game.login(loginPacket.getConnectionId());
+                game.login();
                 sendDataBackToAll = false;
                 break;
             case MOVE:
