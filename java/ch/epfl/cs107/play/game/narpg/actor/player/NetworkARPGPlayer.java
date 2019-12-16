@@ -68,10 +68,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     @Override
     public void update(float deltaTime)
     {
-        //var updateMap = new HashMap<String,String>();
-        //updateMap.put( "username", usernameText.getText() );
-        //new Packet03Update( getId(), updateMap );
-
         if(!queuedUpdates.isEmpty()){
             var updatePacket= new Packet03Update(id, queuedUpdates);
             queuedUpdates = new HashMap<String,String>();
