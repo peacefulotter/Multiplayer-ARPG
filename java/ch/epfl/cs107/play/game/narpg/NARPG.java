@@ -7,6 +7,7 @@ import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
+import ch.epfl.cs107.play.Networking.Packets.Packet04Chat;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -15,6 +16,7 @@ import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
+import ch.epfl.cs107.play.game.narpg.announcement.ServerAnnouncement;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
@@ -98,6 +100,12 @@ public class NARPG extends AreaGame
 
             }
         }
+    }
+
+    public void addChat( Packet04Chat packet )
+    {
+        getCurrentArea().registerActor(
+                new ServerAnnouncement( packet.getText() ) );
     }
 
     public boolean spawnObject(Packet00Spawn packet) {

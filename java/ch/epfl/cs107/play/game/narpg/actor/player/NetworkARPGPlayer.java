@@ -5,6 +5,7 @@ import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
+import ch.epfl.cs107.play.Networking.Packets.Packet04Chat;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
@@ -89,6 +90,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     moved = Orientation.DOWN;
                 } else if (keyboard.get(keyboard.SPACE).isPressed()) {
                     useItem();
+                } else if ( keyboard.get( keyboard.Y ).isPressed() )
+                {
+                    new Packet04Chat( 0, "loooooooooool" ).writeData( connection );
                 }
                 if (moved != null) {
                     Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);

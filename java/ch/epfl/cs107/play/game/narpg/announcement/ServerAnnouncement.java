@@ -16,14 +16,17 @@ import java.util.List;
 
 public class ServerAnnouncement implements Graphics, NetworkEntity
 {
+    private String text;
     private List<TextGraphics> announcements = new ArrayList<>();
     private List<Integer> removeQueue = new ArrayList<>();
 
-    ServerAnnouncement( String text )
+    public ServerAnnouncement( String text )
     {
         TextGraphics graphics = new TextGraphics( text, 0.5f, Color.GRAY, Color.BLACK, 0.1f, false, false, new Vector( 0, 1f ), TextAlign.Horizontal.CENTER, TextAlign.Vertical.MIDDLE, 1, 1000 );
         announcements.add( graphics );
+        this.text = text;
     }
+
     @Override
     public void draw(Canvas canvas)
     {
@@ -31,7 +34,8 @@ public class ServerAnnouncement implements Graphics, NetworkEntity
         for ( int i = 0; i < announcementLen; i++ )
         {
             TextGraphics t = announcements.get( i );
-            t.setAnchor( canvas.getTransform().getOrigin().sub( new Vector(canvas.getWidth() / 2, ( canvas.getHeight() / 2 ) + i + 3 ) ) );
+            t.setAnchor( canvas.getVelocity() );
+            //t.setAnchor( canvas.getTransform().getOrigin().sub( new Vector(canvas.getWidth() / 2, ( canvas.getHeight() / 2 ) + i + 3 ) ) );
             t.draw( canvas );
             t.setAlpha( t.getAlpha() - 1 );
             if ( t.getAlpha() <= 0 )
@@ -59,7 +63,6 @@ public class ServerAnnouncement implements Graphics, NetworkEntity
     @Override
     public Packet00Spawn getSpawnPacket()
     {
-
         return null;
     }
 

@@ -13,9 +13,7 @@ import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
-import javax.swing.*;
 import java.util.HashMap;
-import java.util.Map;
 
 public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProjectile {
     private final int spawnedBy;
@@ -81,8 +79,9 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
         SPAWNED_BY("spawnedBy");
 
         private final String property;
+
         stateProperties(String spawnedBy) {
-            this.property=spawnedBy;
+            this.property = spawnedBy;
         }
 
         public String getProperty() {

@@ -103,6 +103,10 @@ public class ConnectionHandler implements Runnable {
                 Packet03Update updatePacket = new Packet03Update(data);
                 game.updateObject(updatePacket);
                 break;
+            case TCHAT:
+                Packet04Chat chatPacket = new Packet04Chat( data );
+                game.addChat( chatPacket );
+                break;
         }
         if (isServer && sendDataBackToAll) {
             connection.sendData(data);
