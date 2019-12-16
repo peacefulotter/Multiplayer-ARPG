@@ -15,7 +15,6 @@ import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.player.PlayerStates;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
-import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkCoin;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
@@ -122,7 +121,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     protected void useItem() {
-        if(state!=PlayerStates.IDLE) return;
+        if ( state != PlayerStates.IDLE ) { return; }
         switch ( getEquippedItem() ) {
             case BOMB:
                 new Packet00Spawn(

@@ -1,16 +1,20 @@
 package ch.epfl.cs107.play.game.narpg.announcement;
 
+import ch.epfl.cs107.play.Networking.NetworkEntity;
+import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.game.actor.Graphics;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.math.TextAlign;
+import ch.epfl.cs107.play.math.Transform;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class ServerAnnouncement implements Graphics
+public class ServerAnnouncement implements Graphics, NetworkEntity
 {
     private List<TextGraphics> announcements = new ArrayList<>();
     private List<Integer> removeQueue = new ArrayList<>();
@@ -45,4 +49,36 @@ public class ServerAnnouncement implements Graphics
             announcements.remove( i );
         }
     }
+
+    @Override
+    public int getId()
+    {
+        return 0;
+    }
+
+    @Override
+    public Packet00Spawn getSpawnPacket()
+    {
+
+        return null;
+    }
+
+    @Override
+    public void updateState(HashMap<String, String> updateMap)
+    {
+
+    }
+
+    @Override
+    public Transform getTransform()
+    {
+        return null;
+    }
+
+    @Override
+    public Vector getVelocity()
+    {
+        return null;
+    }
+
 }
