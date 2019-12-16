@@ -14,7 +14,6 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
-import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.game.narpg.announcement.ServerAnnouncement;
@@ -24,7 +23,6 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -37,11 +35,13 @@ public class NARPG extends AreaGame
     private Connection connection;
     private final boolean isServer;
     private NetworkARPGPlayer player;
+    private ServerAnnouncement announcement;
 
     public NARPG(boolean isServer, Connection connection) {
         super();
         this.isServer = isServer;
         this.connection = connection;
+        announcement = new ServerAnnouncement();
     }
 
     @Override
@@ -61,10 +61,12 @@ public class NARPG extends AreaGame
         if ( super.begin( window, fileSystem ) ) {
             createAreas();
             Area area = setCurrentArea( "custom/Arena", true );
+            getCurrentArea().registerActor( announcement );
             if ( !isServer ) {
                 ((Client) connection).login();
                 String username = ((Client) connection).getUsername();
                 player = new NetworkARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true, username, 0 );
+                new Packet04Chat( 0 , username + " has connected").writeData( connection );
                 area.registerActor( player );
                 area.setViewCandidate( player );
                 player.getSpawnPacket().writeData( connection );
@@ -106,8 +108,7 @@ public class NARPG extends AreaGame
 
     public void addChat( Packet04Chat packet )
     {
-        getCurrentArea().registerActor(
-                new ServerAnnouncement( packet.getText() ) );
+        announcement.addAnnouncement( packet.getText() );
     }
 
     public boolean spawnObject(Packet00Spawn packet) {
