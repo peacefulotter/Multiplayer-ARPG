@@ -21,6 +21,14 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
     private final static float MAGIC_DAMAGE = 0.5f;
     private final Connection connection;
     private final int spawnedBy;
+    private enum stateProperties{
+        MAX_DISTANCE("maxDistance"),
+        SPEED("speed"),
+        SPAWNED_BY("spawnedBy");
+
+        stateProperties(String spawnedBy) {
+        }
+    }
     /**
      * Default MovableAreaEntity constructor
      *
@@ -30,12 +38,16 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
      * @param speed
      * @param maxDistance
      */
-    public NetworkMagic(Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance, Connection connection ,int spawnedBy)
+    public NetworkMagic(Area area, Orientation orientation, DiscreteCoordinates position,Connection connection, int speed, int maxDistance,int spawnedBy)
     {
         super(area, orientation, position, speed, maxDistance);
         this.connection = connection;
         handler = new NetworkMagicHandler();
         this.spawnedBy=spawnedBy;
+    }
+    public NetworkMagic(Area area, Orientation orientation, DiscreteCoordinates position,Connection connection,HashMap<String,String> initialState) {
+        this(area,orientation,position, connection, Integer.parseInt(initialState.get(stateProperties.SPEED)),Integer.parseInt(initialState.get(stateProperties.MAX_DISTANCE)),
+                Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY)));
     }
 
     @Override
@@ -48,7 +60,9 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
     @Override
     public Packet00Spawn getSpawnPacket()
     {
-        return null;
+        var initialState = new HashMap<String, String>();
+        initialState.put("spawnedBy", String.valueOf(spawnedBy));
+        return new Packet00Spawn(getId(), NetworkEntities.STAFF, getOrientation(), getCurrentMainCellCoordinates(), initialState);
     }
 
     @Override
@@ -67,10 +81,8 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
     @Override
     public void interactWith(Interactable other)
     {
-        System.out.println("interact with magic projectile");
         if ( connection.isServer() )
         {
-            System.out.println("interact with only server");
             super.interactWith( other );
         }
     }

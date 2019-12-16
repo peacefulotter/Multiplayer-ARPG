@@ -16,7 +16,7 @@ public class Packet01Login extends Packet {
 
     public Packet01Login(byte[] data) {
         super(01, 0);
-        String[] dataArray = readData(data).split(",");
+        String[] dataArray = readData(data).split(";");
         connectionId = Long.parseLong(dataArray[1]);
         username= dataArray[2];
     }
@@ -35,6 +35,6 @@ public class Packet01Login extends Packet {
 
     @Override
     public byte[] getData() {
-        return ("01" + 0 + "," + connectionId+","+ username).getBytes();
+        return ("01" + 0 + ";" + connectionId+";"+ username).getBytes();
     }
 }

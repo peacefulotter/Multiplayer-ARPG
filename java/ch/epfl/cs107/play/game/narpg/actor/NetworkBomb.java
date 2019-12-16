@@ -8,15 +8,20 @@ import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import org.apache.commons.beanutils.converters.StringArrayConverter;
 
 import java.util.HashMap;
 
 public class NetworkBomb extends Bomb implements NetworkEntity {
-    public NetworkBomb(Area area, Orientation orientation, DiscreteCoordinates position ) {
+    private int spawnedBy;
+    public NetworkBomb(Area area, Orientation orientation, DiscreteCoordinates position, int spawnedBy ) {
         super(area, orientation, position);
         handler = new NetworkBombHandler();
+        this.spawnedBy=spawnedBy;
     }
-
+    public NetworkBomb(Area area, Orientation orientation, DiscreteCoordinates position, HashMap<String, String> initialState) {
+       this(area,orientation,position,Integer.parseInt(initialState.get("spawnedBy")));
+    }
     @Override
     public int getId() {
         return NetworkEntities.BOMB.getClassId();
@@ -25,8 +30,11 @@ public class NetworkBomb extends Bomb implements NetworkEntity {
 
     @Override
     public Packet00Spawn getSpawnPacket() {
-        return null;
+        var initialState = new HashMap<String, String>();
+        initialState.put("spawnedBy", String.valueOf(spawnedBy));
+        return new Packet00Spawn(getId(), NetworkEntities.BOW, getOrientation(), getCurrentMainCellCoordinates(), initialState);
     }
+
 
     @Override
     public void updateState(HashMap<String, String> updateMap) {

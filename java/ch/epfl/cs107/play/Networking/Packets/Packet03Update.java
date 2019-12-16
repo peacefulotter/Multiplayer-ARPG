@@ -24,7 +24,7 @@ public class Packet03Update extends Packet {
 
     public Packet03Update(byte[] data) {
         super(packetId, data);
-        String[] dataArray = readData(data).split(",");
+        String[] dataArray = readData(data).split(";");
         updateMap=Packet.getHashMapFromString(dataArray[1]);
 
     }
@@ -40,6 +40,6 @@ public class Packet03Update extends Packet {
 
     @Override
     public byte[] getData() {
-        return ("03" + objectId + "," + (updateMap)).getBytes();
+        return ("03" + objectId + ";" + (updateMap)).getBytes();
     }
 }

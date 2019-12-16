@@ -17,7 +17,7 @@ public abstract class Packet {
         this.objectId = objectId;
     }
     public Packet(int packetId,byte[] data){
-        String message[]=readData(data).split(",");
+        String message[]=readData(data).split(";");
         this.objectId= Integer.parseInt(message[0]);
     }
 
@@ -45,6 +45,7 @@ public abstract class Packet {
 
     //converting string of a HashMap to an actual hash map as seen here : https://stackoverflow.com/questions/3957094/convert-hashmap-tostring-back-to-hashmap-in-java
     public static HashMap<String,String> getHashMapFromString(String hashMapString){
+        System.out.println(hashMapString);
         Properties props = new Properties();
         try {
             props.load(new StringReader(hashMapString.substring(1, hashMapString.length() - 1).replace(", ", "\n")));
