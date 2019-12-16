@@ -1,17 +1,12 @@
 package ch.epfl.cs107.play.game.arpg.actor;
 
-import ch.epfl.cs107.play.game.actor.Entity;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.ARPGBehavior;
-import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
-import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
-import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
@@ -29,7 +24,8 @@ public class Bomb extends AreaEntity implements Interactor {
     private Animation animation;
     private boolean exploded=false;
     private static final float BOMB_DAMAGE = .5f;
-    private final BombHandler handler;
+    // type ArpgInteractionVisitor not final and protected because its overwritten by NetworkBomb
+    protected ARPGInteractionVisitor handler;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area,orientation,position);

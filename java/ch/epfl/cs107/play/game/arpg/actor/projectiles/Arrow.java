@@ -17,7 +17,8 @@ public class Arrow extends Projectile
 {
     private final static float ARROW_DAMAGE = 0.5f;
     private Sprite sprite;
-    private ArrowInteractionHandler interactionHandler;
+    // type ARPGInteractionVisitor, not private and not final because it will be overwritten by NetworkArrow
+    protected ARPGInteractionVisitor handler;
 
     private enum Directions
     {
@@ -51,7 +52,7 @@ public class Arrow extends Projectile
     public Arrow( Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance )
     {
         super( area, orientation, position, speed, maxDistance );
-        interactionHandler = new ArrowInteractionHandler();
+        handler = new ArrowInteractionHandler();
         int spriteOffset = 0;
         switch ( orientation )
         {
@@ -79,7 +80,7 @@ public class Arrow extends Projectile
 
     @Override
     public void interactWith( Interactable other ) {
-        other.acceptInteraction( interactionHandler );
+        other.acceptInteraction( handler );
     }
 
     @Override

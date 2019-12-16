@@ -5,7 +5,10 @@ import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
+import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
+import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
+import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
 public class NetworkArrow extends Arrow implements NetworkEntity
@@ -22,6 +25,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity
     public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance)
     {
         super(area, orientation, position, speed, maxDistance);
+        handler = new NetworkArrowHandler();
     }
 
     @Override
@@ -35,5 +39,21 @@ public class NetworkArrow extends Arrow implements NetworkEntity
     public Packet00Spawn getSpawnPacket()
     {
         return null;
+    }
+
+    class NetworkArrowHandler implements NARPGInteractionVisitor
+    {
+        @Override
+        public void interactWith( NetworkARPGPlayer player )
+        {
+            System.out.println("arrow interact");
+        }
+
+        @Override
+        public void interactWith( NetworkBomb bomb )
+        {
+            stopProjectile();
+            bomb.explode();
+        }
     }
 }
