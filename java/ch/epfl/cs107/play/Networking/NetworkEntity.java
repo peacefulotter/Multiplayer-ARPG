@@ -7,7 +7,8 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
 import java.util.HashMap;
 
-public interface NetworkEntity extends Actor {
+public interface NetworkEntity extends Actor
+{
     int getId();
     void setPosition( DiscreteCoordinates position );
     void setOrientation( Orientation orientation );

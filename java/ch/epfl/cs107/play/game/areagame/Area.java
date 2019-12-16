@@ -369,6 +369,7 @@ public abstract class Area implements Playable {
         // Update expected viewport center
         if (viewCandidate != null) {
             viewCenter = viewCandidate.getPosition();
+            // Bound the camera to avoid seeing the border of the map
             if (viewCenter.x < 7.5f) {
                 viewCenter = new Vector(7.5f, viewCenter.y);
             }

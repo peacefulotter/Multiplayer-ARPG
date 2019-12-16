@@ -8,7 +8,9 @@ import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.player.PlayerStates;
@@ -33,7 +35,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private boolean clientAuthority;
     private String playerMoney;
     private PlayerStates state;
-    private final NetworkARPGPlayerHandler handler;
     private TextGraphics usernameText;
 
     /**
@@ -45,7 +46,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      */
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, String username) {
         super(area, orientation, coordinates);
-        this.handler = new NetworkARPGPlayerHandler();
+        handler = new NetworkARPGPlayerHandler();
         this.currentArea = area;
         this.connection = connection;
         this.id = IdGenerator.generateId();
@@ -53,18 +54,22 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.state = PlayerStates.IDLE;
         if (!clientAuthority) unReactive = true;
 
-        usernameText= new TextGraphics(username,.8f,Color.WHITE,Color.BLACK,.1f,true,false,new Vector(+.4f,+1.5f), TextAlign.Horizontal.CENTER,null,1f,10000);
+        usernameText = new TextGraphics(username,.5f,Color.WHITE,Color.BLACK,.005f,true,false,new Vector(+.4f,+1.5f), TextAlign.Horizontal.CENTER,null,1f,10000);
         usernameText.setParent(this);
     }
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority) {
         this(area,orientation,coordinates,connection,clientAuthority,"");
     }
+
     @Override
-    public void update(float deltaTime) {
-        var updateMap=new HashMap<String,String>();
-        updateMap.put("username",usernameText.getText());
-        new Packet03Update(getId(),updateMap);
-        if (!connection.isServer() && clientAuthority) {
+    public void update(float deltaTime)
+    {
+        var updateMap = new HashMap<String,String>();
+        updateMap.put( "username", usernameText.getText() );
+        new Packet03Update( getId(), updateMap );
+
+        if ( !connection.isServer() && clientAuthority )
+        {
             Keyboard keyboard = getOwnerArea().getKeyboard();
             Orientation moved = null;
             if (connection != null) {
@@ -89,12 +94,24 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         super.update(deltaTime);
     }
 
+
+    @Override
+    public void draw( Canvas canvas )
+    {
+        super.draw(canvas);
+        usernameText.draw(canvas);
+    }
+
+
     @Override
     public void updateState(HashMap<String, String> updateMap) {
         for(Map.Entry<String,String> entry : updateMap.entrySet() ){
             switch (entry.getKey()){
                 case "username":
                     usernameText.setText(entry.getValue());
+                    break;
+                case "hp":
+                    hp = Integer.parseInt( entry.getValue() );
             }
         }
     }
@@ -124,6 +141,15 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     }
 
     @Override
+    public void giveDamage(float damage)
+    {
+        super.giveDamage( damage );
+        var updateMap = new HashMap<String,String>();
+        updateMap.put( "hp", String.valueOf( getHp() ) );
+        new Packet03Update( getId(), updateMap );
+    }
+
+    @Override
     public int getId() {
         return this.id;
     }
@@ -148,9 +174,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public Packet00Spawn getSpawnPacket() {
-        HashMap initalState=new HashMap();
-        initalState.put("username",usernameText.getText());
-        return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0),initalState);
+        HashMap initalState = new HashMap();
+        initalState.put( "username", usernameText.getText() );
+        return new Packet00Spawn( getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0), initalState );
     }
 
     @Override
@@ -173,6 +199,26 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         return clientAuthority;
     }
 
+    @Override
+    public boolean wantsCellInteraction()
+    {
+        return false;
+    }
+
+    @Override
+    public void acceptInteraction(AreaInteractionVisitor v)
+    {
+        ((NARPGInteractionVisitor)v).interactWith( this );
+    }
+
+    @Override
+    public void interactWith(Interactable other)
+    {
+        if ( connection.isServer() )
+        {
+            super.interactWith( other );
+        }
+    }
 
     class NetworkARPGPlayerHandler implements NARPGInteractionVisitor
     {
@@ -180,8 +226,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         @Override
         public void interactWith( NetworkARPGPlayer player )
         {
-            if ( getEquippedItem().getVuln() == Vulnerabilities.CLOSE_RANGE )
+            if ( state != PlayerStates.IDLE && getEquippedItem().getVuln() == Vulnerabilities.CLOSE_RANGE )
             {
+                System.out.println(getHp());
                 player.giveDamage( getEquippedItem().getDamage() );
             }
         }
@@ -190,7 +237,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         public void interactWith( NetworkCoin coin ) {
             coin.collect();
             HashMap<String, String> changeMap = new HashMap();
-            changeMap.put("playerMoney", String.valueOf(getMoney() + 50));
+            changeMap.put("playerMoney", String.valueOf(getMoney() + coin.getValue()));
             var updatePacket = new Packet03Update(getId(), changeMap);
             updatePacket.writeData(connection);
         }
@@ -199,11 +246,5 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         {
             heart.collect();
         }
-    }
-
-    @Override
-    public void draw(Canvas canvas) {
-        super.draw(canvas);
-        usernameText.draw(canvas);
     }
 }

@@ -6,10 +6,10 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.arpg.actor.Bomb;
-import ch.epfl.cs107.play.game.arpg.actor.monster.*;
+import ch.epfl.cs107.play.game.arpg.actor.monster.DarkLord;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Monster;
+import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
-import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.window.Canvas;
@@ -18,7 +18,8 @@ public class MagicProjectile extends Projectile
 {
     private final static float MAGIC_DAMAGE = 1;
     private Animation animation;
-    private InteractionHandler interactionHandler;
+    // protected and not final because NetworkMagic overrides it
+    protected ARPGInteractionVisitor handler;
     /**
      * Default MovableAreaEntity constructor
      *
@@ -37,7 +38,7 @@ public class MagicProjectile extends Projectile
             sprites[ i ] = new Sprite( "zelda/magicWaterProjectile",1,1,this,new RegionOfInterest(i*32,0,32,32) );
         }
         animation = new Animation( 2, sprites, true );
-        interactionHandler = new InteractionHandler();
+        handler = new MagicProjectileHandler();
     }
 
     @Override
@@ -54,7 +55,7 @@ public class MagicProjectile extends Projectile
 
     @Override
     public void interactWith( Interactable other ) {
-        other.acceptInteraction( interactionHandler );
+        other.acceptInteraction( handler );
     }
 
     @Override
@@ -62,9 +63,9 @@ public class MagicProjectile extends Projectile
         ((ARPGInteractionVisitor)v).interactWith(this );
     }
 
-    class InteractionHandler implements ARPGInteractionVisitor
-    {
 
+    class MagicProjectileHandler implements ARPGInteractionVisitor
+    {
         @Override
         public void interactWith( Monster monster )
         {

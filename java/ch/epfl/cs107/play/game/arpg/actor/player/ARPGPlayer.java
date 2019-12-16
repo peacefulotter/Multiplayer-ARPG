@@ -36,12 +36,12 @@ import java.util.List;
 public class ARPGPlayer extends Player {
     /// Animation duration in frame number
     protected final static int ANIMATION_DURATION = 8;
-    //not final because might be changed in networkARPGPlayer
-    protected ARPGPlayerHandler handler;
+    // protected, not final and not ARPGPlayerHandler type because it will be overwritten by NetworkARPGPlayer
+    protected ARPGInteractionVisitor handler;
     protected boolean unReactive = false;
     protected ARPGInventory inventory;
     private PlayerStates state;
-    private float hp;
+    protected float hp;
     private int maxHP = 5;
     private Animation[][] animations;
     private int currentAnimation = 0;
@@ -194,7 +194,6 @@ public class ARPGPlayer extends Player {
                 currentAnimation = 1;
                 break;
             case BOW:
-                System.out.println("shooting");
                 if (inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW)) {
                     state = PlayerStates.ATTACKING_BOW;
                     getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));

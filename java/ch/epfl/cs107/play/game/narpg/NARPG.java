@@ -7,12 +7,11 @@ import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
-import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
+import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.projectiles.NetworkArrow;
@@ -20,11 +19,8 @@ import ch.epfl.cs107.play.game.narpg.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
-import org.apache.commons.beanutils.BeanUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -59,7 +55,7 @@ public class NARPG extends AreaGame
         if (super.begin(window, fileSystem)) {
             createAreas();
             Area area = setCurrentArea("custom/Arena", true);
-            if (!isServer) {
+            if ( !isServer ) {
                 ((Client) connection).login();
                 String username= ((Client) connection).getUsername();
                 var player = new NetworkARPGPlayer(area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true,username);
@@ -97,7 +93,7 @@ public class NARPG extends AreaGame
 
     public boolean spawnObject(Packet00Spawn packet) {
         NetworkEntities object = packet.getObject();
-        Area area=getCurrentArea();
+        Area area = getCurrentArea();
         switch (object) {
             case PLAYER:
                 for (NetworkARPGPlayer p : players)
@@ -112,7 +108,7 @@ public class NARPG extends AreaGame
                 newPlayer.setId(packet.getObjectId());
                 players.add(newPlayer);
                 networkEntities.add(newPlayer);
-                System.out.println(packet.getInitialState());
+                //System.out.println(packet.getInitialState());
                 newPlayer.updateState(packet.getInitialState());
                 boolean registered = getCurrentArea().registerActor(newPlayer);
                 if (!registered) leftToRegister.add(newPlayer);
@@ -124,10 +120,12 @@ public class NARPG extends AreaGame
                 break;
             case BOW:
                 NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8 );
+                networkEntities.add( newArrow );
                 area.registerActor( newArrow );
                 break;
             case STAFF:
-                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8 );
+                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(), 3, 8, connection );
+                networkEntities.add( newMagic );
                 area.registerActor( newMagic );
         }
 
@@ -143,13 +141,13 @@ public class NARPG extends AreaGame
 
     @Override
     public void update( float deltaTime ) {
-        super.update(deltaTime);
         for (NetworkEntity e : leftToRegister) {
             if (getCurrentArea().registerActor(e)) {
                 leftToRegister.remove(e);
                 return;
             }
         }
+        super.update(deltaTime);
     }
 
     public NetworkEntity findEntity(int objectId) {
