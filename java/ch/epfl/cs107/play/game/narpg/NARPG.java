@@ -14,6 +14,7 @@ import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
+import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.game.narpg.announcement.ServerAnnouncement;
@@ -23,6 +24,7 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -62,7 +64,7 @@ public class NARPG extends AreaGame
             if ( !isServer ) {
                 ((Client) connection).login();
                 String username = ((Client) connection).getUsername();
-                player = new NetworkARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true, username );
+                player = new NetworkARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true, username, 0 );
                 area.registerActor( player );
                 area.setViewCandidate( player );
                 player.getSpawnPacket().writeData( connection );
@@ -125,7 +127,6 @@ public class NARPG extends AreaGame
                 newPlayer.setId(packet.getObjectId());
                 players.add(newPlayer);
                 networkEntities.add(newPlayer);
-                //System.out.println(packet.getInitialState());
                 boolean registered = getCurrentArea().registerActor(newPlayer);
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
@@ -135,7 +136,6 @@ public class NARPG extends AreaGame
                 area.registerActor( newBomb );
                 break;
             case BOW:
-                System.out.println(packet.getInitialState());
                 NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection,packet.getInitialState());
                 networkEntities.add( newArrow );
                 area.registerActor( newArrow );

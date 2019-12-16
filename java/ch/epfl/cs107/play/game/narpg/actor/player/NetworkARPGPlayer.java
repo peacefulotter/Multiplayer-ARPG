@@ -40,6 +40,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private TextGraphics usernameText;
     private HashMap<String, String> queuedUpdates;
 
+    private int arrowSpeed;
+    private int arrowRange;
+
     /**
      * Default Player constructor
      *
@@ -47,13 +50,14 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      * @param orientation (Orientation): Initial player orientation, not null
      * @param coordinates (Coordinates): Initial position, not null
      */
-    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, String username) {
+    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, String username,int id) {
         super(area, orientation, coordinates);
         this.handler = new NetworkARPGPlayerHandler();
         this.queuedUpdates = new HashMap<String, String>();
         this.currentArea = area;
         this.connection = connection;
-        this.id = IdGenerator.generateId();
+        // id of 0 is used as null value for id
+        if(id==0) this.id = IdGenerator.generateId();
         this.clientAuthority = clientAuthority;
         this.state = PlayerStates.IDLE;
         if (!clientAuthority) {
@@ -62,10 +66,12 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         if (username == null) username = "";
         usernameText = new TextGraphics(username, .5f, Color.WHITE, Color.BLACK, .005f, true, false, new Vector(+.4f, +1.5f), TextAlign.Horizontal.CENTER, null, 1f, 10000);
         usernameText.setParent(this);
+        arrowRange=3;
+        arrowSpeed=6;
     }
 
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String, String> initialState) {
-        this(area, orientation, coordinates, connection, clientAuthority, initialState.get("username"));
+        this(area, orientation, coordinates, connection, clientAuthority, initialState.get("username"),Integer.parseInt(initialState.get("id")));
         updateState(initialState);
     }
 
@@ -140,7 +146,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 setState(PlayerStates.ATTACKING_BOW);
                 new NetworkArrow(getOwnerArea(), getOrientation()
                         , inFronOfPlayer(),
-                        connection, 10, 10, id).getSpawnPacket().writeData(connection);
+                        connection, arrowSpeed, arrowRange, id).getSpawnPacket().writeData(connection);
                 currentAnimation = 2;
                 break;
             case STAFF:
@@ -180,6 +186,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public Packet00Spawn getSpawnPacket() {
         HashMap initalState = new HashMap();
         initalState.put("username", usernameText.getText());
+        initalState.put("id",String.valueOf(id));
         return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0), initalState);
     }
 
@@ -227,7 +234,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         @Override
         public void interactWith(NetworkARPGPlayer player) {
             if (state != PlayerStates.IDLE && getEquippedItem().getVuln() == Vulnerabilities.CLOSE_RANGE) {
-                System.out.println(getHp());
                 player.giveDamage(getEquippedItem().getDamage());
             }
         }

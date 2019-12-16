@@ -17,6 +17,15 @@ import java.util.List;
 public abstract class Projectile extends MovableAreaEntity implements Interactor, FlyableEntity {
 
     private int speed;
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public int getMaxDistance() {
+        return maxDistance;
+    }
+
     private int maxDistance;
     private Vector startingPos;
 

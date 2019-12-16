@@ -48,10 +48,9 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
     @Override
     public Packet00Spawn getSpawnPacket() {
         var initialState = new HashMap<String, String>();
-        initialState.put(stateProperties.SPAWNED_BY.toString(),"10");
-        initialState.put(stateProperties.MAX_DISTANCE.toString(),String.valueOf(10));
-        initialState.put(stateProperties.SPEED.toString(),"10");
-        System.out.println(initialState);
+        initialState.put(stateProperties.SPAWNED_BY.toString(),String.valueOf(spawnedBy));
+        initialState.put(stateProperties.MAX_DISTANCE.toString(),String.valueOf(getMaxDistance()));
+        initialState.put(stateProperties.SPEED.toString(),String.valueOf(getSpeed()));
 
         return new Packet00Spawn(getId(), NetworkEntities.BOW, getOrientation(), getCurrentMainCellCoordinates(), initialState);
     }
