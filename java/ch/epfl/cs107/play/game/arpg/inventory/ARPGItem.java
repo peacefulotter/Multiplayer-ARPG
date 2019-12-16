@@ -20,7 +20,7 @@ public enum ARPGItem implements InventoryItem {
     CASTLE_KEY(
             "CastleKey", "zelda/key",
             0.1f, 10,
-            false, 0),
+            true, 0),
     STAFF("Magic Wand", "zelda/staff_water.icon",
             2f, 10,
             true, 1.5f, Vulnerabilities.MAGIC),
