@@ -3,6 +3,7 @@ package ch.epfl.cs107.play;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.ConnectionHandler;
 import ch.epfl.cs107.play.Networking.Packets.Packet01Login;
+import ch.epfl.cs107.play.Networking.Packets.Packet05Logout;
 import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class Client extends Play implements Connection {
     }
 
     public static void main(String[] args) {
-        String address=args[0];
+        String address = args[0];
         int port = Integer.parseInt(args[1]);
         String username = args[2];
         new Client(address,port,username);
@@ -57,6 +58,11 @@ public class Client extends Play implements Connection {
     public void login(){
         var loginPacket = new Packet01Login(mainId,username);
         loginPacket.writeData(this);
+    }
+
+    public void logout() {
+        Packet05Logout logoutPacket = new Packet05Logout( mainId, username );
+        logoutPacket.writeData( this );
     }
 
     public String getUsername() {

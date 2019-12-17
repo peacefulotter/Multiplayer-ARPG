@@ -4,7 +4,6 @@ import ch.epfl.cs107.play.game.areagame.AreaBehavior;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlyableEntity;
-import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Window;
 
 public class ARPGBehavior extends AreaBehavior
@@ -17,8 +16,7 @@ public class ARPGBehavior extends AreaBehavior
         IMPASSABLE( -8750470, false, true ),
         INTERACT( -256, true, true ),
         DOOR( -195580, true, true ),
-        WALKABLE( -1, true, true ),
-        ;
+        WALKABLE( -1, true, true );
 
         final int type;
         final boolean isWalkable;
@@ -56,11 +54,6 @@ public class ARPGBehavior extends AreaBehavior
                 setCell( x, y, new ARPGBehavior.ARPGCell( x, y, cellType ) );
             }
         }
-    }
-
-    public boolean isDoor( DiscreteCoordinates coords )
-    {
-        return ( ( (ARPGBehavior.ARPGCell) getCell( coords.x, coords.y ) ).isDoor() );
     }
 
 

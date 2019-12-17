@@ -94,7 +94,6 @@ public class ThreadedPlay implements Runnable {
         } finally {
             // Release resources
             System.out.println("closing");
-            game.unloadPlayer();
             window.dispose();
         }
     }

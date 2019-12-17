@@ -27,7 +27,6 @@ import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.TextAlign;
 import ch.epfl.cs107.play.math.Vector;
-import ch.epfl.cs107.play.signal.logic.Or;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
@@ -64,17 +63,17 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.currentArea = area;
         this.connection = connection;
         // id of 0 is used as null value for id
-        if(id==0) this.id = IdGenerator.generateId();
+        if ( id == 0 ) { this.id = IdGenerator.generateId(); }
         this.clientAuthority = clientAuthority;
         this.state = PlayerStates.IDLE;
         if (!clientAuthority) {
             unReactive = true;
         }
-        if (username == null) username = "";
+        if (username == null) { username = ""; }
         usernameText = new TextGraphics(username, .5f, Color.WHITE, Color.BLACK, .005f, true, false, new Vector(+.4f, +1.5f), TextAlign.Horizontal.CENTER, null, 1f, 10000);
         usernameText.setParent(this);
-        arrowRange=3;
-        arrowSpeed=6;
+        arrowRange = 3;
+        arrowSpeed = 6;
     }
 
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String, String> initialState) {
@@ -106,7 +105,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     useItem();
                 } else if ( keyboard.get( keyboard.Y ).isPressed() )
                 {
-                    new Packet04Chat( 0, "loooooooooool" ).writeData( connection );
+                    new Packet04Chat( 0, "j'aime ce jeu !" ).writeData( connection );
                 }
                 super.update(deltaTime);
                 if (moved != null && isDisplacementOccurs()) {
@@ -134,7 +133,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         super.draw(canvas);
         usernameText.draw(canvas);
     }
-
 
     @Override
     public void updateState(HashMap<String, String> updateMap) {

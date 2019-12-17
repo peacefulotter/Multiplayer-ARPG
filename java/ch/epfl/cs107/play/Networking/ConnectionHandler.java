@@ -108,6 +108,10 @@ public class ConnectionHandler implements Runnable {
                 Packet04Chat chatPacket = new Packet04Chat( data );
                 game.addChat( chatPacket );
                 break;
+            case LOGOUT:
+                Packet05Logout logoutPacket = new Packet05Logout( data );
+                game.logout( logoutPacket.getConnectionId(), logoutPacket.getUsername() );
+                break;
         }
         if (isServer && sendDataBackToAll) {
             connection.sendData(data);

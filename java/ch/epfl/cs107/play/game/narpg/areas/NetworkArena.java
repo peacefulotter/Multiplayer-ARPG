@@ -28,5 +28,13 @@ public class NetworkArena extends ARPGArea
         return "custom/Arena";
     }
 
+    @Override
+    public float getCameraScaleFactor() {
+        if ( isServer )
+        {
+            return 30;
+        }
+        return SCALE_FACTOR+3;
+    }
 
 }

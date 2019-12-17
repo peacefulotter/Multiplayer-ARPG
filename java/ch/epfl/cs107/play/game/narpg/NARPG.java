@@ -4,10 +4,7 @@ import ch.epfl.cs107.play.Client;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
-import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
-import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
-import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
-import ch.epfl.cs107.play.Networking.Packets.Packet04Chat;
+import ch.epfl.cs107.play.Networking.Packets.*;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -20,9 +17,11 @@ import ch.epfl.cs107.play.game.narpg.announcement.ServerAnnouncement;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.RandomGenerator;
 import ch.epfl.cs107.play.window.Window;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -34,6 +33,7 @@ public class NARPG extends AreaGame
     private List<NetworkEntity> leftToRegister = new ArrayList<>();
     private Connection connection;
     private final boolean isServer;
+    private String username;
     private NetworkARPGPlayer player;
     private ServerAnnouncement announcement;
 
@@ -65,9 +65,11 @@ public class NARPG extends AreaGame
             getCurrentArea().registerActor( announcement );
             if ( !isServer ) {
                 ((Client) connection).login();
-                String username = ((Client) connection).getUsername();
-                player = new NetworkARPGPlayer( area, Orientation.DOWN, new DiscreteCoordinates(6, 10), connection, true, username, 0 );
-                new Packet04Chat( 0 , username + " has connected").writeData( connection );
+                username = ((Client) connection).getUsername();
+                DiscreteCoordinates spawnCoords = findRandomSpawn();
+                System.out.println(spawnCoords);
+                player = new NetworkARPGPlayer( area, Orientation.DOWN, spawnCoords, connection, true, username, 0 );
+                new Packet04Chat( 0 , username + " has connected" ).writeData( connection );
                 area.registerActor( player );
                 area.setViewCandidate( player );
                 player.getSpawnPacket().writeData( connection );
@@ -79,12 +81,24 @@ public class NARPG extends AreaGame
         return false;
     }
 
-    public void unloadPlayer()
+    private DiscreteCoordinates findRandomSpawn()
     {
-        if ( player == null || getCurrentArea() == null ) { return; }
-        getCurrentArea().unregisterActor( player );
-        networkEntities.remove( player );
-        players.remove( player );
+        boolean canSpawnTo = false;
+        DiscreteCoordinates coords;
+        NetworkBomb dummy = new NetworkBomb( getCurrentArea(), Orientation.DOWN, new DiscreteCoordinates(1, 1 ), 0  );
+
+        do {
+            coords = new DiscreteCoordinates( getRandomPos(), getRandomPos() );
+            canSpawnTo = getCurrentArea().canEnterAreaCells( dummy, Collections.singletonList( coords ) );
+        } while ( !canSpawnTo );
+
+        return coords;
+    }
+
+    private int getRandomPos()
+    {
+        // from 1 to 27
+        return RandomGenerator.getInstance().nextInt( 26 ) + 1;
     }
 
     public void updateObject(Packet03Update update) {
@@ -151,10 +165,20 @@ public class NARPG extends AreaGame
         return true;
     }
 
-    public void login() {
-        for (NetworkEntity p : networkEntities) {
-            var packet = p.getSpawnPacket();
-            packet.writeData(connection);
+    public void login()
+    {
+        for ( NetworkEntity p : networkEntities ) {
+            Packet00Spawn packet = p.getSpawnPacket();
+            packet.writeData( connection );
+        }
+    }
+
+    public void logout( long id, String username )
+    {
+        for ( NetworkEntity p : networkEntities )
+        {
+            Packet05Logout packet = new Packet05Logout( id, username );
+            packet.writeData( connection );
         }
     }
 
@@ -186,7 +210,20 @@ public class NARPG extends AreaGame
     }
 
     @Override
-    public void end() {
+    public void end()
+    {
         super.end();
+        if ( player == null || getCurrentArea() == null ) { return; }
+
+        getCurrentArea().unregisterActor( player );
+        networkEntities.remove( player );
+        players.remove( player );
+        System.out.println("unloadPlayer NARPG");
+        announcement.addAnnouncement( username + " has disconnected" );
+
+        if ( !isServer )
+        {
+            ((Client) connection).logout();
+        }
     }
 }

@@ -9,7 +9,8 @@ import ch.epfl.cs107.play.window.Window;
 
 public abstract class ARPGArea extends Area
 {
-    private static int SCALE_FACTOR = 15;
+    // protected because the server overwrites it
+    protected static int SCALE_FACTOR = 15;
     private Window window;
     private ARPGBehavior behavior;
 
@@ -52,6 +53,7 @@ public abstract class ARPGArea extends Area
         return behavior;
     }
 
+    // not final because the NetworkArena overrides it
     @Override
-    public final float getCameraScaleFactor() { return SCALE_FACTOR;  }
+    public float getCameraScaleFactor() { return SCALE_FACTOR;  }
 }
