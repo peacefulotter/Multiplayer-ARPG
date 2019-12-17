@@ -7,6 +7,7 @@ import ch.epfl.cs107.play.Networking.Packets.Packet02Move;
 import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.Networking.Packets.Packet04Chat;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
+import ch.epfl.cs107.play.Networking.utils.OrientationValues;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
@@ -29,6 +30,7 @@ import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +41,8 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private int id;
     private TextGraphics usernameText;
     private HashMap<String, String> queuedUpdates;
+    //to check if the packet that sets the correct position after movement has been sent
+    private boolean hasSentCorrectPosition=false;
 
     private int arrowSpeed;
     private int arrowRange;
@@ -79,6 +83,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public void update(float deltaTime) {
         if (!queuedUpdates.isEmpty()) {
             var updatePacket = new Packet03Update(id, queuedUpdates);
+            updatePacket.writeData(connection);
             queuedUpdates = new HashMap<String, String>();
         }
 
@@ -101,10 +106,18 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     new Packet04Chat( 0, "loooooooooool" ).writeData( connection );
                 }
                 if (moved != null) {
+                    hasSentCorrectPosition=false;
                     Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
                     packet.writeData(connection);
                 }
+                if(!isDisplacementOccurs() && !hasSentCorrectPosition){
+                    var currentDisPos=getCurrentMainCellCoordinates();
+                    queuedUpdates.put("position",currentDisPos.x+","+currentDisPos.y);
+                    queuedUpdates.put("orientation", String.valueOf(OrientationValues.getOrientationValue(getOrientation())));
+                    hasSentCorrectPosition=true;
+                }
             }
+
 
         }
         super.update(deltaTime);
@@ -126,7 +139,18 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     usernameText.setText(entry.getValue());
                     break;
                 case "hp":
-                    hp = Integer.parseInt(entry.getValue());
+                    hp =Float.parseFloat(entry.getValue());
+                    break;
+                case "position":
+                    if(clientAuthority || isDisplacementOccurs()) return;
+                    String[] pos=entry.getValue().split(",");
+                    DiscreteCoordinates position= new DiscreteCoordinates(Integer.parseInt(pos[0]),Integer.parseInt(pos[1]));
+                    if(getCurrentMainCellCoordinates()!=position) setPosition(position);
+                    break;
+                case "orientation":
+                    if(clientAuthority || isDisplacementOccurs()) return;
+                    orientate(OrientationValues.getOrientationByValue(Integer.parseInt(entry.getValue())));
+
             }
         }
     }
@@ -163,9 +187,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     @Override
     public void giveDamage(float damage) {
         super.giveDamage(damage);
-        var updateMap = new HashMap<String, String>();
-        updateMap.put("hp", String.valueOf(getHp()));
-        new Packet03Update(getId(), updateMap);
+        queuedUpdates.put("hp", String.valueOf(getHp()));
     }
 
     @Override
@@ -187,6 +209,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         HashMap initalState = new HashMap();
         initalState.put("username", usernameText.getText());
         initalState.put("id",String.valueOf(id));
+        initalState.put("hp",String.valueOf(hp));
         return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0), initalState);
     }
 
@@ -197,15 +220,19 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         DiscreteCoordinates startPosition = movePacket.getStart();
         if (!isDisplacementOccurs() || isTargetReached()) {
             super.orientate(orientation);
-            if (getPosition() != startPosition.toVector()) {
-                getOwnerArea().leaveAreaCells(this, getCurrentCells());
-                getOwnerArea().enterAreaCells(this, getCurrentCells());
-                setCurrentPosition(startPosition.toVector());
+            if (getCurrentMainCellCoordinates() != startPosition) {
+                System.out.println("setting new position");
+                setPosition(startPosition);
             }
             setAnimationByOrientation(orientation);
             move(speed);
         }
 
+    }
+    public void setPosition(DiscreteCoordinates destination){
+        getOwnerArea().leaveAreaCells(this,getCurrentCells());
+        getOwnerArea().enterAreaCells(this,Collections.singletonList(destination));
+        setCurrentPosition(destination.toVector());
     }
 
     public boolean isClientAuthority() {
@@ -219,13 +246,15 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
-        ((NARPGInteractionVisitor) v).interactWith(this);
+        if(connection.isServer()){
+            ((NARPGInteractionVisitor) v).interactWith(this);
+        }
     }
 
     @Override
     public void interactWith(Interactable other) {
         if (connection.isServer()) {
-            super.interactWith(other);
+            other.acceptInteraction(handler);
         }
     }
 

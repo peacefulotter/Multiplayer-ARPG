@@ -339,16 +339,18 @@ public abstract class Area implements Playable {
     final void purgeRegistration() {
         // PART 1
         // - Register actors
-        for (Actor actor : registeredActors) {
-            addActor(actor, false);
+        //made these into iterators to avoid concurrentModificationException
+        for(Iterator<Actor> iterator = registeredActors.iterator(); iterator.hasNext();){
+            Actor actor= iterator.next();
+            addActor(actor,false);
+            iterator.remove();
         }
-        registeredActors.clear();
 
         // - unregister actors
-        for (Actor actor : unregisteredActors) {
-            removeActor(actor, false);
+        for (Iterator<Actor> iterator = unregisteredActors.iterator(); iterator.hasNext();) {
+            removeActor(iterator.next(), false);
+            iterator.remove();
         }
-        unregisteredActors.clear();
 
         // PART 2
         // - leave old cells

@@ -87,7 +87,7 @@ public class ARPGPlayer extends Player {
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
         inventory.addItemToInventory(ARPGItem.STAFF);
-        inventory.addItemToInventory(ARPGItem.ARROW, 20);
+        inventory.addItemToInventory(ARPGItem.ARROW, 300);
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
@@ -103,7 +103,6 @@ public class ARPGPlayer extends Player {
         }
         // display animation if player is moving
         if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
-            System.out.println(currentAnimation);
             animations[currentAnimation][currentAnimationIndex].update(deltaTime);
             if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationIndex].isCompleted()) {
                 state = PlayerStates.IDLE;

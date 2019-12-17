@@ -166,6 +166,7 @@ public class NARPG extends AreaGame
                 return;
             }
         }
+        //if(players.size()>0) System.out.println(((NetworkArena)getCurrentArea()).getBehavior().getEntityCount(players.get(0)));
         super.update(deltaTime);
     }
 

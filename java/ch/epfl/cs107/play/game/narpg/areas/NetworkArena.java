@@ -28,4 +28,5 @@ public class NetworkArena extends ARPGArea
         return "custom/Arena";
     }
 
+
 }

@@ -46,8 +46,8 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
         this.spawnedBy=spawnedBy;
     }
     public NetworkMagic(Area area, Orientation orientation, DiscreteCoordinates position,Connection connection,HashMap<String,String> initialState) {
-        this(area,orientation,position, connection, Integer.parseInt(initialState.get(stateProperties.SPEED)),Integer.parseInt(initialState.get(stateProperties.MAX_DISTANCE)),
-                Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY)));
+        this(area,orientation,position, connection, Integer.parseInt(initialState.get(stateProperties.SPEED.toString())),Integer.parseInt(initialState.get(stateProperties.MAX_DISTANCE.toString())),
+                Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY.toString())));
     }
 
     @Override
@@ -61,7 +61,9 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
     public Packet00Spawn getSpawnPacket()
     {
         var initialState = new HashMap<String, String>();
-        initialState.put("spawnedBy", String.valueOf(spawnedBy));
+        initialState.put(stateProperties.SPAWNED_BY.toString(), String.valueOf(spawnedBy));
+        initialState.put(stateProperties.MAX_DISTANCE.toString(),String.valueOf(getMaxDistance()));
+        initialState.put(stateProperties.SPEED.toString(),String.valueOf(getSpeed()));
         return new Packet00Spawn(getId(), NetworkEntities.STAFF, getOrientation(), getCurrentMainCellCoordinates(), initialState);
     }
 

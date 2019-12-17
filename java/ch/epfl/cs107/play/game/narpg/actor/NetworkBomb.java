@@ -32,7 +32,7 @@ public class NetworkBomb extends Bomb implements NetworkEntity {
     public Packet00Spawn getSpawnPacket() {
         var initialState = new HashMap<String, String>();
         initialState.put("spawnedBy", String.valueOf(spawnedBy));
-        return new Packet00Spawn(getId(), NetworkEntities.BOW, getOrientation(), getCurrentMainCellCoordinates(), initialState);
+        return new Packet00Spawn(getId(), NetworkEntities.BOMB, getOrientation(), getCurrentMainCellCoordinates(), initialState);
     }
 
 

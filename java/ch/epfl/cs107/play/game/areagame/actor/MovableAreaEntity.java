@@ -100,6 +100,9 @@ public abstract class MovableAreaEntity extends AreaEntity {
         }
         return false;
     }
+    protected final void forceMove(int frameForMove, int startingFrame, DiscreteCoordinates start, DiscreteCoordinates end){
+
+    }
     
     /**
      * Final abortCurrentMove method

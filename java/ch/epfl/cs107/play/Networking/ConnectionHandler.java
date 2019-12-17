@@ -55,7 +55,8 @@ public class ConnectionHandler implements Runnable {
             dos.write(data, 0, data.length);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+            game.end();
+            }
     }
 
     private void processIncomingData(InputStream inStream, OutputStream outStream) throws IOException {

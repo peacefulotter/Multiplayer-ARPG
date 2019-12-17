@@ -1,14 +1,14 @@
 package ch.epfl.cs107.play.game.areagame;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactor;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
+import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Image;
 import ch.epfl.cs107.play.window.Window;
 
@@ -38,6 +38,27 @@ public abstract class AreaBehavior
         cells = new Cell[width][height];
     }
 
+    public List<Vector> getEntityCount(Interactable findObject){
+        List<Vector> entitiesList= new ArrayList<>();
+        int count=0;
+        for(int i = 0; i<width;i++){
+            for(int j =0; j<height;j++){
+                var entities=cells[i][j].getEntities();
+                if(entities.contains(findObject)) entitiesList.add(new Vector(i,j));
+            }
+        }
+        return  entitiesList;
+    }
+    public void ClearCells(Actor clearObject){
+        for(int i = 0; i<width;i++){
+            for(int j =0; j<height;j++){
+                var entities=cells[i][j].getEntities();
+                if(entities.contains(clearObject) && clearObject.getPosition()!=new Vector(i,j)){
+                    cells[i][j].leave((Interactable)clearObject);
+                }
+            }
+        }
+    }
 
     protected void cellInteractionOf(Interactor interactor){
         for(DiscreteCoordinates dc : interactor.getCurrentCells()){
@@ -121,6 +142,9 @@ public abstract class AreaBehavior
         private DiscreteCoordinates coordinates;
 
 
+        public Set<Interactable> getEntities(){
+            return entities;
+        }
         /**
          * Default Cell constructor
          * @param x (int): x-coordinate of this cell

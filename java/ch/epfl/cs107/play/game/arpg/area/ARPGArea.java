@@ -47,6 +47,11 @@ public abstract class ARPGArea extends Area
         return false;
     }
 
+
+    public ARPGBehavior getBehavior() {
+        return behavior;
+    }
+
     @Override
     public final float getCameraScaleFactor() { return SCALE_FACTOR;  }
 }

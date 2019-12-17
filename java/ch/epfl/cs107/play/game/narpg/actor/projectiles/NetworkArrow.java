@@ -6,6 +6,7 @@ import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
@@ -63,8 +64,13 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
     @Override
     public void interactWith(Interactable other) {
         if (connection.isServer()) {
-            super.interactWith(other);
+            other.acceptInteraction(handler);
         }
+    }
+
+    @Override
+    public void acceptInteraction(AreaInteractionVisitor v) {
+        ((NARPGInteractionVisitor)v).interactWith(this);
     }
 
     @Override
@@ -91,8 +97,12 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
     class NetworkArrowHandler implements NARPGInteractionVisitor {
         @Override
         public void interactWith(NetworkARPGPlayer player) {
-            stopProjectile();
+            if(player.getId()==spawnedBy) {
+                System.out.println("touched owner");
+                return;
+            }
             player.giveDamage(1f);
+            stopProjectile();
         }
 
         @Override
