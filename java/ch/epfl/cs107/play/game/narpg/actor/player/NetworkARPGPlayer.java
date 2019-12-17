@@ -37,12 +37,16 @@ import ch.epfl.cs107.play.window.Keyboard;
 import java.awt.*;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
     private static final float DEPTH = 10000;
+    private static final float HEART_SIZE = .7f;
     private final boolean clientAuthority;
     private Connection connection;
+    private final long connectionId;
+
     private Area currentArea;
     private int id;
     private TextGraphics usernameText;
@@ -54,8 +58,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private int arrowSpeed;
     private int arrowRange;
 
-    private static final float HEART_SIZE= .7f;
-
     /**
      * Default Player constructor
      *
@@ -63,35 +65,44 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
      * @param orientation (Orientation): Initial player orientation, not null
      * @param coordinates (Coordinates): Initial position, not null
      */
-    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, String username, int id) {
+    public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, long connectionId, String username, int id) {
         super(area, orientation, coordinates);
         this.handler = new NetworkARPGPlayerHandler();
         this.queuedUpdates = new HashMap<String, String>();
         this.currentArea = area;
         this.connection = connection;
         // id of 0 is used as null value for id
-        if ( id == 0 ) { this.id = IdGenerator.generateId(); }
+        if (id == 0) {
+            this.id = IdGenerator.generateId();
+        }
         this.clientAuthority = clientAuthority;
         this.state = PlayerStates.IDLE;
         if (!clientAuthority) {
             unReactive = true;
         }
-        if (username == null) { username = ""; }
+        if (username == null) {
+            username = "";
+        }
         usernameText = new TextGraphics(username, .5f, Color.WHITE, Color.BLACK, .005f, true, false, new Vector(+.4f, +1.5f), TextAlign.Horizontal.CENTER, null, 1f, 10000);
         usernameText.setParent(this);
         arrowRange = 3;
         arrowSpeed = 6;
+        this.connectionId = connectionId;
     }
 
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String, String> initialState) {
-        this(area, orientation, coordinates, connection, clientAuthority, initialState.get("username"), Integer.parseInt(initialState.get("id")));
+        this(area, orientation, coordinates, connection, clientAuthority, Long.parseLong(initialState.get("connectionId")), initialState.get("username"), Integer.parseInt(initialState.get("id")));
         updateState(initialState);
+    }
+
+    public long getConnectionId() {
+        return connectionId;
     }
 
     @Override
     public void update(float deltaTime) {
         if (!queuedUpdates.isEmpty()) {
-            var updatePacket = new Packet03Update(id, queuedUpdates);
+            Packet03Update updatePacket = new Packet03Update(id, queuedUpdates);
             updatePacket.writeData(connection);
             queuedUpdates = new HashMap<String, String>();
         }
@@ -110,9 +121,8 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     moved = Orientation.DOWN;
                 } else if (keyboard.get(keyboard.SPACE).isPressed()) {
                     useItem();
-                } else if ( keyboard.get( keyboard.Y ).isPressed() )
-                {
-                    new Packet04Chat( 0, "j'aime ce jeu !" ).writeData( connection );
+                } else if (keyboard.get(keyboard.Y).isPressed()) {
+                    new Packet04Chat("j'aime ce jeu !").writeData(connection);
                 }
                 super.update(deltaTime);
                 if (moved != null && isDisplacementOccurs()) {
@@ -121,7 +131,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     packet.writeData(connection);
                 }
                 if (!isDisplacementOccurs() && !hasSentCorrectPosition) {
-                    var currentDisPos = getCurrentMainCellCoordinates();
+                    DiscreteCoordinates currentDisPos = getCurrentMainCellCoordinates();
                     queuedUpdates.put("position", currentDisPos.x + "," + currentDisPos.y);
                     queuedUpdates.put("orientation", String.valueOf(OrientationValues.getOrientationValue(getOrientation())));
                     hasSentCorrectPosition = true;
@@ -139,11 +149,13 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public void draw(Canvas canvas) {
         super.draw(canvas);
         usernameText.draw(canvas);
-        if ( clientAuthority ) { return; }
+        if (clientAuthority) {
+            return;
+        }
 
         float hp = getHp();
         int hearts = getMaxHP();
-        var heartsDisplay = new ImageGraphics[hearts];
+        ImageGraphics[] heartsDisplay = new ImageGraphics[hearts];
 
         for (int i = 0; i < hearts; i++) {
             int spriteOffset = 0;
@@ -160,7 +172,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     this.getPosition(), 1, DEPTH);
             heartsDisplay[i].setAnchor(
                     this.getPosition().add(
-                            (HEART_SIZE+.1f)*i +.5f - 0.5f*(getMaxHP()* (HEART_SIZE+.1f)), -HEART_SIZE));
+                            (HEART_SIZE + .1f) * i + .5f - 0.5f * (getMaxHP() * (HEART_SIZE + .1f)), -HEART_SIZE));
             heartsDisplay[i].draw(canvas);
 
         }
@@ -181,7 +193,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     String[] pos = entry.getValue().split(",");
                     DiscreteCoordinates position = new DiscreteCoordinates(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
                     if (!getCurrentMainCellCoordinates().equals(position)) {
-                        System.out.println("UPDATING POS : " + position.toVector() + " ; " + getCurrentMainCellCoordinates());
+                        //System.out.println("UPDATING POS : " + position.toVector() + " ; " + getCurrentMainCellCoordinates());
                         ((NetworkArena) getOwnerArea()).getBehavior().leave(this, getCurrentCells());
                         getOwnerArea().enterAreaCells(this, Collections.singletonList(position));
                         setCurrentPosition(position.toVector());
@@ -235,6 +247,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public int getId() {
         return this.id;
     }
+    public String getUsername(){
+        return usernameText.getText();
+    }
 
     public void setId(int objectId) {
         this.id = objectId;
@@ -251,6 +266,8 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         initalState.put("username", usernameText.getText());
         initalState.put("id", String.valueOf(id));
         initalState.put("hp", String.valueOf(hp));
+        initalState.put("connectionId", String.valueOf(connectionId));
+        System.out.println(initalState.get("connectionId"));
         return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0), initalState);
     }
 
@@ -258,7 +275,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public void networkMove(Packet02Move movePacket) {
         Orientation orientation = movePacket.getOrientation();
         int speed = movePacket.getSpeed();
-        var positionBeforeMoving = getCurrentCells();
+        List<DiscreteCoordinates> positionBeforeMoving = getCurrentCells();
         DiscreteCoordinates startPosition = movePacket.getStart();
         if (!isDisplacementOccurs() || isTargetReached()) {
             super.orientate(orientation);

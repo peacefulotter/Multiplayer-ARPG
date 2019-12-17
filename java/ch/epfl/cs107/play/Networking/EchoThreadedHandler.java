@@ -22,8 +22,8 @@ public class EchoThreadedHandler implements Runnable {
     }
     private void process(InputStream inStream, OutputStream outStream) throws IOException{
         String msg;
-        var in= new Scanner(inStream, StandardCharsets.UTF_8);
-        var out= new PrintWriter(new OutputStreamWriter(outStream,StandardCharsets.UTF_8),true);
+        Scanner in= new Scanner(inStream, StandardCharsets.UTF_8);
+        PrintWriter out= new PrintWriter(new OutputStreamWriter(outStream,StandardCharsets.UTF_8),true);
         boolean done=false;
         while (!done && in.hasNextLine()) { //in = new BufferedReader(new
             // InputStreamReader(clientSocket.getInputStream(), "UTF-8"));

@@ -7,9 +7,9 @@ public class Packet04Chat extends Packet
     private final static int packetId = PacketTypes.TCHAT.getPacketID();
     private String text;
 
-    public Packet04Chat(int objectId, String text )
+    public Packet04Chat(String text )
     {
-        super(packetId, objectId);
+        super(packetId,0);
         this.text = text;
     }
 
@@ -31,6 +31,6 @@ public class Packet04Chat extends Packet
     @Override
     public byte[] getData()
     {
-        return ("04" + objectId + ";" + text ).getBytes();
+        return ("04"+0+";" + text ).getBytes();
     }
 }

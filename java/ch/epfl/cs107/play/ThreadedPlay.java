@@ -62,8 +62,11 @@ public class ThreadedPlay implements Runnable {
                 final float frameDuration = ONE_SEC / game.getFrameRate();
 
                 // Run until the user try to close the window
-                while (!window.isCloseRequested() && !stopGame) {
-
+                while (!stopGame) {
+                    if(window.isCloseRequested()){
+                        game.end();
+                        stopGame=true;
+                    }
                     // Compute time interval
                     lastTime = currentTime;
                     currentTime = System.nanoTime();

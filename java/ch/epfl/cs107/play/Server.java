@@ -8,13 +8,14 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Server implements Connection {
     private List<ConnectionHandler> connections = new ArrayList<ConnectionHandler>();
 
     public Server(int port) {
-        NARPG game = new NARPG(true,this);
+        NARPG game = new NARPG(true, this);
         Thread GameThread = new Thread(new ThreadedPlay(game, true));
         GameThread.start();
         try {
@@ -40,8 +41,8 @@ public class Server implements Connection {
     }
 
     public void sendDataToAllClients(byte[] data) {
-        for (ConnectionHandler c : connections) {
-            c.sendData(data);
+        for(Iterator<ConnectionHandler> iterator= connections.iterator();iterator.hasNext();){
+            iterator.next().sendData(data);
         }
     }
 
@@ -56,11 +57,20 @@ public class Server implements Connection {
     }
 
     @Override
-    public void sendDataTo(long connectionId,byte[] data) {
+    public void sendDataTo(long connectionId, byte[] data) {
         //System.out.println(connectionId);
-        for(ConnectionHandler c : connections){
-            if(c.getConnectionId()==connectionId){
+        for (ConnectionHandler c : connections) {
+            if (c.getConnectionId() == connectionId) {
                 c.sendData(data);
+            }
+        }
+    }
+
+    public void removeConnection(long connectionId) {
+        for(Iterator<ConnectionHandler> iterator= connections.iterator();iterator.hasNext();){
+            ConnectionHandler connection= iterator.next();
+            if(connection.getConnectionId()==connectionId){
+                iterator.remove();
             }
         }
     }

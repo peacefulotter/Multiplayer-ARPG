@@ -5,6 +5,7 @@ import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.*;
+import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -20,9 +21,11 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RandomGenerator;
 import ch.epfl.cs107.play.window.Window;
 
+import javax.net.ssl.SNIHostName;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 public class NARPG extends AreaGame
@@ -67,9 +70,8 @@ public class NARPG extends AreaGame
                 ((Client) connection).login();
                 username = ((Client) connection).getUsername();
                 DiscreteCoordinates spawnCoords = findRandomSpawn();
-                System.out.println(spawnCoords);
-                player = new NetworkARPGPlayer( area, Orientation.DOWN, spawnCoords, connection, true, username, 0 );
-                new Packet04Chat( 0 , username + " has connected" ).writeData( connection );
+                player = new NetworkARPGPlayer( area, Orientation.DOWN, spawnCoords, connection, true,((Client)connection).getMainId(), username, 0 );
+                new Packet04Chat(  username + " has connected" ).writeData( connection );
                 area.registerActor( player );
                 area.setViewCandidate( player );
                 player.getSpawnPacket().writeData( connection );
@@ -138,6 +140,7 @@ public class NARPG extends AreaGame
                         return false;
                     }
                 }
+                System.out.println(packet.getInitialState());
                 var newPlayer = new NetworkARPGPlayer(area, packet.getOrientation(),
                         packet.getDiscreteCoordinate(), connection, false, packet.getInitialState());
                 newPlayer.setId(packet.getObjectId());
@@ -173,12 +176,22 @@ public class NARPG extends AreaGame
         }
     }
 
-    public void logout( long id, String username )
+    public void logout(Packet05Logout logoutPacket)
     {
-        for ( NetworkEntity p : networkEntities )
+        for ( NetworkARPGPlayer p : players )
         {
-            Packet05Logout packet = new Packet05Logout( id, username );
-            packet.writeData( connection );
+            System.out.println(p.getId() +" ; " + logoutPacket.getObjectId());
+            if(p.getId()==logoutPacket.getObjectId()) {
+                System.out.println(p);
+                getCurrentArea().unregisterActor(p);
+                //using removeall to avoid concurrentModificationException
+                players.removeAll(Collections.singleton(p));
+                networkEntities.remove(Collections.singleton(p));
+                if (isServer) {
+                    new Packet04Chat(p.getUsername() + " has disconnected").writeData(connection);
+                    System.out.println(p.getUsername() + " has disconnected");
+                }
+            }
         }
     }
 
@@ -212,18 +225,28 @@ public class NARPG extends AreaGame
     @Override
     public void end()
     {
-        super.end();
         if ( player == null || getCurrentArea() == null ) { return; }
-
-        getCurrentArea().unregisterActor( player );
-        networkEntities.remove( player );
-        players.remove( player );
-        System.out.println("unloadPlayer NARPG");
-        announcement.addAnnouncement( username + " has disconnected" );
 
         if ( !isServer )
         {
             ((Client) connection).logout();
         }
+        getCurrentArea().unregisterActor( player );
+        networkEntities.remove( player );
+        players.remove( player );
+        System.out.println("unloadPlayer NARPG");
+
+    }
+    public int getClientPlayerId(){
+        for(NetworkARPGPlayer p: players){
+            if(p.isClientAuthority()) return p.getId();
+        }
+        throw new NoSuchElementException("no client player found by objectId");
+    }
+    public int getClientPlayerId(long mainId){
+        for(NetworkARPGPlayer p:players){
+            if(p.getConnectionId()==mainId) return p.getId();
+        }
+        throw new NoSuchElementException("no client player found by mainId");
     }
 }

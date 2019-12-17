@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.Networking;
 
 import ch.epfl.cs107.play.Networking.Packets.*;
 import ch.epfl.cs107.play.Networking.Packets.Packet.PacketTypes;
+import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
@@ -56,7 +57,7 @@ public class ConnectionHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
             game.end();
-            }
+        }
     }
 
     private void processIncomingData(InputStream inStream, OutputStream outStream) throws IOException {
@@ -66,13 +67,26 @@ public class ConnectionHandler implements Runnable {
             // InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
             DataInputStream dis = new DataInputStream(inStream);
 
-            int len = dis.readInt();
-            byte[] data = new byte[len];
-            if (len > 0) {
-                dis.readFully(data);
+            try {
+                int len = dis.readInt();
+                byte[] data = new byte[len];
+                if (len > 0) {
+                    dis.readFully(data);
+                }
+
+                parsePacket(data);
+            } catch (EOFException e) {
+                done=true;
+                if (isServer) {
+                    ((Server)connection).removeConnection(connectionId);
+                    socket.close();
+                    Packet05Logout logoutPacket = new Packet05Logout(game.getClientPlayerId(connectionId), connectionId);
+                    logoutPacket.writeData(connection);
+                    game.logout(logoutPacket);
+                    Thread.currentThread().interrupt();
+                }
             }
 
-            parsePacket(data);
         }
     }
 
@@ -105,12 +119,12 @@ public class ConnectionHandler implements Runnable {
                 game.updateObject(updatePacket);
                 break;
             case TCHAT:
-                Packet04Chat chatPacket = new Packet04Chat( data );
-                game.addChat( chatPacket );
+                Packet04Chat chatPacket = new Packet04Chat(data);
+                game.addChat(chatPacket);
                 break;
             case LOGOUT:
-                Packet05Logout logoutPacket = new Packet05Logout( data );
-                game.logout( logoutPacket.getConnectionId(), logoutPacket.getUsername() );
+                Packet05Logout logoutPacket = new Packet05Logout(data);
+                game.logout(logoutPacket);
                 break;
         }
         if (isServer && sendDataBackToAll) {
