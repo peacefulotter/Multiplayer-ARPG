@@ -100,7 +100,8 @@ public abstract class AreaBehavior
         return true;
     }
 
-    protected void leave(Interactable entity, List<DiscreteCoordinates> coordinates) {
+    //changed it to public as we needed it for NetworkARPGLPlayer
+    public void leave(Interactable entity, List<DiscreteCoordinates> coordinates) {
 
         for(DiscreteCoordinates c : coordinates){
             cells[c.x][c.y].leave(entity);

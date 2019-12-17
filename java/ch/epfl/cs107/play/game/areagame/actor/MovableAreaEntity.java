@@ -84,7 +84,8 @@ public abstract class MovableAreaEntity extends AreaEntity {
 
             	leftCells = leavingCells;
             	enteredCells = enteringCells;
-            	
+                //System.out.println("Inside move : "+ leavingCells +" ; " +enteringCells);
+
                 displacementOccurs = true;
                 this.framesForCurrentMove = Math.max(1, frameForMove);
                 startingFrame = Math.min(startingFrame, frameForMove);
@@ -145,15 +146,11 @@ public abstract class MovableAreaEntity extends AreaEntity {
     	}
     	return nextCells;
     }
-    
+
+    //modified to remove unnecessary next cells inside getLeftCells()
     /** @return (List of DiscreteCoordinates): the cells a movement will implies to leave. May be empty but not null */
     private List<DiscreteCoordinates> getLeftCells(){
     	Set<DiscreteCoordinates> leavingCells = new HashSet<>(getCurrentCells());
-    	List<DiscreteCoordinates> nextCells = new ArrayList<>();
-    	for(DiscreteCoordinates coord : getCurrentCells()) {
-    		nextCells.add(coord.jump(getOrientation().toVector()));
-    	}
-
     	leavingCells.removeAll(getNextCurrentCells());
     	
     	return new ArrayList<>(leavingCells);

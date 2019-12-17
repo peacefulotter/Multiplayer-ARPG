@@ -20,12 +20,14 @@ import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
+import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkCoin;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.TextAlign;
 import ch.epfl.cs107.play.math.Vector;
+import ch.epfl.cs107.play.signal.logic.Or;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
@@ -40,9 +42,10 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private Area currentArea;
     private int id;
     private TextGraphics usernameText;
+    //add updates to queue so they can be sent at the same time
     private HashMap<String, String> queuedUpdates;
     //to check if the packet that sets the correct position after movement has been sent
-    private boolean hasSentCorrectPosition=false;
+    private boolean hasSentCorrectPosition=true;
 
     private int arrowSpeed;
     private int arrowRange;
@@ -105,7 +108,8 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 {
                     new Packet04Chat( 0, "loooooooooool" ).writeData( connection );
                 }
-                if (moved != null) {
+                super.update(deltaTime);
+                if (moved != null && isDisplacementOccurs()) {
                     hasSentCorrectPosition=false;
                     Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
                     packet.writeData(connection);
@@ -116,6 +120,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     queuedUpdates.put("orientation", String.valueOf(OrientationValues.getOrientationValue(getOrientation())));
                     hasSentCorrectPosition=true;
                 }
+                return;
             }
 
 
@@ -145,7 +150,12 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     if(clientAuthority || isDisplacementOccurs()) return;
                     String[] pos=entry.getValue().split(",");
                     DiscreteCoordinates position= new DiscreteCoordinates(Integer.parseInt(pos[0]),Integer.parseInt(pos[1]));
-                    if(getCurrentMainCellCoordinates()!=position) setPosition(position);
+                    if(!getCurrentMainCellCoordinates().equals(position)){
+                        System.out.println("UPDATING POS : " + position.toVector() + " ; " + getCurrentMainCellCoordinates());
+                        ((NetworkArena)getOwnerArea()).getBehavior().leave(this,getCurrentCells());
+                        getOwnerArea().enterAreaCells(this,Collections.singletonList(position));
+                        setCurrentPosition(position.toVector());
+                    }
                     break;
                 case "orientation":
                     if(clientAuthority || isDisplacementOccurs()) return;
@@ -217,22 +227,20 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public void networkMove(Packet02Move movePacket) {
         Orientation orientation = movePacket.getOrientation();
         int speed = movePacket.getSpeed();
+        var positionBeforeMoving= getCurrentCells();
         DiscreteCoordinates startPosition = movePacket.getStart();
-        if (!isDisplacementOccurs() || isTargetReached()) {
+        if (!isDisplacementOccurs() || isTargetReached()) { ;
             super.orientate(orientation);
-            if (getCurrentMainCellCoordinates() != startPosition) {
-                System.out.println("setting new position");
-                setPosition(startPosition);
+            if (!getCurrentCells().get(0).equals(startPosition)) {
+                ((NetworkArena)getOwnerArea()).getBehavior().leave(this,positionBeforeMoving);
+                ((NetworkArena)getOwnerArea()).getBehavior().leave(this,Collections.singletonList(positionBeforeMoving.get(0).jump(getOrientation().toVector())));
+                setCurrentPosition(startPosition.toVector());
+                //Very useful for debugging
+                //System.out.println("Setting position  : " + positionBeforeMoving+ " ; " +startPosition);
             }
             setAnimationByOrientation(orientation);
             move(speed);
         }
-
-    }
-    public void setPosition(DiscreteCoordinates destination){
-        getOwnerArea().leaveAreaCells(this,getCurrentCells());
-        getOwnerArea().enterAreaCells(this,Collections.singletonList(destination));
-        setCurrentPosition(destination.toVector());
     }
 
     public boolean isClientAuthority() {

@@ -37,6 +37,7 @@ public class NARPG extends AreaGame
     private NetworkARPGPlayer player;
     private ServerAnnouncement announcement;
 
+    private double time =0;
     public NARPG(boolean isServer, Connection connection) {
         super();
         this.isServer = isServer;
@@ -159,6 +160,7 @@ public class NARPG extends AreaGame
 
     @Override
     public void update( float deltaTime ) {
+        time+=deltaTime;
         // register the entities that still need to be registered
         for (NetworkEntity e : leftToRegister)
         {
@@ -167,7 +169,12 @@ public class NARPG extends AreaGame
                 return;
             }
         }
-        //if(players.size()>0) System.out.println(((NetworkArena)getCurrentArea()).getBehavior().getEntityCount(players.get(0)));
+        if(time>.5d){
+            //extremely useful for debugging
+            //if(players.size()>0) System.out.println("p1 : " +((NetworkArena)getCurrentArea()).getBehavior().getEntityCount(players.get(0)));
+            //if(players.size()>1) System.out.println("p2 : " +((NetworkArena)getCurrentArea()).getBehavior().getEntityCount(players.get(1)));
+            time-=.5;
+        }
         super.update(deltaTime);
     }
 
