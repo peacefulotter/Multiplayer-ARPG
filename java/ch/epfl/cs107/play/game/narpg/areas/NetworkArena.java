@@ -37,4 +37,8 @@ public class NetworkArena extends ARPGArea
         return SCALE_FACTOR+3;
     }
 
+    @Override
+    public void end() {
+        super.end();
+    }
 }

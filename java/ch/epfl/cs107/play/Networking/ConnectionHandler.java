@@ -81,7 +81,6 @@ public class ConnectionHandler implements Runnable {
                     ((Server)connection).removeConnection(connectionId);
                     socket.close();
                     Packet05Logout logoutPacket = new Packet05Logout(game.getClientPlayerId(connectionId), connectionId);
-                    logoutPacket.writeData(connection);
                     game.logout(logoutPacket);
                     Thread.currentThread().interrupt();
                 }

@@ -98,7 +98,6 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
         @Override
         public void interactWith(NetworkARPGPlayer player) {
             if(player.getId()==spawnedBy) {
-                System.out.println("touched owner");
                 return;
             }
             player.giveDamage(1f);

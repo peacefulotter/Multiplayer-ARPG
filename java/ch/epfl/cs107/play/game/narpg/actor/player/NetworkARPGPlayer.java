@@ -187,6 +187,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     break;
                 case "hp":
                     hp = Float.parseFloat(entry.getValue());
+                    if(clientAuthority){
+                        if(hp<1) getOwnerArea().end();
+                    }
                     break;
                 case "position":
                     if (clientAuthority || isDisplacementOccurs()) return;
@@ -267,7 +270,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         initalState.put("id", String.valueOf(id));
         initalState.put("hp", String.valueOf(hp));
         initalState.put("connectionId", String.valueOf(connectionId));
-        System.out.println(initalState.get("connectionId"));
         return new Packet00Spawn(getId(), NetworkEntities.PLAYER, getOrientation(), getCurrentCells().get(0), initalState);
     }
 

@@ -12,7 +12,9 @@ import ch.epfl.cs107.play.game.Playable;
 import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.io.FileSystem;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 
 /**
@@ -403,8 +405,7 @@ public abstract class Area implements Playable {
 
     @Override
     public void end() {
-        // by default does nothing
-        // can save the Area state somewhere if wanted
+        window.dispose();
     }
 
 }

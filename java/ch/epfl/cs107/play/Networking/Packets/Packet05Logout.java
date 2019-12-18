@@ -25,7 +25,7 @@ public class Packet05Logout extends Packet
         }
         @Override
         public void writeData(Connection connection) {
-            connection.sendDataTo(connectionId, getData() );
+            connection.sendData(getData());
         }
 
         @Override

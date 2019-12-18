@@ -1,1 +1,2 @@
 inside movableareaentity removed a part of code from getLeftCells as it was unnecessary
+added close method to project window class

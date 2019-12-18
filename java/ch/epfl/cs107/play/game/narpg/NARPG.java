@@ -22,10 +22,9 @@ import ch.epfl.cs107.play.math.RandomGenerator;
 import ch.epfl.cs107.play.window.Window;
 
 import javax.net.ssl.SNIHostName;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import javax.swing.*;
+import java.awt.event.WindowEvent;
+import java.util.*;
 
 
 public class NARPG extends AreaGame
@@ -178,18 +177,18 @@ public class NARPG extends AreaGame
 
     public void logout(Packet05Logout logoutPacket)
     {
-        for ( NetworkARPGPlayer p : players )
+        System.out.println("GOT LOGOUT : " +logoutPacket.getConnectionId());
+        for (Iterator<NetworkARPGPlayer> iter = players.listIterator(); iter.hasNext();)
         {
-            System.out.println(p.getId() +" ; " + logoutPacket.getObjectId());
+            NetworkARPGPlayer p = iter.next();
             if(p.getId()==logoutPacket.getObjectId()) {
-                System.out.println(p);
                 getCurrentArea().unregisterActor(p);
                 //using removeall to avoid concurrentModificationException
-                players.removeAll(Collections.singleton(p));
-                networkEntities.remove(Collections.singleton(p));
+                networkEntities.removeAll(Collections.singleton(p));
+                iter.remove();
                 if (isServer) {
                     new Packet04Chat(p.getUsername() + " has disconnected").writeData(connection);
-                    System.out.println(p.getUsername() + " has disconnected");
+                    logoutPacket.writeData(connection);
                 }
             }
         }
@@ -235,7 +234,6 @@ public class NARPG extends AreaGame
         networkEntities.remove( player );
         players.remove( player );
         System.out.println("unloadPlayer NARPG");
-
     }
     public int getClientPlayerId(){
         for(NetworkARPGPlayer p: players){

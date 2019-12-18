@@ -325,8 +325,8 @@ public final class SwingWindow extends Node implements Window {
 	@Override
 	public void dispose() {
 		playSound(null, false,0.0f, false, false, true);
-		if(!headless)
-		frame.dispose();
+		if(headless) return;
+		frame.dispatchEvent(new WindowEvent(frame,WindowEvent.WINDOW_CLOSING));
 	}
 
 	@Override
