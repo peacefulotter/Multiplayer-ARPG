@@ -3,6 +3,7 @@ package ch.epfl.cs107.play.game.narpg.actor.projectiles;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
+import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -46,6 +47,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
         return NetworkEntities.BOW.getClassId();
     }
 
+
     @Override
     public Packet00Spawn getSpawnPacket() {
         var initialState = new HashMap<String, String>();
@@ -58,7 +60,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
 
     @Override
     public void updateState(HashMap<String, String> updateMap) {
-
+        if ( )
     }
 
     @Override
@@ -102,12 +104,10 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
             }
             player.giveDamage(1f);
             stopProjectile();
-        }
 
-        @Override
-        public void interactWith(NetworkBomb bomb) {
-            stopProjectile();
-            bomb.explode();
+            HashMap<String, String> updateMap = new HashMap<>();
+            updateMap.put( "stopArrow", String.valueOf( spawnedBy ) );
+            Packet03Update updatePacket = new Packet03Update( getId(), updateMap );
         }
     }
 }
