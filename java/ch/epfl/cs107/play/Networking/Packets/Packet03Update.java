@@ -18,7 +18,8 @@ public class Packet03Update extends Packet {
         super(packetId, data);
         String[] dataArray = readData(data).split(";");
         updateMap = Packet.getHashMapFromString(dataArray[1]);
-        System.out.println(getObjectId() + " packet ");
+        System.out.println(getObjectId() + " packet Update");
+        System.out.println(updateMap);
     }
 
     @Override

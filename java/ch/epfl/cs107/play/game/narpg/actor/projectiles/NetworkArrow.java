@@ -3,7 +3,7 @@ package ch.epfl.cs107.play.game.narpg.actor.projectiles;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
-import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
+import ch.epfl.cs107.play.Networking.Packets.Packet06Despawn;
 import ch.epfl.cs107.play.Networking.utils.IdGenerator;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
@@ -31,17 +31,22 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
      * @param maxDistance
      */
 
-    public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, int speed, int maxDistance, int spawnedBy) {
+    public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, int speed, int maxDistance, int spawnedBy, int id ) {
         super(area, orientation, position, speed, maxDistance);
         handler = new NetworkArrowHandler();
         this.spawnedBy = spawnedBy;
         this.connection=connection;
-        id = IdGenerator.generateId();
+        if ( id == 0 )
+        {
+            this.id = IdGenerator.generateId();
+        } else {
+            this.id = id;
+        }
     }
 
-    public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, HashMap<String, String> initialState) {
+    public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, HashMap<String, String> initialState, int id) {
         this(area, orientation, position, connection, Integer.parseInt(initialState.get(stateProperties.SPEED.toString())), Integer.parseInt(initialState.get(stateProperties.MAX_DISTANCE.toString())),
-                Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY.toString())));
+                Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY.toString())), id );
     }
 
     @Override
@@ -62,14 +67,6 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
 
     @Override
     public void updateState(HashMap<String, String> updateMap) {
-        String key = (String) updateMap.keySet().toArray()[ 0 ];
-        System.out.println(key);
-        switch( key )
-        {
-            case "despawnArrow":
-                System.out.println("all good");
-                break;
-        }
     }
 
     @Override
@@ -113,10 +110,8 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
             }
             player.giveDamage(1f,spawnedBy);
             System.out.println(id);
-            HashMap<String, String> updateMap = new HashMap<>();
-            updateMap.put( "despawnArrow", "true" );
-            Packet03Update updatePacket = new Packet03Update( id, updateMap );
-            updatePacket.writeData( connection );
+            HashMap<String, String> despawnMap = new HashMap<>();
+            new Packet06Despawn( id, despawnMap ).writeData( connection );
             stopProjectile();
         }
     }

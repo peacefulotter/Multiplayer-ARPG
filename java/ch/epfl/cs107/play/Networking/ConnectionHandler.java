@@ -8,7 +8,6 @@ import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 
 
 public class ConnectionHandler implements Runnable {
@@ -123,6 +122,9 @@ public class ConnectionHandler implements Runnable {
                 Packet05Logout logoutPacket = new Packet05Logout(data);
                 game.logout(logoutPacket);
                 break;
+            case DESPAWN:
+                Packet06Despawn despawnPacket = new Packet06Despawn( data );
+                game.despawnEntity( despawnPacket );
         }
         if (isServer && sendDataBackToAll) {
             connection.sendData(data);
