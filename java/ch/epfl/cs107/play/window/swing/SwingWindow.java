@@ -18,6 +18,7 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferStrategy;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.spec.RSAOtherPrimeInfo;
 import java.util.List;
 import java.util.*;
 
@@ -324,6 +325,7 @@ public final class SwingWindow extends Node implements Window {
 
 	@Override
 	public void dispose() {
+		System.out.println("somebody called disposed");
 		playSound(null, false,0.0f, false, false, true);
 		if(headless) return;
 		frame.dispatchEvent(new WindowEvent(frame,WindowEvent.WINDOW_CLOSING));

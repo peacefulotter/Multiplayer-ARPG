@@ -186,8 +186,7 @@ public class NARPG extends AreaGame
                 networkEntities.removeAll(Collections.singleton(p));
                 iter.remove();
                 if (isServer) {
-                    System.out.println(p.isDead());
-                    if(p.isDead() && p.getKiller()!=0){
+                    if(p.isDead()){
                         new Packet04Chat(((NetworkARPGPlayer)findEntity(p.getKiller())).getUsername() + "  killed " +p.getUsername()).writeData(connection);
                     }
                     else{

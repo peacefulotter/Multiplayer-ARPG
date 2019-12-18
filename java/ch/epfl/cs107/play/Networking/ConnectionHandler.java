@@ -71,17 +71,22 @@ public class ConnectionHandler implements Runnable {
                 }
 
                 parsePacket(data);
-            } catch (IOException e) {
+
+            }catch (EOFException e){
+                e.printStackTrace();
                 done = true;
                 if (isServer) {
                     ((Server) connection).removeConnection(connectionId);
                     socket.close();
                     Packet05Logout logoutPacket = new Packet05Logout(game.getClientPlayerId(connectionId), connectionId);
                     game.logout(logoutPacket);
+
                     Thread.currentThread().interrupt();
-                }else {
                     e.printStackTrace();
                 }
+            }
+            catch (IOException e) {
+
             }
 
         }

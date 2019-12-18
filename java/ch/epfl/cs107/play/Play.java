@@ -82,6 +82,7 @@ public class Play {
 
 		} finally {
 			// Release resources
+			System.out.println("end finally");
 			window.dispose();
 		}
 	}

@@ -220,6 +220,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     protected void useItem() {
+        System.out.println(state);
         if (state != PlayerStates.IDLE) return;
         switch (getEquippedItem()) {
             case BOMB:

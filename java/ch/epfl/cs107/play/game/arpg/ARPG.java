@@ -67,5 +67,6 @@ public class ARPG extends RPG {
 
     @Override
     public void end() {
+        System.out.println("end");
     }
 }
