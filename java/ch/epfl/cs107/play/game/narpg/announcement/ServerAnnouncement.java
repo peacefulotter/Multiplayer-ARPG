@@ -21,7 +21,7 @@ public class ServerAnnouncement implements Graphics, NetworkEntity
 
     public void addAnnouncement( String text )
     {
-        TextGraphics graphics = new TextGraphics( text, 0.4f, Color.GRAY, Color.BLACK, 0.05f, false, false, Vector.ZERO, TextAlign.Horizontal.RIGHT, TextAlign.Vertical.MIDDLE, 0.9f, 1000 );
+        TextGraphics graphics = new TextGraphics( text, 0.4f, Color.GREEN, Color.BLACK, 0.05f, true, false, Vector.ZERO, TextAlign.Horizontal.RIGHT, TextAlign.Vertical.MIDDLE, 0.9f, 1000 );
         announcements.add( graphics );
     }
 

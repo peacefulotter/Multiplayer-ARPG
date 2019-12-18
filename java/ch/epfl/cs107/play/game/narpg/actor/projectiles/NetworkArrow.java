@@ -102,7 +102,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
             if(player.getId()==spawnedBy) {
                 return;
             }
-            player.giveDamage(1f);
+            player.giveDamage(1f,spawnedBy);
             stopProjectile();
 
             HashMap<String, String> updateMap = new HashMap<>();
