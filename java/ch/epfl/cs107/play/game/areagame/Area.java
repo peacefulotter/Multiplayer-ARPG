@@ -406,5 +406,6 @@ public abstract class Area implements Playable {
     @Override
     public void end() {
         System.out.println("end");
+        window.dispose();
     }
 }

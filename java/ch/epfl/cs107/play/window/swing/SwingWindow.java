@@ -328,7 +328,7 @@ public final class SwingWindow extends Node implements Window {
 		System.out.println("somebody called disposed");
 		playSound(null, false,0.0f, false, false, true);
 		if(headless) return;
-		frame.dispose();
+		frame.dispatchEvent(new WindowEvent(frame,WindowEvent.WINDOW_CLOSING));
 	}
 
 	@Override
