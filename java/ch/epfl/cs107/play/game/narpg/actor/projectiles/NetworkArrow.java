@@ -109,7 +109,6 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
                 return;
             }
             player.giveDamage(1f,spawnedBy);
-            System.out.println(id);
             HashMap<String, String> despawnMap = new HashMap<>();
             new Packet06Despawn( id, despawnMap ).writeData( connection );
             stopProjectile();

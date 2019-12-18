@@ -195,7 +195,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     hp = Float.parseFloat(entry.getValue());
                     if(hp<1){
                         dead=true;
-                        System.out.println("setting dead to true");
                     }
                     break;
                 case "position":
@@ -219,7 +218,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     protected void useItem() {
-        System.out.println(state);
         if (state != PlayerStates.IDLE) return;
         switch (getEquippedItem()) {
             case BOMB:

@@ -99,12 +99,7 @@ public class NARPG extends AreaGame
     }
 
     public void updateObject(Packet03Update update) {
-        update.getObjectId();
         var entity = findEntity(update.getObjectId());
-        if ( entity == null )
-        {
-            System.out.println("NARPG UPDATEOBJECT ENTITY IS NULL");
-        }
         entity.updateState(update.getUpdateMap());
     }
 
@@ -177,7 +172,6 @@ public class NARPG extends AreaGame
 
     public void logout(Packet05Logout logoutPacket)
     {
-        System.out.println(logoutPacket.getConnectionId());
         for (Iterator<NetworkARPGPlayer> iter = players.listIterator(); iter.hasNext();)
         {
             NetworkARPGPlayer p = iter.next();
