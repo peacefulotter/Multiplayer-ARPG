@@ -5,11 +5,9 @@ import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.MovableNetworkEntity;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.*;
-import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
@@ -22,9 +20,6 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RandomGenerator;
 import ch.epfl.cs107.play.window.Window;
 
-import javax.net.ssl.SNIHostName;
-import javax.swing.*;
-import java.awt.event.WindowEvent;
 import java.util.*;
 
 
@@ -104,7 +99,9 @@ public class NARPG extends AreaGame
     }
 
     public void updateObject(Packet03Update update) {
+        update.getObjectId();
         var entity = findEntity(update.getObjectId());
+        System.out.println(entity);
         entity.updateState(update.getUpdateMap());
     }
 

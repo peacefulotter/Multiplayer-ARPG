@@ -1,16 +1,8 @@
 package ch.epfl.cs107.play.Networking.Packets;
 
 import ch.epfl.cs107.play.Networking.Connection;
-import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
-import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 public class Packet03Update extends Packet {
     private final static int packetId = 03;
@@ -25,8 +17,8 @@ public class Packet03Update extends Packet {
     public Packet03Update(byte[] data) {
         super(packetId, data);
         String[] dataArray = readData(data).split(";");
-        updateMap=Packet.getHashMapFromString(dataArray[1]);
-
+        updateMap = Packet.getHashMapFromString(dataArray[1]);
+        System.out.println(getObjectId() + " packet ");
     }
 
     @Override
