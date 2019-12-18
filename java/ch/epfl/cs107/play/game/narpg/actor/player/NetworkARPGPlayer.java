@@ -18,7 +18,6 @@ import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.player.PlayerStates;
-import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
@@ -234,7 +233,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 setState(PlayerStates.ATTACKING_BOW);
                 new NetworkArrow(getOwnerArea(), getOrientation()
                         , inFronOfPlayer(),
-                        connection, arrowSpeed, arrowRange, id).getSpawnPacket().writeData(connection);
+                        connection, arrowSpeed, arrowRange, id, 0).getSpawnPacket().writeData(connection);
                 currentAnimation = 2;
                 break;
             case STAFF:

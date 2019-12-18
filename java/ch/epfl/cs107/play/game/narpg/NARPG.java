@@ -101,7 +101,10 @@ public class NARPG extends AreaGame
     public void updateObject(Packet03Update update) {
         update.getObjectId();
         var entity = findEntity(update.getObjectId());
-        System.out.println(entity);
+        if ( entity == null )
+        {
+            System.out.println("NARPG UPDATEOBJECT ENTITY IS NULL");
+        }
         entity.updateState(update.getUpdateMap());
     }
 
@@ -151,7 +154,7 @@ public class NARPG extends AreaGame
                 area.registerActor( newBomb );
                 break;
             case BOW:
-                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection,packet.getInitialState());
+                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection,packet.getInitialState(), packet.getObjectId());
                 networkEntities.add( newArrow );
                 area.registerActor( newArrow );
                 break;
@@ -191,6 +194,18 @@ public class NARPG extends AreaGame
                     }
                     logoutPacket.writeData(connection);
                 }
+            }
+        }
+    }
+
+    public void despawnEntity( Packet06Despawn packet )
+    {
+        NetworkEntity entity = findEntity( packet.getObjectId() );
+        for ( NetworkEntity p : networkEntities )
+        {
+            if ( p.getId() == packet.getObjectId() )
+            {
+                getCurrentArea().unregisterActor( entity );
             }
         }
     }

@@ -76,7 +76,8 @@ public abstract class Packet {
         MOVE(02),
         UPDATE(03),
         TCHAT( 04 ),
-        LOGOUT( 05 );
+        LOGOUT( 05 ),
+        DESPAWN( 06 );
 
         private int packetID;
 
