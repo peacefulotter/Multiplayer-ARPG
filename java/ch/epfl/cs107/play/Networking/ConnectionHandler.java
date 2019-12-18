@@ -8,6 +8,7 @@ import ch.epfl.cs107.play.game.narpg.NARPG;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 
 public class ConnectionHandler implements Runnable {
@@ -49,15 +50,10 @@ public class ConnectionHandler implements Runnable {
     }
 
 
-    public void sendData(byte[] data) {
-        try {
-            var dos = new DataOutputStream(out);
-            dos.writeInt(data.length);
-            dos.write(data, 0, data.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-            game.end();
-        }
+    public void sendData(byte[] data) throws IOException {
+        var dos = new DataOutputStream(out);
+        dos.writeInt(data.length);
+        dos.write(data, 0, data.length);
     }
 
     private void processIncomingData(InputStream inStream, OutputStream outStream) throws IOException {
@@ -75,14 +71,16 @@ public class ConnectionHandler implements Runnable {
                 }
 
                 parsePacket(data);
-            } catch (EOFException e) {
-                done=true;
+            } catch (IOException e) {
+                done = true;
                 if (isServer) {
-                    ((Server)connection).removeConnection(connectionId);
+                    ((Server) connection).removeConnection(connectionId);
                     socket.close();
                     Packet05Logout logoutPacket = new Packet05Logout(game.getClientPlayerId(connectionId), connectionId);
                     game.logout(logoutPacket);
                     Thread.currentThread().interrupt();
+                }else {
+                    e.printStackTrace();
                 }
             }
 

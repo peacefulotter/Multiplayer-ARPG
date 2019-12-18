@@ -6,6 +6,7 @@ import ch.epfl.cs107.play.Networking.Packets.Packet01Login;
 import ch.epfl.cs107.play.Networking.Packets.Packet05Logout;
 import ch.epfl.cs107.play.game.narpg.NARPG;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Random;
@@ -15,6 +16,7 @@ public class Client extends Play implements Connection {
     private final String username;
     private ConnectionHandler connection;
     private NARPG game;
+
     public Client(String adress, int port, String username) {
         boolean connected = false;
         this.username = username;
@@ -54,11 +56,21 @@ public class Client extends Play implements Connection {
 
     @Override
     public void sendData(byte[] data) {
-        connection.sendData(data);
+        try {
+            connection.sendData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+            game.end();
+        }
     }
 
     public void sendDataTo(long mainId, byte[] data) {
-        connection.sendData(data);
+        try {
+            connection.sendData(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+            game.end();
+        }
     }
 
     public void login() {
@@ -66,10 +78,6 @@ public class Client extends Play implements Connection {
         loginPacket.writeData(this);
     }
 
-    public void logout() {
-        Packet05Logout logoutPacket = new Packet05Logout(game.getClientPlayerId(), mainId);
-        logoutPacket.writeData(this);
-    }
 
     public String getUsername() {
         return username;

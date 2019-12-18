@@ -9,6 +9,7 @@ import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
+import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
@@ -139,7 +140,6 @@ public class NARPG extends AreaGame
                         return false;
                     }
                 }
-                System.out.println(packet.getInitialState());
                 var newPlayer = new NetworkARPGPlayer(area, packet.getOrientation(),
                         packet.getDiscreteCoordinate(), connection, false, packet.getInitialState());
                 newPlayer.setId(packet.getObjectId());
@@ -177,17 +177,22 @@ public class NARPG extends AreaGame
 
     public void logout(Packet05Logout logoutPacket)
     {
-        System.out.println("GOT LOGOUT : " +logoutPacket.getConnectionId());
+        System.out.println(logoutPacket.getConnectionId());
         for (Iterator<NetworkARPGPlayer> iter = players.listIterator(); iter.hasNext();)
         {
             NetworkARPGPlayer p = iter.next();
             if(p.getId()==logoutPacket.getObjectId()) {
                 getCurrentArea().unregisterActor(p);
-                //using removeall to avoid concurrentModificationException
                 networkEntities.removeAll(Collections.singleton(p));
                 iter.remove();
                 if (isServer) {
-                    new Packet04Chat(p.getUsername() + " has disconnected").writeData(connection);
+                    System.out.println(p.isDead());
+                    if(p.isDead() && p.getKiller()!=0){
+                        new Packet04Chat(((NetworkARPGPlayer)findEntity(p.getKiller())).getUsername() + "  killed " +p.getUsername()).writeData(connection);
+                    }
+                    else{
+                        new Packet04Chat(p.getUsername() + " has disconnected").writeData(connection);
+                    }
                     logoutPacket.writeData(connection);
                 }
             }
@@ -205,6 +210,12 @@ public class NARPG extends AreaGame
                 return;
             }
         }
+        for( NetworkARPGPlayer p : players){
+            if(p.isDead()&& p.isClientAuthority()){
+                    getCurrentArea().end();
+            }
+        }
+
         if(time>.5d){
             //extremely useful for debugging
             //if(players.size()>0) System.out.println("p1 : " +((NetworkArena)getCurrentArea()).getBehavior().getEntityCount(players.get(0)));
@@ -212,6 +223,9 @@ public class NARPG extends AreaGame
             time-=.5;
         }
         super.update(deltaTime);
+    }
+    public void removeEntitys(List<NetworkEntity> entitys){
+        networkEntities.removeAll(entitys);
     }
 
     public NetworkEntity findEntity(int objectId) {
@@ -226,20 +240,13 @@ public class NARPG extends AreaGame
     {
         if ( player == null || getCurrentArea() == null ) { return; }
 
-        if ( !isServer )
-        {
-            ((Client) connection).logout();
-        }
-        getCurrentArea().unregisterActor( player );
-        networkEntities.remove( player );
-        players.remove( player );
-        System.out.println("unloadPlayer NARPG");
+        getWindow().dispose();
     }
     public int getClientPlayerId(){
         for(NetworkARPGPlayer p: players){
             if(p.isClientAuthority()) return p.getId();
         }
-        throw new NoSuchElementException("no client player found by objectId");
+        throw new NoSuchElementException("no client player");
     }
     public int getClientPlayerId(long mainId){
         for(NetworkARPGPlayer p:players){

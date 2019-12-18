@@ -44,9 +44,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private static final float DEPTH = 10000;
     private static final float HEART_SIZE = .7f;
     private final boolean clientAuthority;
-    private Connection connection;
     private final long connectionId;
-
+    private boolean dead;
+    private Connection connection;
     private Area currentArea;
     private int id;
     private TextGraphics usernameText;
@@ -54,10 +54,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private HashMap<String, String> queuedUpdates;
     //to check if the packet that sets the correct position after movement has been sent
     private boolean hasSentCorrectPosition = true;
-
     private int arrowSpeed;
     private int arrowRange;
-
+    private int killer;
     /**
      * Default Player constructor
      *
@@ -93,6 +92,14 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String, String> initialState) {
         this(area, orientation, coordinates, connection, clientAuthority, Long.parseLong(initialState.get("connectionId")), initialState.get("username"), Integer.parseInt(initialState.get("id")));
         updateState(initialState);
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
+    public int getKiller() {
+        return killer;
     }
 
     public long getConnectionId() {
@@ -187,8 +194,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     break;
                 case "hp":
                     hp = Float.parseFloat(entry.getValue());
-                    if(clientAuthority){
-                        if(hp<1) getOwnerArea().end();
+                    if(hp<1){
+                        dead=true;
+                        System.out.println("setting dead to true");
                     }
                     break;
                 case "position":
@@ -243,19 +251,28 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     @Override
     public void giveDamage(float damage) {
         super.giveDamage(damage);
-        queuedUpdates.put("hp", String.valueOf(getHp()));
+        queuedUpdates.put("hp",String.valueOf(getHp()));
+    }
+
+    public void giveDamage(float damage, int givenBy) {
+        giveDamage(damage);
+        if (hp < 1) {
+            killer = givenBy;
+            dead=true;
+        }
     }
 
     @Override
     public int getId() {
         return this.id;
     }
-    public String getUsername(){
-        return usernameText.getText();
-    }
 
     public void setId(int objectId) {
         this.id = objectId;
+    }
+
+    public String getUsername() {
+        return usernameText.getText();
     }
 
     public void setState(PlayerStates state) {

@@ -7,6 +7,7 @@ import ch.epfl.cs107.play.game.narpg.NARPG;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ public class Server implements Connection {
             int num = 1;
             while (true) {
                 Socket incoming = server.accept();
+                System.out.println("Thread n" + Thread.activeCount());
                 System.out.println("Welcome : " + num);
                 ConnectionHandler handler = new ConnectionHandler(incoming, game, true, this);
                 connections.add(handler);
@@ -42,7 +44,12 @@ public class Server implements Connection {
 
     public void sendDataToAllClients(byte[] data) {
         for(Iterator<ConnectionHandler> iterator= connections.iterator();iterator.hasNext();){
-            iterator.next().sendData(data);
+            try{
+                iterator.next().sendData(data);
+            }catch (IOException e){
+                e.printStackTrace();
+                iterator.remove();
+            }
         }
     }
 
@@ -59,9 +66,15 @@ public class Server implements Connection {
     @Override
     public void sendDataTo(long connectionId, byte[] data) {
         //System.out.println(connectionId);
-        for (ConnectionHandler c : connections) {
+        for (Iterator<ConnectionHandler> iter=connections.listIterator(); iter.hasNext();) {
+            ConnectionHandler c= iter.next();
             if (c.getConnectionId() == connectionId) {
-                c.sendData(data);
+                try{
+                    c.sendData(data);
+                }catch (IOException e){
+                    e.printStackTrace();
+                    iter.remove();
+                }
             }
         }
     }
