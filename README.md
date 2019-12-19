@@ -2,7 +2,7 @@
 EPFL - Mini-Project 2 
 
 ## Inputs
- - [ARROW KEY] Move the player
+ - `[ARROW KEY]` Move the player
  - [E] Interact
  - [SPACE] Use equipped item
  - [TAB / MOUSE WHEEL] Switch equipped item
