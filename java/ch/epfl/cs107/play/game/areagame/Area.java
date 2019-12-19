@@ -379,8 +379,8 @@ public abstract class Area implements Playable {
             if (viewCenter.y > areaBehavior.getHeight() - bound+0.5f) {
                 viewCenter = new Vector(viewCenter.x, areaBehavior.getHeight() - bound+0.5f);
             }
-            if (viewCenter.y < bound+0.5f) {
-                viewCenter = new Vector(viewCenter.x, bound+0.5f);
+            if (viewCenter.y < bound-0.5f) {
+                viewCenter = new Vector(viewCenter.x, bound-0.5f);
             }
             if (viewCenter.x > areaBehavior.getWidth() - bound) {
                 viewCenter = new Vector(areaBehavior.getWidth() - bound, viewCenter.y);

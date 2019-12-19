@@ -28,7 +28,6 @@ import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
-import ch.epfl.cs107.play.game.rpg.inventory.Inventory;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.TextAlign;
@@ -103,6 +102,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         playerKills = 0;
         showUpgrades = false;
         playerGUI = new NetworkARPGPlayerGUI(this, getEquippedItem().getSpriteName());
+        inventory = setInitialInventory( new ARPGInventory( 1000, 1000, 0 ) );
     }
 
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String, String> initialState) {
@@ -110,7 +110,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         updateState(initialState);
     }
 
-    private static ARPGInventory setInitialInventory(ARPGInventory inventory) {
+    private ARPGInventory setInitialInventory(ARPGInventory inventory) {
         inventory.addItemToInventory(ARPGItem.BOW);
         return inventory;
     }

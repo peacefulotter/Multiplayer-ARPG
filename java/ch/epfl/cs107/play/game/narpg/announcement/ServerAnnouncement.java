@@ -1,10 +1,6 @@
 package ch.epfl.cs107.play.game.narpg.announcement;
 
-import ch.epfl.cs107.play.Networking.NetworkEntity;
-import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
-import ch.epfl.cs107.play.game.Updatable;
 import ch.epfl.cs107.play.game.actor.Actor;
-import ch.epfl.cs107.play.game.actor.Graphics;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.math.TextAlign;
 import ch.epfl.cs107.play.math.Transform;
@@ -13,7 +9,6 @@ import ch.epfl.cs107.play.window.Canvas;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ServerAnnouncement implements Actor {

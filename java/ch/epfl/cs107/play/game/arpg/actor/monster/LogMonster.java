@@ -154,6 +154,7 @@ public class LogMonster extends Monster
             getOwnerArea().registerActor(
                     new Coin( getOwnerArea(), getCurrentCells().get(0), 50 ) );
         }
+
         // update but can only change orientation if the state allows to
         super.update( deltaTime, state.allowReorientation );
     }
@@ -178,7 +179,7 @@ public class LogMonster extends Monster
         }
         // or we draw only either the default animation or the death animation
         // we let the super.draw handle this since it is common to all monsters
-        super.draw( canvas, state.allowReorientation );
+        super.draw( canvas, state.drawMonster );
     }
 
     /**

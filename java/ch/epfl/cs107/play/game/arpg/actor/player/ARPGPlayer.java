@@ -94,7 +94,7 @@ public class ARPGPlayer extends Player {
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
-    private static ARPGInventory setInitialInventory(ARPGInventory inventory){
+    private ARPGInventory setInitialInventory(ARPGInventory inventory){
         inventory.addItemToInventory(ARPGItem.BOMB, 10);
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
