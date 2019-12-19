@@ -12,6 +12,7 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
+import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
@@ -47,6 +48,14 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
     public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, HashMap<String, String> initialState, int id) {
         this(area, orientation, position, connection, Integer.parseInt(initialState.get(stateProperties.SPEED.toString())), Integer.parseInt(initialState.get(stateProperties.MAX_DISTANCE.toString())),
                 Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY.toString())), id );
+    }
+
+    @Override
+    public void stopProjectile() {
+        if(connection.isServer()){
+            new Packet06Despawn(id).writeData(connection);
+        }
+        ((NetworkArena)getOwnerArea()).unregisterActor(this);
     }
 
     @Override
@@ -109,8 +118,6 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
                 return;
             }
             player.giveDamage(1f,spawnedBy);
-            HashMap<String, String> despawnMap = new HashMap<>();
-            new Packet06Despawn( id, despawnMap ).writeData( connection );
             stopProjectile();
         }
     }

@@ -134,6 +134,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 if (moved != null && isDisplacementOccurs()) {
                     hasSentCorrectPosition = false;
                     Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
+                    System.out.println("data : "+ new String(packet.getData()));
                     packet.writeData(connection);
                 }
                 if (!isDisplacementOccurs() && !hasSentCorrectPosition) {

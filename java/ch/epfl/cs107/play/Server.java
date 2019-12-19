@@ -24,7 +24,6 @@ public class Server implements Connection {
             int num = 1;
             while (true) {
                 Socket incoming = server.accept();
-                System.out.println("Thread n" + Thread.activeCount());
                 System.out.println("Welcome : " + num);
                 ConnectionHandler handler = new ConnectionHandler(incoming, game, true, this);
                 connections.add(handler);

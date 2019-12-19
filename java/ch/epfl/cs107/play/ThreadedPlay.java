@@ -64,7 +64,6 @@ public class ThreadedPlay implements Runnable {
                 // Run until the user try to close the window
                 while (!stopGame) {
                     if(window.isCloseRequested()){
-                        game.end();
                         stopGame=true;
                     }
                     // Compute time interval
@@ -91,9 +90,8 @@ public class ThreadedPlay implements Runnable {
                     //replayer.update();
                 }
             }
-            //recorder.stop("record1.xml");
             game.end();
-
+            //recorder.stop("record1.xml");
         } finally {
             // Release resources
             System.out.println("closing");
