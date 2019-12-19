@@ -36,7 +36,9 @@ public class NARPG extends AreaGame
     private NetworkARPGPlayer player;
     private ServerAnnouncement announcement;
 
-    private double time =0;
+    private double time = 0;
+    private NetworkArena area;
+
     public NARPG(boolean isServer, Connection connection) {
         super();
         this.isServer = isServer;
@@ -77,11 +79,6 @@ public class NARPG extends AreaGame
             return true;
         }
         return false;
-    }
-
-    public ServerAnnouncement getAnnouncement()
-    {
-        return announcement;
     }
 
     private DiscreteCoordinates findRandomSpawn()

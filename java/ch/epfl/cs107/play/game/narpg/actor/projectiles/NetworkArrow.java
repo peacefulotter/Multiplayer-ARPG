@@ -12,6 +12,7 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.projectiles.Arrow;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
+import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
@@ -56,6 +57,14 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
     }
 
     @Override
+    public void stopProjectile() {
+        if(connection.isServer()){
+            new Packet06Despawn(id).writeData(connection);
+        }
+        ((NetworkArena)getOwnerArea()).unregisterActor(this);
+    }
+
+    @Override
     public int getId() {
         return id;
     }
@@ -68,8 +77,6 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
         initialState.put(stateProperties.MAX_DISTANCE.toString(),String.valueOf(getMaxDistance()));
         initialState.put(stateProperties.SPEED.toString(),String.valueOf(getSpeed()));
         initialState.put(stateProperties.DAMAGE.toString(), String.valueOf( arrowDamage ));
-        initialState.put(stateProperties.DAMAGE.toString(), String.valueOf( arrowDamage ));
-
         return new Packet00Spawn(id, NetworkEntities.BOW, getOrientation(), getCurrentMainCellCoordinates(), initialState);
     }
 
@@ -117,14 +124,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
             if(player.getId()==spawnedBy) {
                 return;
             }
-<<<<<<< HEAD
             player.giveDamage(arrowDamage, spawnedBy);
-            System.out.println(id);
-=======
-            player.giveDamage(1f,spawnedBy);
->>>>>>> 129a128ee6407b41b22d1ecbda65b3994fb7eeee
-            HashMap<String, String> despawnMap = new HashMap<>();
-            new Packet06Despawn( id, despawnMap ).writeData( connection );
             stopProjectile();
         }
     }

@@ -25,8 +25,8 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
         return maxDistance;
     }
 
-    private float maxDistance;
-    private Vector startingPos;
+    private final float maxDistance;
+    private final Vector startingPos;
 
     /**
      * Default MovableAreaEntity constructor

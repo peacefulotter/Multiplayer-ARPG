@@ -9,17 +9,14 @@ public class Packet06Despawn extends Packet
     private final static int packetId = 03;
     private HashMap despawnMap;
 
-    public Packet06Despawn( int objectId, HashMap updateMap)
+    public Packet06Despawn( int objectId)
     {
         super( packetId, objectId );
-        this.despawnMap = updateMap;
     }
 
     public Packet06Despawn(byte[] data)
     {
         super(packetId, data);
-        String[] dataArray = readData(data).split(";");
-        despawnMap = Packet.getHashMapFromString(dataArray[1]);
     }
 
     @Override
@@ -28,9 +25,6 @@ public class Packet06Despawn extends Packet
             connection.sendData(getData());
     }
 
-    public HashMap getUpdateMap() {
-            return despawnMap;
-        }
 
     @Override
     public byte[] getData() {
