@@ -2,3 +2,4 @@ inside movableareaentity removed a part of code from getLeftCells as it was unne
 modified window dispose to properly 
 changed registerActor without final
 no inventory holder interface implemented
+playerInputEnums
