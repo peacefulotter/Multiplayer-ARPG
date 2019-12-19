@@ -41,8 +41,7 @@ public class NARPG extends AreaGame {
     }
 
     @Override
-    public String getTitle()
-    {
+    public String getTitle() {
         return "ZeldIC - Multiplayer";
     }
 
@@ -69,24 +68,22 @@ public class NARPG extends AreaGame {
         return false;
     }
 
-    private DiscreteCoordinates findRandomSpawn()
-    {
+    private DiscreteCoordinates findRandomSpawn() {
         boolean canSpawnTo = false;
         DiscreteCoordinates coords;
-        NetworkBomb dummy = new NetworkBomb( area, Orientation.DOWN, new DiscreteCoordinates(1, 1 ), 0  );
+        NetworkBomb dummy = new NetworkBomb(area, Orientation.DOWN, new DiscreteCoordinates(1, 1), 0);
 
         do {
-            coords = new DiscreteCoordinates( getRandomPos(), getRandomPos() );
-            canSpawnTo = area.canEnterAreaCells( dummy, Collections.singletonList( coords ) );
-        } while ( !canSpawnTo );
+            coords = new DiscreteCoordinates(getRandomPos(), getRandomPos());
+            canSpawnTo = area.canEnterAreaCells(dummy, Collections.singletonList(coords));
+        } while (!canSpawnTo);
 
         return coords;
     }
 
-    private int getRandomPos()
-    {
+    private int getRandomPos() {
         // from 1 to 27
-        return RandomGenerator.getInstance().nextInt( 26 ) + 1;
+        return RandomGenerator.getInstance().nextInt(26) + 1;
     }
 
     public void updateObject(Packet03Update update) {
@@ -110,10 +107,8 @@ public class NARPG extends AreaGame {
         NetworkEntities object = packet.getObject();
         switch (object) {
             case PLAYER:
-                for (NetworkARPGPlayer p : players)
-                {
-                    if (p.getId() == packet.getObjectId())
-                    {
+                for (NetworkARPGPlayer p : players) {
+                    if (p.getId() == packet.getObjectId()) {
                         return false;
                     }
                 }
@@ -121,51 +116,47 @@ public class NARPG extends AreaGame {
                         packet.getDiscreteCoordinate(), connection, false, packet.getInitialState());
                 newPlayer.setId(packet.getObjectId());
                 players.add(newPlayer);
-                boolean registered =area.registerActor(newPlayer);
+                boolean registered = area.registerActor(newPlayer);
                 if (!registered) leftToRegister.add(newPlayer);
                 break;
             case BOMB:
-                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(),packet.getInitialState());
-                area.registerActor( newBomb );
+                NetworkBomb newBomb = new NetworkBomb(area, packet.getOrientation(), packet.getDiscreteCoordinate(), packet.getInitialState());
+                area.registerActor(newBomb);
                 break;
             case BOW:
-                NetworkArrow newArrow = new NetworkArrow( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection,packet.getInitialState(), packet.getObjectId());
-                area.registerActor( newArrow );
+                NetworkArrow newArrow = new NetworkArrow(area, packet.getOrientation(), packet.getDiscreteCoordinate(), connection, packet.getInitialState(), packet.getObjectId());
+                area.registerActor(newArrow);
                 break;
             case STAFF:
-                NetworkMagic newMagic = new NetworkMagic( area, packet.getOrientation(), packet.getDiscreteCoordinate(),connection, packet.getInitialState());
-                area.registerActor( newMagic );
+                NetworkMagic newMagic = new NetworkMagic(area, packet.getOrientation(), packet.getDiscreteCoordinate(), connection, packet.getInitialState());
+                area.registerActor(newMagic);
         }
 
         return true;
     }
 
-    public void login()
-    {
-        for ( NetworkEntity p : area.getNetworkEntities() ) {
+    public void login() {
+        for (NetworkEntity p : area.getNetworkEntities()) {
             Packet00Spawn packet = p.getSpawnPacket();
-            packet.writeData( connection );
+            packet.writeData(connection);
         }
     }
 
     //Handles disconnects and player kills
-    public void logout(Packet05Logout logoutPacket)
-    {
-        for (Iterator<NetworkARPGPlayer> iter = players.listIterator(); iter.hasNext();)
-        {
+    public void logout(Packet05Logout logoutPacket) {
+        for (Iterator<NetworkARPGPlayer> iter = players.listIterator(); iter.hasNext(); ) {
             NetworkARPGPlayer p = iter.next();
-            if ( p.getId() == logoutPacket.getObjectId() ) {
+            if (p.getId() == logoutPacket.getObjectId()) {
                 area.unregisterActor(p);
                 iter.remove();
                 if (isServer) {
-                    if(p.isDead()){
-                        NetworkARPGPlayer killer = (NetworkARPGPlayer)findEntity(p.getKiller());
+                    if (p.isDead()) {
+                        NetworkARPGPlayer killer = (NetworkARPGPlayer) findEntity(p.getKiller());
                         new Packet04Chat(killer.getUsername() + "  killed " + p.getUsername()).writeData(connection);
                         HashMap<String, String> updateMap = new HashMap<>();
-                        updateMap.put( "killed", String.valueOf( killer.getKills() ) );
-                        new Packet03Update( killer.getId(), updateMap ).writeData( connection, killer.getConnectionId() );
-                    }
-                    else {
+                        updateMap.put("killed", String.valueOf(killer.getKills()));
+                        new Packet03Update(killer.getId(), updateMap).writeData(connection, killer.getConnectionId());
+                    } else {
                         new Packet04Chat(p.getUsername() + " has disconnected").writeData(connection);
                     }
                     logoutPacket.writeData(connection);
@@ -174,18 +165,16 @@ public class NARPG extends AreaGame {
         }
     }
 
-    public void despawnEntity( Packet06Despawn packet )
-    {
-        NetworkEntity entity = findEntity( packet.getObjectId() );
+    public void despawnEntity(Packet06Despawn packet) {
+        NetworkEntity entity = findEntity(packet.getObjectId());
         leftToUnregister.add(entity);
     }
 
     @Override
-    public void update( float deltaTime ) {
-        time+=deltaTime;
+    public void update(float deltaTime) {
+        time += deltaTime;
         // register the entities that still need to be registered
-        for (NetworkEntity e : leftToRegister)
-        {
+        for (NetworkEntity e : leftToRegister) {
             if (area.registerActor(e)) {
                 leftToRegister.remove(e);
                 return;
@@ -193,17 +182,22 @@ public class NARPG extends AreaGame {
         }
         area.unregisterActor(leftToUnregister);
         leftToUnregister.clear();
-        for( NetworkARPGPlayer p : players){
-            if(p.isDead()&& p.isClientAuthority()){
-                    area.end();
+        for (NetworkARPGPlayer p : players) {
+            if (p.isDead() && p.isClientAuthority()) {
+                area.end();
             }
         }
 
-        if(time>.5d){
+        if (time > 5d) {
             //extremely useful for debugging
             //if(players.size()>0) System.out.println("p1 : " +((NetworkArena)getCurrentArea()).getBehavior().getEntityCount(players.get(0)));
             //if(players.size()>1) System.out.println("p2 : " +((NetworkArena)getCurrentArea()).getBehavior().getEntityCount(players.get(1)));
-            time-=.5;
+            for (NetworkARPGPlayer p : players) {
+                if (p.getHp() == 0) {
+                    area.unregisterActor(p);
+                }
+            }
+            time -= 5d;
         }
         super.update(deltaTime);
     }
@@ -216,21 +210,24 @@ public class NARPG extends AreaGame {
     }
 
     @Override
-    public void end()
-    {
-        if ( player == null || getCurrentArea() == null ) { return; }
+    public void end() {
+        if (player == null || getCurrentArea() == null) {
+            return;
+        }
 
         getWindow().dispose();
     }
-    public int getClientPlayerId(){
-        for(NetworkARPGPlayer p: players){
-            if(p.isClientAuthority()) return p.getId();
+
+    public int getClientPlayerId() {
+        for (NetworkARPGPlayer p : players) {
+            if (p.isClientAuthority()) return p.getId();
         }
         throw new NoSuchElementException("no client player");
     }
-    public int getClientPlayerId(long mainId){
-        for(NetworkARPGPlayer p:players){
-            if(p.getConnectionId()==mainId) return p.getId();
+
+    public int getClientPlayerId(long mainId) {
+        for (NetworkARPGPlayer p : players) {
+            if (p.getConnectionId() == mainId) return p.getId();
         }
         throw new NoSuchElementException("no client player found by mainId");
     }
