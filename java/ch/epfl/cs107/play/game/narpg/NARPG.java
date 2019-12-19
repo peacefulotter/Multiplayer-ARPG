@@ -73,7 +73,6 @@ public class NARPG extends AreaGame {
         boolean canSpawnTo = false;
         DiscreteCoordinates coords;
         NetworkBomb dummy = new NetworkBomb(area, Orientation.DOWN, new DiscreteCoordinates(1, 1), 0);
-
         do {
             coords = new DiscreteCoordinates(getRandomPos(), getRandomPos());
             canSpawnTo = area.canEnterAreaCells(dummy, Collections.singletonList(coords));
@@ -88,7 +87,7 @@ public class NARPG extends AreaGame {
     }
 
     public void updateObject(Packet03Update update) {
-        var entity = findEntity(update.getObjectId());
+        NetworkEntity entity = findEntity(update.getObjectId());
         entity.updateState(update.getUpdateMap());
     }
 
@@ -214,7 +213,6 @@ public class NARPG extends AreaGame {
         if (player == null || getCurrentArea() == null) {
             return;
         }
-
         getWindow().dispose();
     }
 

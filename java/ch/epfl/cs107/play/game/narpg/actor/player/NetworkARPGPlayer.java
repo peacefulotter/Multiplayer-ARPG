@@ -98,7 +98,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         arrowDamage = 1;
         bowAnimationDuration = ANIMATION_DURATION;
         playerKills = 0;
-        showUpgrades = true;
+        showUpgrades = false;
         playerGUI =  new NetworkARPGPlayerGUI( this, getEquippedItem().getSpriteName() );
     }
 
@@ -150,14 +150,14 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 {
                     if ( keyboard.get( Keyboard.U ).isPressed() )
                     {
-                        arrowRange = increaseArrowStat( arrowRange, 1, MAX_ARROW_RANGE );
+                        arrowRange = increaseArrowStat( arrowRange, 1, MAX_ARROW_RANGE, "range" );
                     } else if ( keyboard.get( Keyboard.I ).isPressed() )
                     {
                         reduceBowAnimationDuration();
                     }
                     else if ( keyboard.get( Keyboard.O ).isPressed() )
                     {
-                        arrowDamage = increaseArrowStat( arrowDamage, 0.5f, MAX_ARROW_DAMAGE );
+                        arrowDamage = increaseArrowStat( arrowDamage, 0.5f, MAX_ARROW_DAMAGE, "damage" );
                     }
                     else if ( keyboard.get( Keyboard.P ).isPressed() ) {
                         arrowSpeed = increaseArrowSpeed();
@@ -296,20 +296,24 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
             killer = givenBy;
             dead = true;
         }
-
     }
 
-    private float increaseArrowStat( float stat, float increase, float bound )
+    private void privateMessage( String text )
+    {
+        ((NetworkArena)getOwnerArea()).getAnnouncement().addAnnouncement( text );
+    }
+
+    private float increaseArrowStat( float stat, float increase, float bound, String name )
     {
         stat += increase;
         if ( stat > bound )
         {
             stat = bound;
-            // message that upgrade is not possible
+            privateMessage( name + " already fully upgraded" );
         } else
         {
-            // message that upgrade happened
-            showUpgrades = false;
+            privateMessage( "Upgraded arrow" + name + " to " + stat );
+            //showUpgrades = false;
         }
         return stat;
     }
@@ -319,11 +323,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         if ( arrowSpeed <= MIN_ARROW_SPEED )
         {
             arrowSpeed = MIN_ARROW_SPEED;
-            // message that it wasnt possible
+            privateMessage( "Arrow speed already fully upgraded" );
         } else
         {
-            // message that it was possible
-            showUpgrades = false;
+            privateMessage( "Upgraded Arrow Speed to " + arrowSpeed );
+            //showUpgrades = false;
         }
         return arrowSpeed;
     }
@@ -336,10 +340,10 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
             {
                 animation.setSpeedFactor(--bowAnimationDuration);
             }
-            // message that upgrade was done
-            showUpgrades = false;
+            privateMessage( "Upgraded Bow Reload Speed");
+            //showUpgrades = false;
         } else {
-            // message that upgrade is not possible
+            privateMessage( "Bow already fully upgraded");
         }
 
     }
@@ -421,6 +425,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         public void interactWith(NetworkARPGPlayer player) {
             if (state != PlayerStates.IDLE && getEquippedItem().getVuln() == Vulnerabilities.CLOSE_RANGE) {
                 player.giveDamage(getEquippedItem().getDamage());
+                System.out.println(player.isDead());
                 if ( player.isDead() )
                 {
                     playerKills++;

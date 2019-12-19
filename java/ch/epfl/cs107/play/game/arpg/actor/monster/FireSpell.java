@@ -117,9 +117,6 @@ public class FireSpell extends AreaEntity implements Interactor
         getOwnerArea().unregisterActor( this );
     }
 
-    public float getDamage() { return damage; }
-
-
     @Override
     public List<DiscreteCoordinates> getCurrentCells()
     {
