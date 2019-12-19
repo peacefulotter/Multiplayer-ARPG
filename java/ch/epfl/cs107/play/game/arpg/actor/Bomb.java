@@ -26,8 +26,8 @@ public class Bomb extends AreaEntity implements Interactor {
     private Animation animation;
     private boolean exploded = false;
     private static final float BOMB_DAMAGE = .5f;
-    // type ArpgInteractionVisitor and  not final because its overwritten by NetworkBomb
-    private ARPGInteractionVisitor handler;
+    // type ArpgInteractionVisitor, protected and not final because its overwritten by NetworkBomb
+    protected ARPGInteractionVisitor handler;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super( area, orientation, position );
@@ -41,12 +41,6 @@ public class Bomb extends AreaEntity implements Interactor {
         }
         animation = new Animation(4,animationSprites, false);
         handler = new BombHandler();
-    }
-
-    // getter used by NetworkBomb
-    public ARPGInteractionVisitor getHandler()
-    {
-        return handler;
     }
 
     @Override

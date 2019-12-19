@@ -33,13 +33,15 @@ import ch.epfl.cs107.play.window.Mouse;
 import java.util.Collections;
 import java.util.List;
 
+// All the variables in protected are used in NetworkARPGPlayer
 public class ARPGPlayer extends Player {
-    /// Animation duration in frame number
+    // Animation duration in frame number
     protected final static int ANIMATION_DURATION = 8;
     // protected, not final and not ARPGPlayerHandler type because it will be overwritten by NetworkARPGPlayer
     protected ARPGInteractionVisitor handler;
     protected boolean unReactive = false;
     protected ARPGInventory inventory;
+    // different states of the player
     protected PlayerStates state;
     protected float hp;
     private static final int maxHP = 5;
@@ -94,36 +96,49 @@ public class ARPGPlayer extends Player {
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
-    private void setInitialInventory(){
+    /**
+     *  Add some items to the player's inventory
+     */
+    private void setInitialInventory() {
         inventory.addItemToInventory(ARPGItem.BOMB, 10);
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
         inventory.addItemToInventory(ARPGItem.STAFF);
         inventory.addItemToInventory(ARPGItem.ARROW, 10);
     }
+
     public void update(float deltaTime) {
+        // while dashing the player cannot do anything else
         if (state == PlayerStates.IS_DASHING) {
+            // if the dashAnimation is completed, then the dash is over, the player goes back to IDLE
             if (dashAnimation.isCompleted()) {
                 state = PlayerStates.IDLE;
                 dashAnimation.reset();
+            // or the player moves straight-forward quickly
             } else {
                 dashAnimation.update(deltaTime);
                 move(5);
             }
         }
-        // display animation if player is moving or has any state other than Idle
+        // update animation if player is moving or has any state other than Idle
         else if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
             animations[currentAnimation][currentAnimationDirection].update(deltaTime);
+            // if the player is in any other state and its animation is completed
             if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationDirection].isCompleted()) {
+                // then it turns back to IDLE and the animation is reset
                 state = PlayerStates.IDLE;
                 animations[currentAnimation][currentAnimationDirection].reset();
                 setAnimationByOrientation(getOrientation());
             }
         }
+
+        // necessary for NetworkARPGPlayer, player is unReactive when it is not the Client's player
         if (unReactive) {
             super.update(deltaTime);
             return;
         }
+
+        // get the keyboard and mouse input
         Keyboard keyboard = getOwnerArea().getKeyboard();
         Mouse mouse = getOwnerArea().getMouse();
         // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
@@ -131,19 +146,23 @@ public class ARPGPlayer extends Player {
 
         wantsViewInteraction = false;
 
-
+        // for every player input check if the corresponding keycaps is pressed and if so react to the input
         for (PlayerInput input : PlayerInput.values()) {
             boolean reactToInput = false;
-            if (input.getCanHoldDown() && keyboard.get(input.getKeyCode()).isDown()) reactToInput = true;
-            if (keyboard.get(input.getKeyCode()).isPressed()) reactToInput = true;
-            if (reactToInput) reactToInput(input);
+            if (input.getCanHoldDown() && keyboard.get(input.getKeyCode()).isDown()) { reactToInput = true; }
+            if (keyboard.get(input.getKeyCode()).isPressed()) { reactToInput = true; }
+            if (reactToInput) { reactToInput(input); }
         }
 
+        // of there is an input from the mouse wheel, then takes the next item
+        // if mouseWheelInput is -1 : Take the previous item
+        // if it is 1 : Take the next one
         if (mouseWheelInput != 0) {
             takeNextItem(mouseWheelInput);
         }
-        // register movement
+        // register movement if the player is IDLE
         if (state == PlayerStates.IDLE) {
+            // move the player according to the movement inputs (witht the arrow)
             moveOrientate(Orientation.LEFT, keyboard.get(Keyboard.LEFT));
             moveOrientate(Orientation.UP, keyboard.get(Keyboard.UP));
             moveOrientate(Orientation.RIGHT, keyboard.get(Keyboard.RIGHT));
@@ -153,6 +172,10 @@ public class ARPGPlayer extends Player {
         super.update(deltaTime);
     }
 
+    /**
+     * React to input depending on the Input type
+     * @param input
+     */
     private void reactToInput(PlayerInput input) {
         switch (input) {
             case INTERACT:
@@ -173,16 +196,25 @@ public class ARPGPlayer extends Player {
         }
     }
 
+    /**
+     * Make the player dash
+     */
     private void playerDash() {
+        // only allow the player to dash if he is moving and is IDLE
         if (isDisplacementOccurs() && state == PlayerStates.IDLE) {
             state = PlayerStates.IS_DASHING;
             dashStartingPos = getCurrentCells().get(0).toVector();
         }
     }
 
+    /**
+     * Use the item the player is currently equipped with
+     */
     protected void useItem() {
         currentItem = getEquippedItem();
+        // use the item only if the player is IDLE
         if (state != state.IDLE || currentItem == null ) { return; }
+
         switch (currentItem) {
             case BOMB:
                 //handles adding a bomb to the area and removing it from inventory
@@ -191,25 +223,30 @@ public class ARPGPlayer extends Player {
                 {
                     bombCoordinates = bombCoordinates.jump( getOrientation().toVector() );
                 }
+                // try to register the bomb
                 boolean registeredActor = getOwnerArea().registerActor(new Bomb(getOwnerArea(), Orientation.DOWN, bombCoordinates));
+                // if it successfully registered, then remove one bomb from his inventory
                 if (registeredActor) {
                     inventory.removeItemFromInventory(ARPGItem.BOMB);
-
                 }
                 break;
             case SWORD:
+                // if he uses his sword, then he wants viewInteraction
                 wantsViewInteraction = true;
                 state = PlayerStates.ATTACKING_SWORD;
                 currentAnimation = 1;
                 break;
             case BOW:
+                // if the player has at least one arrow in his inventory
                 if ( inventory.removeItemFromInventory((InventoryItem) ARPGItem.ARROW) ) {
                     state = PlayerStates.ATTACKING_BOW;
+                    // throw an arrow in front of him
                     getOwnerArea().registerActor(new Arrow(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
                     currentAnimation = 2;
                 }
                 break;
             case STAFF:
+                // create a Magic Projectile in front of him
                 state = PlayerStates.ATTACKING_STAFF;
                 getOwnerArea().registerActor(new MagicProjectile(getOwnerArea(), getOrientation(), getCurrentMainCellCoordinates().jump(getOrientation().toVector()), 2, 5));
                 currentAnimation = 3;
@@ -217,22 +254,34 @@ public class ARPGPlayer extends Player {
         }
     }
 
+    /**
+     * get the next / previous item in his inventory depending on the direction
+     * @param direction
+     */
     private void takeNextItem(int direction) {
         currentItem = (ARPGItem) inventory.getNextItem(direction);
+        // and update the GUI to match the new item
         playerGUI.setItemSprite(currentItem.getSpriteName());
     }
 
+    /**
+     * Get the item the player is equipped with
+     * @return ARPGItem : the item he is equipped with
+     */
     public ARPGItem getEquippedItem() {
         return (ARPGItem) inventory.getCurrentItem();
     }
 
+
     @Override
     public void draw(Canvas canvas) {
-        if(!unReactive)playerGUI.draw(canvas);
+        if (!unReactive) { playerGUI.draw(canvas); }
+        // if the player is dashing, draw the dash animation at the position when he started to dash
         if (state == PlayerStates.IS_DASHING) {
             dashAnimation.setAnchor(dashStartingPos.sub(getCurrentCells().get(0).toVector()));
             dashAnimation.draw(canvas);
         }
+        // and finally draw the player animation depending on his state (currentAnimation)
         animations[currentAnimation][currentAnimationDirection].draw(canvas);
     }
 
@@ -248,6 +297,10 @@ public class ARPGPlayer extends Player {
         }
     }
 
+    /**
+     * move the player or change his orientation
+     * @param orientation : player orientation
+     */
     protected void moveOrientate(Orientation orientation) {
         if (getOrientation() == orientation) {
             move(ANIMATION_DURATION);
@@ -260,6 +313,10 @@ public class ARPGPlayer extends Player {
         }
     }
 
+    /**
+     * Set the animation index depending on the player orientation
+     * @param orientation : player orientation
+     */
     public void setAnimationByOrientation(Orientation orientation) {
         switch (orientation) {
             case UP:
@@ -401,6 +458,8 @@ public class ARPGPlayer extends Player {
 
         @Override
         public void interactWith(Monster monster) {
+            // deal damage to the monsters only if the vulnerabilities of the equipped item match
+            // one of the vulnerabilities of the monster
             if (monster.getVulnerabilities().contains(getEquippedItem().getVuln())) {
                 monster.giveDamage(getEquippedItem().getDamage());
             }
