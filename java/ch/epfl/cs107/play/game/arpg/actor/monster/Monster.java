@@ -142,6 +142,13 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         super.update( deltaTime );
     }
 
+    @Override
+    protected boolean orientate(Orientation orientation) {
+        boolean orientated= super.orientate(orientation);
+        if(orientated) changeAnimationIndex(orientation);
+        return orientated;
+    }
+
     // by default we draw the monster
     @Override
     public void draw( Canvas canvas )
