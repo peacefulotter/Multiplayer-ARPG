@@ -53,6 +53,7 @@ public class Arrow extends Projectile
     {
         super( area, orientation, position, speed, maxDistance );
         handler = new ArrowInteractionHandler();
+        //spriteOffset used to choose which sprite to use from zelda/arrow file
         int spriteOffset = 0;
         switch ( orientation )
         {
@@ -69,6 +70,7 @@ public class Arrow extends Projectile
                 spriteOffset = Directions.LEFT.value();
                 break;
         }
+        //uses spriteOffset to choose correct sprite region based on direction
         sprite = new Sprite( "zelda/arrow", 1, 1, this, new RegionOfInterest(spriteOffset * 32, 0, 32, 32) );
     }
 

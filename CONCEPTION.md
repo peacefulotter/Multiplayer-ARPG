@@ -1,4 +1,4 @@
-# Game
+Game
 ## Movement
 #### Dash
 [PRESS A] : the player makes a dash (moves quickly and forward by a couple of cells)
@@ -12,11 +12,16 @@ The house has walls thanks to the House Behavior Image
 ## Inventory items
 #### Mouse Wheel
 Added the mouse wheel to switch items (using tab still works)
+## Battles
+#### Crits
+The player has a certain percentage of chance to deal "crits" ("critical damage") to any monster he fights
+A little image is shown above the monster when dealing a crits
 
 
 
 # Multiplayer
 ## General architecture
+![General Architecture](architecture.png)
     
 ## Game thread
 Both the server and the client have their own game thread that runs the runnable ThreadedPlay, this is so that we 

@@ -33,6 +33,7 @@ public class MagicProjectile extends Projectile
     {
         super( area, orientation, position, speed, maxDistance );
         Sprite[] sprites = new Sprite[4];
+        //gets magic projectile animation sprites
         for ( int i = 0; i < 4; i++ )
         {
             sprites[ i ] = new Sprite( "zelda/magicWaterProjectile",1,1,this,new RegionOfInterest(i*32,0,32,32) );
