@@ -125,6 +125,10 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
                 return;
             }
             player.giveDamage(arrowDamage, spawnedBy);
+            if ( player.isDead() )
+            {
+
+            }
             stopProjectile();
         }
     }

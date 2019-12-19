@@ -25,7 +25,6 @@ import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
-import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkCoin;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
@@ -167,7 +166,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 if (moved != null && isDisplacementOccurs()) {
                     hasSentCorrectPosition = false;
                     Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
-                    System.out.println("data : "+ new String(packet.getData()));
                     packet.writeData(connection);
                 }
                 if (!isDisplacementOccurs() && !hasSentCorrectPosition) {
@@ -220,6 +218,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void updateState(HashMap<String, String> updateMap) {
+        System.out.println("update state  " +  updateMap );
         for (Map.Entry<String, String> entry : updateMap.entrySet()) {
             switch (entry.getKey()) {
                 case "username":
@@ -236,7 +235,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     String[] pos = entry.getValue().split(",");
                     DiscreteCoordinates position = new DiscreteCoordinates(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
                     if (!getCurrentMainCellCoordinates().equals(position)) {
-                        //System.out.println("UPDATING POS : " + position.toVector() + " ; " + getCurrentMainCellCoordinates());
                         ((NetworkArena) getOwnerArea()).getBehavior().leave(this, getCurrentCells());
                         getOwnerArea().enterAreaCells(this, Collections.singletonList(position));
                         setCurrentPosition(position.toVector());
@@ -245,7 +243,12 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 case "orientation":
                     if (clientAuthority || isDisplacementOccurs()) return;
                     orientate(OrientationValues.getOrientationByValue(Integer.parseInt(entry.getValue())));
-
+                    break;
+                case "killed":
+                    playerKills++;
+                    showUpgrades = true;
+                    System.out.println(playerKills);
+                    break;
             }
         }
     }
@@ -262,7 +265,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 super.useItem();
                 break;
             case BOW:
-                System.out.println( arrowSpeed + " " + arrowRange + " " + arrowDamage );
                 setState(PlayerStates.ATTACKING_BOW);
                 new NetworkArrow(getOwnerArea(), getOrientation()
                         , inFronOfPlayer(),
@@ -313,7 +315,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         } else
         {
             privateMessage( "Upgraded arrow" + name + " to " + stat );
-            //showUpgrades = false;
+            showUpgrades = false;
         }
         return stat;
     }
@@ -327,7 +329,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         } else
         {
             privateMessage( "Upgraded Arrow Speed to " + arrowSpeed );
-            //showUpgrades = false;
+            showUpgrades = false;
         }
         return arrowSpeed;
     }
@@ -341,7 +343,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 animation.setSpeedFactor(--bowAnimationDuration);
             }
             privateMessage( "Upgraded Bow Reload Speed");
-            //showUpgrades = false;
+            showUpgrades = false;
         } else {
             privateMessage( "Bow already fully upgraded");
         }
@@ -365,6 +367,10 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.state = state;
     }
 
+    public int getKills() {
+        return playerKills;
+    }
+
 
     @Override
     public Packet00Spawn getSpawnPacket() {
@@ -378,6 +384,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void networkMove(Packet02Move movePacket) {
+        if(clientAuthority) return;
         Orientation orientation = movePacket.getOrientation();
         int speed = movePacket.getSpeed();
         List<DiscreteCoordinates> positionBeforeMoving = getCurrentCells();
@@ -395,6 +402,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
             move(speed);
         }
     }
+
 
     public boolean isClientAuthority() {
         return clientAuthority;
@@ -425,20 +433,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         public void interactWith(NetworkARPGPlayer player) {
             if (state != PlayerStates.IDLE && getEquippedItem().getVuln() == Vulnerabilities.CLOSE_RANGE) {
                 player.giveDamage(getEquippedItem().getDamage());
-                System.out.println(player.isDead());
-                if ( player.isDead() )
-                {
-                    playerKills++;
-                    showUpgrades = true;
-                }
             }
         }
 
-        @Override
-        public void interactWith(NetworkCoin coin) {
-            coin.collect();
-            queuedUpdates.put("money", String.valueOf(inventory.getMoney() + 50));
-        }
 
         public void interactWith(NetworkHeart heart) {
             hp++;

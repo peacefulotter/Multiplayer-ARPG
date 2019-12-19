@@ -12,6 +12,8 @@ import java.net.Socket;
 
 
 public class ConnectionHandler implements Runnable {
+    private final static double MAX_TIMEOUT = 3d;
+    private long lastConnectionTime;
     private boolean isServer;
     private NARPG game;
     private Socket socket;
@@ -64,27 +66,29 @@ public class ConnectionHandler implements Runnable {
             DataInputStream dis = new DataInputStream(inStream);
 
             try {
-                if(socket.isClosed()) throw new ConnectException();
+                if (socket.isClosed()) throw new ConnectException();
                 int len = dis.readInt();
                 byte[] data = new byte[len];
                 if (len > 0) {
                     dis.readFully(data);
                 }
+
+                lastConnectionTime=System.currentTimeMillis();
                 parsePacket(data);
 
-            }catch (ConnectException e){
-                e.printStackTrace();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 done = true;
-                if (isServer) {
-                    ((Server) connection).removeConnection(connectionId);
-                    socket.close();
-                    Packet05Logout logoutPacket = new Packet05Logout(game.getClientPlayerId(connectionId), connectionId);
-                    game.logout(logoutPacket);
+                if(System.currentTimeMillis()-lastConnectionTime > MAX_TIMEOUT*1000){
+                    if (isServer) {
+                        ((Server) connection).removeConnection(connectionId);
+                        socket.close();
+                        Packet05Logout logoutPacket = new Packet05Logout(game.getClientPlayerId(connectionId), connectionId);
+                        game.logout(logoutPacket);
+                        Thread.currentThread().interrupt();
+                    }
                 }
-                Thread.currentThread().interrupt();
+                System.out.println(lastConnectionTime-System.currentTimeMillis());
             }
 
         }
@@ -127,8 +131,8 @@ public class ConnectionHandler implements Runnable {
                 game.logout(logoutPacket);
                 break;
             case DESPAWN:
-                Packet06Despawn despawnPacket = new Packet06Despawn( data );
-                game.despawnEntity( despawnPacket );
+                Packet06Despawn despawnPacket = new Packet06Despawn(data);
+                game.despawnEntity(despawnPacket);
         }
         if (isServer && sendDataBackToAll) {
             connection.sendData(data);
