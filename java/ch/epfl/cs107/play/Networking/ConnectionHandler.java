@@ -78,8 +78,8 @@ public class ConnectionHandler implements Runnable {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                done = true;
                 if(System.currentTimeMillis()-lastConnectionTime > MAX_TIMEOUT*1000){
+                    done=true;
                     if (isServer) {
                         ((Server) connection).removeConnection(connectionId);
                         socket.close();

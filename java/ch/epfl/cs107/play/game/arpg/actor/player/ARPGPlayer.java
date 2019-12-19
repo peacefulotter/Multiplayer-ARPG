@@ -90,7 +90,7 @@ public class ARPGPlayer extends Player {
         };
 
         inventory = new ARPGInventory( 100, 10, 1234);
-        setInitialInventory();
+        inventory= setInitialInventory(inventory);
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
@@ -100,6 +100,7 @@ public class ARPGPlayer extends Player {
         inventory.addItemToInventory(ARPGItem.BOW);
         inventory.addItemToInventory(ARPGItem.STAFF);
         inventory.addItemToInventory(ARPGItem.ARROW, 10);
+        return inventory;
     }
     public void update(float deltaTime) {
         if (state == PlayerStates.IS_DASHING) {

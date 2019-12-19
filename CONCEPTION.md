@@ -160,5 +160,9 @@ the NetworkArena area
 
 ## Inventory items
  - Added the mouse wheel to switch items (using tab still works)
+###Miscellaneous
+
+- Modified window dispose to dispatch window closing event
+-
 
 

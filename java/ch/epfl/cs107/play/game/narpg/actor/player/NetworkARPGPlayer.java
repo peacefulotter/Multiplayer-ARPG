@@ -223,7 +223,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void updateState(HashMap<String, String> updateMap) {
-        System.out.println("update state  " + updateMap);
         for (Map.Entry<String, String> entry : updateMap.entrySet()) {
             switch (entry.getKey()) {
                 case "username":
