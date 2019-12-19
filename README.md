@@ -1,13 +1,13 @@
 # MP2
 EPFL - Mini-Project 2 
 
-### todo list
+## Inputs
  - [ARROW KEY] Move the player
  - [E] Interact
  - [SPACE] Use equipped item
- - [TAB/MOUSE WHEEL] Switch equipped item
+ - [TAB / MOUSE WHEEL] Switch equipped item
  - [A] Dash
- - [U/I/O/P] In multiplayer mode, select the upgrade of the bow or arrows
+ - [U / I / O / P] In multiplayer mode, select the upgrade of the bow or arrows
  - [Y] In multiplayer mode, send a message to everyone "J'aime ce jeu!"
  
  # Multiplayer
