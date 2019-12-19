@@ -12,6 +12,10 @@ The house has walls thanks to the House Behavior Image
 ## Inventory items
 #### Mouse Wheel
 Added the mouse wheel to switch items (using tab still works)
+## Battles
+#### Crits
+The player has a certain percentage of chance to deal "crits" ("critical damage") to any monster he fights
+A little image is shown above the monster when dealing a crits
 
 
 
