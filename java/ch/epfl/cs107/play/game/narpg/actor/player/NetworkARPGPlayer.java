@@ -167,7 +167,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 if (moved != null && isDisplacementOccurs()) {
                     hasSentCorrectPosition = false;
                     Packet02Move packet = new Packet02Move(id, moved, getCurrentMainCellCoordinates(), ANIMATION_DURATION);
-                    System.out.println("data : "+ new String(packet.getData()));
                     packet.writeData(connection);
                 }
                 if (!isDisplacementOccurs() && !hasSentCorrectPosition) {
@@ -374,6 +373,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void networkMove(Packet02Move movePacket) {
+        if(clientAuthority) return;
         Orientation orientation = movePacket.getOrientation();
         int speed = movePacket.getSpeed();
         List<DiscreteCoordinates> positionBeforeMoving = getCurrentCells();
