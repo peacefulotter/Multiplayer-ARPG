@@ -1,7 +1,7 @@
 Game
 ## Movement
 #### Dash
-[PRESS A] : the player makes a dash (moves quickly and forward by a couple of cells)
+`[PRESS A]` : the player makes a dash (moves quickly and forward by a couple of cells)
 ## Area
 #### House Background
 The player can enter inside the house at the spawn
@@ -12,6 +12,9 @@ The house has walls thanks to the House Behavior Image
 ## Inventory items
 #### Mouse Wheel
 Added the mouse wheel to switch items (using tab still works)
+## Monsters
+#### LogMonster
+The logMonster falls asleep immediatly after attacking
 ## Battles
 #### Crits
 The player has a certain percentage of chance to deal "crits" ("critical damage") to any monster he fights
