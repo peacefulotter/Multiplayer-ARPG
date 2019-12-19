@@ -58,6 +58,11 @@ public class ARPGPlayerStatusGUI implements Graphics
         setItemSprite( currentItemSpriteName );
     }
 
+    public Vector getBottomLeftAnchor()
+    {
+        return bottomLeftAnchor;
+    }
+
     @Override
     public void draw( Canvas canvas )
     {

@@ -23,8 +23,8 @@ import java.util.Random;
 public class DarkLord extends Monster
 {
     // minimal/maximum time the darklord takes to activate the next spell (firespell or summon)
-    private static final float MIN_SPELL_WAIT_DURATION = 1;
-    private static final float MAX_SPELL_WAIT_DURATION = 2;
+    private static final float MIN_SPELL_WAIT_DURATION = 2;
+    private static final float MAX_SPELL_WAIT_DURATION = 3;
     // The damage that the fire can deal
     private static final float FIRESPELL_DAMAGE = 0.6f;
     // Firespell force = number of cell it can propagate
@@ -122,7 +122,6 @@ public class DarkLord extends Monster
                 }
                 // decrease the cycle time
                 cycleTime -= deltaTime;
-                super.update( deltaTime );
                 break;
 
             case ATTACKING:
@@ -159,13 +158,14 @@ public class DarkLord extends Monster
             // the castlekey spawns and can be taken by the player
             getOwnerArea().registerActor( new CastleKey( getOwnerArea(), getCurrentCells().get(0) ) );
         }
+        super.update( deltaTime );
     }
 
     @Override
     public void draw( Canvas canvas )
     {
         // draw the animation corresponding to its state
-        if ( state.isSpellAnimation )
+        if ( !isDead && state.isSpellAnimation )
         {
             spellAnimation[ currentAnimationIndex ].draw( canvas );
         } else
@@ -237,6 +237,7 @@ public class DarkLord extends Monster
         }
         // the darklord has finished his attack, his state updates to IDLE
         state = DarkLordStates.IDLE;
+        resetCycleTime();
     }
 
     /**
@@ -260,6 +261,7 @@ public class DarkLord extends Monster
         }
         // the darklord has finished his attack, his state updates to IDLE
         state = DarkLordStates.IDLE;
+        resetCycleTime();
     }
 
     /**

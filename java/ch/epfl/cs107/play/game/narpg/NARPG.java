@@ -78,6 +78,11 @@ public class NARPG extends AreaGame
         return false;
     }
 
+    public ServerAnnouncement getAnnouncement()
+    {
+        return announcement;
+    }
+
     private DiscreteCoordinates findRandomSpawn()
     {
         boolean canSpawnTo = false;

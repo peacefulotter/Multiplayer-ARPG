@@ -68,7 +68,6 @@ public class ConnectionHandler implements Runnable {
                 if (len > 0) {
                     dis.readFully(data);
                 }
-
                 parsePacket(data);
             } catch (IOException e) {
                 done = true;

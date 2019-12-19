@@ -21,6 +21,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
     private final int spawnedBy;
     private Connection connection;
     private final int id;
+    private final float arrowDamage;
     /**
      * Default MovableAreaEntity constructor
      *
@@ -31,7 +32,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
      * @param maxDistance
      */
 
-    public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, int speed, int maxDistance, int spawnedBy, int id ) {
+    public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, int speed, float maxDistance, float arrowDamage, int spawnedBy, int id ) {
         super(area, orientation, position, speed, maxDistance);
         handler = new NetworkArrowHandler();
         this.spawnedBy = spawnedBy;
@@ -42,11 +43,16 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
         } else {
             this.id = id;
         }
+        this.arrowDamage = arrowDamage;
     }
 
     public NetworkArrow(Area area, Orientation orientation, DiscreteCoordinates position, Connection connection, HashMap<String, String> initialState, int id) {
-        this(area, orientation, position, connection, Integer.parseInt(initialState.get(stateProperties.SPEED.toString())), Integer.parseInt(initialState.get(stateProperties.MAX_DISTANCE.toString())),
-                Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY.toString())), id );
+        this(area, orientation, position, connection,
+                Integer.parseInt(initialState.get(stateProperties.SPEED.toString())),
+                Float.parseFloat(initialState.get(stateProperties.MAX_DISTANCE.toString())),
+                Float.parseFloat(initialState.get(stateProperties.DAMAGE.toString()) ),
+                Integer.parseInt(initialState.get(stateProperties.SPAWNED_BY.toString())),
+                id );
     }
 
     @Override
@@ -57,10 +63,12 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
 
     @Override
     public Packet00Spawn getSpawnPacket() {
-        var initialState = new HashMap<String, String>();
+        HashMap initialState = new HashMap<String, String>();
         initialState.put(stateProperties.SPAWNED_BY.toString(),String.valueOf(spawnedBy));
         initialState.put(stateProperties.MAX_DISTANCE.toString(),String.valueOf(getMaxDistance()));
         initialState.put(stateProperties.SPEED.toString(),String.valueOf(getSpeed()));
+        initialState.put(stateProperties.DAMAGE.toString(), String.valueOf( arrowDamage ));
+        initialState.put(stateProperties.DAMAGE.toString(), String.valueOf( arrowDamage ));
 
         return new Packet00Spawn(id, NetworkEntities.BOW, getOrientation(), getCurrentMainCellCoordinates(), initialState);
     }
@@ -89,6 +97,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
     private enum stateProperties {
         MAX_DISTANCE("maxDistance"),
         SPEED("speed"),
+        DAMAGE( "damage" ),
         SPAWNED_BY("spawnedBy");
 
         private final String property;
@@ -108,7 +117,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
             if(player.getId()==spawnedBy) {
                 return;
             }
-            player.giveDamage(1f,spawnedBy);
+            player.giveDamage(arrowDamage, spawnedBy);
             System.out.println(id);
             HashMap<String, String> despawnMap = new HashMap<>();
             new Packet06Despawn( id, despawnMap ).writeData( connection );

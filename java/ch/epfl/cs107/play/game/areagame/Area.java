@@ -1,20 +1,18 @@
 package ch.epfl.cs107.play.game.areagame;
 
+import ch.epfl.cs107.play.game.Playable;
+import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactor;
+import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Transform;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Mouse;
 import ch.epfl.cs107.play.window.Window;
-import ch.epfl.cs107.play.game.Playable;
-import ch.epfl.cs107.play.game.actor.Actor;
-import ch.epfl.cs107.play.io.FileSystem;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 
 /**
@@ -373,18 +371,19 @@ public abstract class Area implements Playable {
         // Update expected viewport center
         if (viewCandidate != null) {
             viewCenter = viewCandidate.getPosition();
+            float bound = getCameraScaleFactor() / 2;
             // Bound the camera to avoid seeing the border of the map
-            if (viewCenter.x < 7.5f) {
-                viewCenter = new Vector(7.5f, viewCenter.y);
+            if (viewCenter.x < bound) {
+                viewCenter = new Vector(bound, viewCenter.y);
             }
-            if (viewCenter.y > areaBehavior.getHeight() - 7) {
-                viewCenter = new Vector(viewCenter.x, areaBehavior.getHeight() - 7);
+            if (viewCenter.y > areaBehavior.getHeight() - bound+0.5f) {
+                viewCenter = new Vector(viewCenter.x, areaBehavior.getHeight() - bound+0.5f);
             }
-            if (viewCenter.y < 7) {
-                viewCenter = new Vector(viewCenter.x, 7);
+            if (viewCenter.y < bound+0.5f) {
+                viewCenter = new Vector(viewCenter.x, bound+0.5f);
             }
-            if (viewCenter.x > areaBehavior.getWidth() - 7.5f) {
-                viewCenter = new Vector(areaBehavior.getWidth() - 7.5f, viewCenter.y);
+            if (viewCenter.x > areaBehavior.getWidth() - bound) {
+                viewCenter = new Vector(areaBehavior.getWidth() - bound, viewCenter.y);
             }
         } else { // Set default view to center
             viewCenter = new Vector(getWidth() / (float) 2, getHeight() / (float) 2);

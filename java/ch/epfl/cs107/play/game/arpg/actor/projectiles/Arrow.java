@@ -49,7 +49,7 @@ public class Arrow extends Projectile
      * @param maxDistance
      */
 
-    public Arrow( Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance )
+    public Arrow( Area area, Orientation orientation, DiscreteCoordinates position, int speed, float maxDistance )
     {
         super( area, orientation, position, speed, maxDistance );
         handler = new ArrowInteractionHandler();

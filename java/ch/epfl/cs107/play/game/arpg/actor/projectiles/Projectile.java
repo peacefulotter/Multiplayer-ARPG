@@ -9,7 +9,6 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlyableEntity;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
-import ch.epfl.cs107.play.window.Canvas;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,11 +21,11 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
         return speed;
     }
 
-    public int getMaxDistance() {
+    public float getMaxDistance() {
         return maxDistance;
     }
 
-    private int maxDistance;
+    private float maxDistance;
     private Vector startingPos;
 
     /**
@@ -36,7 +35,7 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
      * @param orientation (Orientation): Initial orientation of the entity. Not null
      * @param position    (Coordinate): Initial position of the entity. Not null
      */
-    public Projectile(Area area, Orientation orientation, DiscreteCoordinates position, int speed, int maxDistance) {
+    public Projectile(Area area, Orientation orientation, DiscreteCoordinates position, int speed, float maxDistance) {
         super(area, orientation, position);
         this.speed = speed;
         this.maxDistance = maxDistance;

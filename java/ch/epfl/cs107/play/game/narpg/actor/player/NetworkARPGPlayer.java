@@ -11,6 +11,7 @@ import ch.epfl.cs107.play.Networking.utils.OrientationValues;
 import ch.epfl.cs107.play.game.actor.ImageGraphics;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.Animation;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
@@ -42,6 +43,10 @@ import java.util.Map;
 public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntity {
     private static final float DEPTH = 10000;
     private static final float HEART_SIZE = .7f;
+    private static final float MAX_ARROW_RANGE = 10;
+    private static final float MAX_ARROW_DAMAGE = 2;
+    private static final int MIN_ARROW_SPEED = 1;
+    private static final int MIN_BOW_DURATION = 1;
     private final boolean clientAuthority;
     private final long connectionId;
     private boolean dead;
@@ -54,8 +59,12 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     //to check if the packet that sets the correct position after movement has been sent
     private boolean hasSentCorrectPosition = true;
     private int arrowSpeed;
-    private int arrowRange;
+    private float arrowRange;
+    private float arrowDamage;
+    private int bowAnimationDuration;
     private int killer;
+    private int playerKills;
+    private boolean showUpgrades;
     /**
      * Default Player constructor
      *
@@ -69,6 +78,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         this.queuedUpdates = new HashMap<String, String>();
         this.currentArea = area;
         this.connection = connection;
+        this.connectionId = connectionId;
         // id of 0 is used as null value for id
         if (id == 0) {
             this.id = IdGenerator.generateId();
@@ -85,13 +95,19 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         usernameText.setParent(this);
         arrowRange = 3;
         arrowSpeed = 6;
-        this.connectionId = connectionId;
+        arrowDamage = 1;
+        bowAnimationDuration = ANIMATION_DURATION;
+        playerKills = 0;
+        showUpgrades = true;
+        playerGUI =  new NetworkARPGPlayerGUI( this, getEquippedItem().getSpriteName() );
     }
 
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String, String> initialState) {
         this(area, orientation, coordinates, connection, clientAuthority, Long.parseLong(initialState.get("connectionId")), initialState.get("username"), Integer.parseInt(initialState.get("id")));
         updateState(initialState);
     }
+
+    public boolean isShowUpgrades() { return showUpgrades; }
 
     public boolean isDead() {
         return dead;
@@ -129,6 +145,23 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     useItem();
                 } else if (keyboard.get(keyboard.Y).isPressed()) {
                     new Packet04Chat("j'aime ce jeu !").writeData(connection);
+                }
+                if ( showUpgrades )
+                {
+                    if ( keyboard.get( Keyboard.U ).isPressed() )
+                    {
+                        arrowRange = increaseArrowStat( arrowRange, 1, MAX_ARROW_RANGE );
+                    } else if ( keyboard.get( Keyboard.I ).isPressed() )
+                    {
+                        reduceBowAnimationDuration();
+                    }
+                    else if ( keyboard.get( Keyboard.O ).isPressed() )
+                    {
+                        arrowDamage = increaseArrowStat( arrowDamage, 0.5f, MAX_ARROW_DAMAGE );
+                    }
+                    else if ( keyboard.get( Keyboard.P ).isPressed() ) {
+                        arrowSpeed = increaseArrowSpeed();
+                    }
                 }
                 super.update(deltaTime);
                 if (moved != null && isDisplacementOccurs()) {
@@ -229,10 +262,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 super.useItem();
                 break;
             case BOW:
+                System.out.println( arrowSpeed + " " + arrowRange + " " + arrowDamage );
                 setState(PlayerStates.ATTACKING_BOW);
                 new NetworkArrow(getOwnerArea(), getOrientation()
                         , inFronOfPlayer(),
-                        connection, arrowSpeed, arrowRange, id, 0).getSpawnPacket().writeData(connection);
+                        connection, arrowSpeed, arrowRange, arrowDamage, id, 0).getSpawnPacket().writeData(connection);
                 currentAnimation = 2;
                 break;
             case STAFF:
@@ -248,17 +282,66 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     }
 
     @Override
-    public void giveDamage(float damage) {
-        super.giveDamage(damage);
-        queuedUpdates.put("hp",String.valueOf(getHp()));
+    public void giveDamage( float damage )
+    {
+        super.giveDamage( damage );
+        queuedUpdates.put( "hp",String.valueOf( getHp() ) );
     }
 
-    public void giveDamage(float damage, int givenBy) {
-        giveDamage(damage);
-        if (hp < 1) {
+    public void giveDamage(float damage, int givenBy)
+    {
+        giveDamage( damage );
+        if ( hp < 1 )
+        {
             killer = givenBy;
-            dead=true;
+            dead = true;
         }
+
+    }
+
+    private float increaseArrowStat( float stat, float increase, float bound )
+    {
+        stat += increase;
+        if ( stat > bound )
+        {
+            stat = bound;
+            // message that upgrade is not possible
+        } else
+        {
+            // message that upgrade happened
+            showUpgrades = false;
+        }
+        return stat;
+    }
+
+    private int increaseArrowSpeed() {
+        arrowSpeed--;
+        if ( arrowSpeed <= MIN_ARROW_SPEED )
+        {
+            arrowSpeed = MIN_ARROW_SPEED;
+            // message that it wasnt possible
+        } else
+        {
+            // message that it was possible
+            showUpgrades = false;
+        }
+        return arrowSpeed;
+    }
+
+    private void reduceBowAnimationDuration()
+    {
+        if ( bowAnimationDuration >= MIN_BOW_DURATION + 1 )
+        {
+            for ( Animation animation : getBowAnimation() )
+            {
+                animation.setSpeedFactor(--bowAnimationDuration);
+            }
+            // message that upgrade was done
+            showUpgrades = false;
+        } else {
+            // message that upgrade is not possible
+        }
+
     }
 
     @Override
@@ -338,6 +421,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         public void interactWith(NetworkARPGPlayer player) {
             if (state != PlayerStates.IDLE && getEquippedItem().getVuln() == Vulnerabilities.CLOSE_RANGE) {
                 player.giveDamage(getEquippedItem().getDamage());
+                if ( player.isDead() )
+                {
+                    playerKills++;
+                    showUpgrades = true;
+                }
             }
         }
 

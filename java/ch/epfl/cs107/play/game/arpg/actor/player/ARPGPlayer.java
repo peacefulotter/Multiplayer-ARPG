@@ -48,7 +48,8 @@ public class ARPGPlayer extends Player {
     private int currentAnimationIndex = 2;
     private boolean wantsInteraction = false;
     private ARPGItem currentItem;
-    protected final ARPGPlayerStatusGUI playerGUI;
+    // not private, and not final because it will be overwritten by NetworkARPGPlayer
+    protected ARPGPlayerStatusGUI playerGUI;
     private Vector dashStartingPos;
     private Animation dashAnimation;
 
@@ -102,7 +103,7 @@ public class ARPGPlayer extends Player {
             }
         }
         // display animation if player is moving
-        if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
+        else if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
             animations[currentAnimation][currentAnimationIndex].update(deltaTime);
             if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationIndex].isCompleted()) {
                 state = PlayerStates.IDLE;
@@ -268,7 +269,12 @@ public class ARPGPlayer extends Player {
         animations[currentAnimation][currentAnimationIndex].reset();
     }
 
-    ;
+
+    // used in NetworkARPGPlayer to modify the bow animation duration
+    public Animation[] getBowAnimation()
+    {
+        return animations[ 2 ];
+    }
 
     public int getMoney() {
         return inventory.getMoney();
