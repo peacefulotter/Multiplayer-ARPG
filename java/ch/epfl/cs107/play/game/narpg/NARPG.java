@@ -148,6 +148,7 @@ public class NARPG extends AreaGame {
         }
     }
 
+    //Handles disconnects and player kills
     public void logout(Packet05Logout logoutPacket)
     {
         for (Iterator<NetworkARPGPlayer> iter = players.listIterator(); iter.hasNext();)
@@ -177,7 +178,6 @@ public class NARPG extends AreaGame {
     {
         NetworkEntity entity = findEntity( packet.getObjectId() );
         leftToUnregister.add(entity);
-
     }
 
     @Override

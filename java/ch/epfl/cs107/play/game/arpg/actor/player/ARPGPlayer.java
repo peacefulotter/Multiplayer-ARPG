@@ -21,6 +21,7 @@ import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.game.rpg.actor.Player;
 import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
+import ch.epfl.cs107.play.game.rpg.inventory.Inventory;
 import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
@@ -90,16 +91,17 @@ public class ARPGPlayer extends Player {
         };
 
         inventory = new ARPGInventory( 100, 10, 1234);
-        setInitialInventory();
+        inventory = setInitialInventory(inventory);
         playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
 
-    private void setInitialInventory(){
+    private static ARPGInventory setInitialInventory(ARPGInventory inventory){
         inventory.addItemToInventory(ARPGItem.BOMB, 10);
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
         inventory.addItemToInventory(ARPGItem.STAFF);
         inventory.addItemToInventory(ARPGItem.ARROW, 10);
+        return inventory;
     }
     public void update(float deltaTime) {
         if (state == PlayerStates.IS_DASHING) {

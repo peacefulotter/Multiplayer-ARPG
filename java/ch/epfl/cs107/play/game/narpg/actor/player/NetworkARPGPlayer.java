@@ -19,6 +19,8 @@ import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
 import ch.epfl.cs107.play.game.arpg.actor.monster.Vulnerabilities;
 import ch.epfl.cs107.play.game.arpg.actor.player.ARPGPlayer;
 import ch.epfl.cs107.play.game.arpg.actor.player.PlayerStates;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGInventory;
+import ch.epfl.cs107.play.game.arpg.inventory.ARPGItem;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkBomb;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
@@ -26,6 +28,7 @@ import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
+import ch.epfl.cs107.play.game.rpg.inventory.Inventory;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.TextAlign;
@@ -64,6 +67,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private int killer;
     private int playerKills;
     private boolean showUpgrades;
+
     /**
      * Default Player constructor
      *
@@ -98,7 +102,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         bowAnimationDuration = ANIMATION_DURATION;
         playerKills = 0;
         showUpgrades = false;
-        playerGUI =  new NetworkARPGPlayerGUI( this, getEquippedItem().getSpriteName() );
+        playerGUI = new NetworkARPGPlayerGUI(this, getEquippedItem().getSpriteName());
     }
 
     public NetworkARPGPlayer(Area area, Orientation orientation, DiscreteCoordinates coordinates, Connection connection, boolean clientAuthority, HashMap<String, String> initialState) {
@@ -106,7 +110,14 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         updateState(initialState);
     }
 
-    public boolean isShowUpgrades() { return showUpgrades; }
+    private static ARPGInventory setInitialInventory(ARPGInventory inventory) {
+        inventory.addItemToInventory(ARPGItem.BOW);
+        return inventory;
+    }
+
+    public boolean isShowUpgrades() {
+        return showUpgrades;
+    }
 
     public boolean isDead() {
         return dead;
@@ -145,20 +156,14 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 } else if (keyboard.get(keyboard.Y).isPressed()) {
                     new Packet04Chat("j'aime ce jeu !").writeData(connection);
                 }
-                if ( showUpgrades )
-                {
-                    if ( keyboard.get( Keyboard.U ).isPressed() )
-                    {
-                        arrowRange = increaseArrowStat( arrowRange, 1, MAX_ARROW_RANGE, "Range" );
-                    } else if ( keyboard.get( Keyboard.I ).isPressed() )
-                    {
+                if (showUpgrades) {
+                    if (keyboard.get(Keyboard.U).isPressed()) {
+                        arrowRange = increaseArrowStat(arrowRange, 1, MAX_ARROW_RANGE, "Range");
+                    } else if (keyboard.get(Keyboard.I).isPressed()) {
                         reduceBowAnimationDuration();
-                    }
-                    else if ( keyboard.get( Keyboard.O ).isPressed() )
-                    {
-                        arrowDamage = increaseArrowStat( arrowDamage, 0.5f, MAX_ARROW_DAMAGE, "Damage" );
-                    }
-                    else if ( keyboard.get( Keyboard.P ).isPressed() ) {
+                    } else if (keyboard.get(Keyboard.O).isPressed()) {
+                        arrowDamage = increaseArrowStat(arrowDamage, 0.5f, MAX_ARROW_DAMAGE, "Damage");
+                    } else if (keyboard.get(Keyboard.P).isPressed()) {
                         arrowSpeed = increaseArrowSpeed();
                     }
                 }
@@ -218,7 +223,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void updateState(HashMap<String, String> updateMap) {
-        System.out.println("update state  " +  updateMap );
+        System.out.println("update state  " + updateMap);
         for (Map.Entry<String, String> entry : updateMap.entrySet()) {
             switch (entry.getKey()) {
                 case "username":
@@ -226,8 +231,8 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     break;
                 case "hp":
                     hp = Float.parseFloat(entry.getValue());
-                    if(hp<1){
-                        dead=true;
+                    if (hp < 1) {
+                        dead = true;
                     }
                     break;
                 case "position":
@@ -284,37 +289,30 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     }
 
     @Override
-    public void giveDamage( float damage )
-    {
-        super.giveDamage( damage );
-        queuedUpdates.put( "hp",String.valueOf( getHp() ) );
+    public void giveDamage(float damage) {
+        super.giveDamage(damage);
+        queuedUpdates.put("hp", String.valueOf(getHp()));
     }
 
-    public void giveDamage(float damage, int givenBy)
-    {
-        giveDamage( damage );
-        if ( hp < 1 )
-        {
+    public void giveDamage(float damage, int givenBy) {
+        giveDamage(damage);
+        if (hp < 1) {
             killer = givenBy;
             dead = true;
         }
     }
 
-    private void privateMessage( String text )
-    {
-        ((NetworkArena)getOwnerArea()).getAnnouncement().addAnnouncement( text );
+    private void privateMessage(String text) {
+        ((NetworkArena) getOwnerArea()).getAnnouncement().addAnnouncement(text);
     }
 
-    private float increaseArrowStat( float stat, float increase, float bound, String name )
-    {
+    private float increaseArrowStat(float stat, float increase, float bound, String name) {
         stat += increase;
-        if ( stat > bound )
-        {
+        if (stat > bound) {
             stat = bound;
-            privateMessage( name + " already fully upgraded" );
-        } else
-        {
-            privateMessage( "Upgraded Arrow " + name + " to " + stat );
+            privateMessage(name + " already fully upgraded");
+        } else {
+            privateMessage("Upgraded Arrow " + name + " to " + stat);
             showUpgrades = false;
         }
         return stat;
@@ -322,30 +320,25 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     private int increaseArrowSpeed() {
         arrowSpeed--;
-        if ( arrowSpeed <= MIN_ARROW_SPEED )
-        {
+        if (arrowSpeed <= MIN_ARROW_SPEED) {
             arrowSpeed = MIN_ARROW_SPEED;
-            privateMessage( "Arrow speed already fully upgraded" );
-        } else
-        {
-            privateMessage( "Upgraded Arrow Speed to " + arrowSpeed );
+            privateMessage("Arrow speed already fully upgraded");
+        } else {
+            privateMessage("Upgraded Arrow Speed to " + arrowSpeed);
             showUpgrades = false;
         }
         return arrowSpeed;
     }
 
-    private void reduceBowAnimationDuration()
-    {
-        if ( bowAnimationDuration >= MIN_BOW_DURATION + 1 )
-        {
-            for ( Animation animation : getBowAnimation() )
-            {
+    private void reduceBowAnimationDuration() {
+        if (bowAnimationDuration >= MIN_BOW_DURATION + 1) {
+            for (Animation animation : getBowAnimation()) {
                 animation.setSpeedFactor(--bowAnimationDuration);
             }
-            privateMessage( "Upgraded Bow Reload Speed");
+            privateMessage("Upgraded Bow Reload Speed");
             showUpgrades = false;
         } else {
-            privateMessage( "Bow already fully upgraded");
+            privateMessage("Bow already fully upgraded");
         }
 
     }
@@ -384,7 +377,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
 
     @Override
     public void networkMove(Packet02Move movePacket) {
-        if(clientAuthority) return;
+        if (clientAuthority) return;
         Orientation orientation = movePacket.getOrientation();
         int speed = movePacket.getSpeed();
         List<DiscreteCoordinates> positionBeforeMoving = getCurrentCells();
