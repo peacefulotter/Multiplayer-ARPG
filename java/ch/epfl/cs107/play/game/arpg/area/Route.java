@@ -5,8 +5,8 @@ import ch.epfl.cs107.play.game.areagame.actor.Foreground;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.arpg.actor.Grass;
-import ch.epfl.cs107.play.game.arpg.actor.monster.FireSpell;
 import ch.epfl.cs107.play.game.arpg.actor.monster.FlameSkull;
+import ch.epfl.cs107.play.game.arpg.actor.monster.LogMonster;
 import ch.epfl.cs107.play.game.rpg.actor.Door;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.signal.logic.Logic;
@@ -51,6 +51,8 @@ public class Route extends ARPGArea
         registerActor(new Bomb(this,Orientation.DOWN, new DiscreteCoordinates(5,5)));
         registerActor( new FlameSkull( this, new DiscreteCoordinates(7, 12 ) ) );
         registerActor( new Bomb(this,Orientation.DOWN, new DiscreteCoordinates(9,12) ));
+        registerActor( new LogMonster( this, new DiscreteCoordinates( 11, 8 ) ));
+        registerActor( new LogMonster( this, new DiscreteCoordinates( 12, 6 ) ));
     }
 
     @Override

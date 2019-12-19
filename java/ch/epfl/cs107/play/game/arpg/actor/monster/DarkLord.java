@@ -80,14 +80,14 @@ public class DarkLord extends Monster
     public DarkLord( Area area, DiscreteCoordinates position )
     {
         super(area, position, new Orientation[] {Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT},
-                "DarkLord", "zelda/darkLord", 10, 1.2f, 8, new Vector( -0.5f, 0 ),
+                "DarkLord", "zelda/darkLord", 10, 1.2f, 3, new Vector( -0.5f, 0.25f ),
                 Vulnerabilities.MAGIC );
         // create the handler
         this.handler = new DarkLordHandler();
         // create the darklord spell animation
         Sprite[][] spellSprites = RPGSprite.extractSprites( "zelda/darkLord.spell",
                 3, 2, 2,
-                this, 32, 32, new Vector( -0.5f, 0 ), new Orientation[] {Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT});
+                this, 32, 32, new Vector( -0.5f, 0.25f ), new Orientation[] {Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT});
         spellAnimation = RPGSprite.createAnimations(5, spellSprites, false );
         // by default, it is in IDLE
         state = DarkLordStates.IDLE;
@@ -199,14 +199,18 @@ public class DarkLord extends Monster
      */
     private boolean changeOrientation()
     {
+        // if the cell in front of him is empty, then no need to change orientation
+        boolean isCellAvailable = getOwnerArea().canEnterAreaCells( this, getNextCurrentCells() );
+        if ( isCellAvailable ) { return true; }
+        // else, try to find another orientation where the cell in front of him is empty
         for ( int i = 0; i < 4; i++ )
         {
             Orientation newOrientation = getRandomOrientation();
-            boolean isCellAvailable = getOwnerArea().canEnterAreaCells( this, getNextCurrentCells() );
+            isCellAvailable = getOwnerArea().canEnterAreaCells( this, getNextCurrentCells() );
             if ( newOrientation != getOrientation() && isCellAvailable )
             {
-                orientate( newOrientation );
-                return true;
+                boolean reorientate = orientate( newOrientation );
+                if ( reorientate ) { return true; }
             }
         }
         return false;
@@ -218,7 +222,7 @@ public class DarkLord extends Monster
      */
     private void throwMagicFlame()
     {
-        // try to change the darklord orientation to make sure he can throw a firespell
+        // make sure it can throw a firespell
         boolean isCellAvailable = changeOrientation();
         // create a new fireSpell
         FireSpell fireSpell = new FireSpell( getOwnerArea(), getOrientation(), getNextCurrentCells().get( 0 ), FIRESPELL_DAMAGE, FIRESPELL_FORCE );
