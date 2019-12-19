@@ -91,6 +91,7 @@ public class NARPG extends AreaGame {
 
     public void updateObject(Packet03Update update) {
         var entity = findEntity(update.getObjectId());
+        if ( entity == null ) return;
         entity.updateState(update.getUpdateMap());
     }
 

@@ -47,12 +47,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private static final float MAX_ARROW_RANGE = 10;
     private static final float MAX_ARROW_DAMAGE = 2;
     private static final int MIN_ARROW_SPEED = 1;
-    private static final int MIN_BOW_DURATION = 1;
+    private static final int MAX_BOW_SPEED_FACTOR = 3;
     private final boolean clientAuthority;
     private final long connectionId;
     private boolean dead;
     private Connection connection;
-    private Area currentArea;
     private int id;
     private TextGraphics usernameText;
     //add updates to queue so they can be sent at the same time
@@ -62,7 +61,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private int arrowSpeed;
     private float arrowRange;
     private float arrowDamage;
-    private int bowAnimationDuration;
+    private int bowSpeedFactor;
     private int killer;
     private int playerKills;
     private boolean showUpgrades;
@@ -78,7 +77,6 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         super(area, orientation, coordinates);
         this.handler = new NetworkARPGPlayerHandler();
         this.queuedUpdates = new HashMap<String, String>();
-        this.currentArea = area;
         this.connection = connection;
         this.connectionId = connectionId;
         // id of 0 is used as null value for id
@@ -98,7 +96,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         arrowRange = 3;
         arrowSpeed = 6;
         arrowDamage = 1;
-        bowAnimationDuration = ANIMATION_DURATION;
+        bowSpeedFactor = 1;
         playerKills = 0;
         showUpgrades = false;
         playerGUI = new NetworkARPGPlayerGUI(this, getEquippedItem().getSpriteName());
@@ -160,11 +158,11 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                     if (keyboard.get(Keyboard.U).isPressed()) {
                         arrowRange = increaseArrowStat(arrowRange, 1, MAX_ARROW_RANGE, "Range");
                     } else if (keyboard.get(Keyboard.I).isPressed()) {
-                        reduceBowAnimationDuration();
+                        increaseBowSpeedFactor();
                     } else if (keyboard.get(Keyboard.O).isPressed()) {
                         arrowDamage = increaseArrowStat(arrowDamage, 0.5f, MAX_ARROW_DAMAGE, "Damage");
                     } else if (keyboard.get(Keyboard.P).isPressed()) {
-                        arrowSpeed = increaseArrowSpeed();
+                        increaseArrowSpeed();
                     }
                 }
                 super.update(deltaTime);
@@ -317,7 +315,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         return stat;
     }
 
-    private int increaseArrowSpeed() {
+    private void increaseArrowSpeed() {
         arrowSpeed--;
         if (arrowSpeed <= MIN_ARROW_SPEED) {
             arrowSpeed = MIN_ARROW_SPEED;
@@ -326,13 +324,14 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
             privateMessage("Upgraded Arrow Speed to " + arrowSpeed);
             showUpgrades = false;
         }
-        return arrowSpeed;
     }
 
-    private void reduceBowAnimationDuration() {
-        if (bowAnimationDuration >= MIN_BOW_DURATION + 1) {
+    private void increaseBowSpeedFactor() {
+        System.out.println("reduce " + bowSpeedFactor );
+        if ( bowSpeedFactor <= MAX_BOW_SPEED_FACTOR ) {
+            bowSpeedFactor++;
             for (Animation animation : getBowAnimation()) {
-                animation.setSpeedFactor(--bowAnimationDuration);
+                animation.setSpeedFactor(bowSpeedFactor);
             }
             privateMessage("Upgraded Bow Reload Speed");
             showUpgrades = false;
