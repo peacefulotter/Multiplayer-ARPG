@@ -21,7 +21,7 @@ public class ServerAnnouncement implements Actor {
     private List<Integer> removeQueue = new ArrayList<>();
 
     public void addAnnouncement(String text) {
-        TextGraphics graphics = new TextGraphics(text, 0.4f, Color.GREEN, Color.BLACK, 0.05f, true, false, Vector.ZERO, TextAlign.Horizontal.RIGHT, TextAlign.Vertical.MIDDLE, 0.9f, 1000);
+        TextGraphics graphics = new TextGraphics(text, 0.6f, Color.GRAY, Color.BLACK, 0.05f, true, false, Vector.ZERO, TextAlign.Horizontal.RIGHT, TextAlign.Vertical.MIDDLE, 1f, 1000);
         announcements.add(graphics);
     }
 
@@ -30,8 +30,8 @@ public class ServerAnnouncement implements Actor {
         int announcementLen = announcements.size();
         for (int i = 0; i < announcementLen; i++) {
             TextGraphics t = announcements.get(i);
-            t.setAlpha(t.getAlpha() - deltaTime / 25);
-            if (t.getAlpha() <= 0.7) {
+            t.setAlpha(t.getAlpha() - deltaTime / 15);
+            if (t.getAlpha() <= 0.6) {
                 removeQueue.add(i);
             }
         }
@@ -46,7 +46,7 @@ public class ServerAnnouncement implements Actor {
         int announcementLen = announcements.size();
         for (int i = 0; i < announcementLen; i++) {
             TextGraphics t = announcements.get(i);
-            t.setAnchor(canvas.getTransform().getOrigin().add(canvas.getScaledWidth() / 2 - 0.9f, (canvas.getScaledHeight() - i - 1) / 2));
+            t.setAnchor(canvas.getTransform().getOrigin().add(canvas.getScaledWidth() / 2 - 0.6f, (canvas.getScaledHeight() - i*1.3f - 1) / 2));
             t.draw(canvas);
         }
     }
