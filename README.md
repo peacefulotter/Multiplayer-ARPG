@@ -1,5 +1,6 @@
 # MP2
 EPFL - Mini-Project 2 
+##### By Koppelmaa Albert and Maire Nathan
 
 ## Inputs
  - `[ARROW KEY]` Move the player
