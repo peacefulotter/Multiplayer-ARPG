@@ -20,7 +20,6 @@ public class Packet06Despawn extends Packet
         super(packetId, data);
         String[] dataArray = readData(data).split(";");
         despawnMap = Packet.getHashMapFromString(dataArray[1]);
-        System.out.println(despawnMap);
     }
 
     @Override

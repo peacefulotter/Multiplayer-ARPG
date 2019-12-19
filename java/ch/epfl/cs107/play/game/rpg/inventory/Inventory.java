@@ -44,6 +44,7 @@ public class Inventory
 
     protected boolean removeItemFromInventory( InventoryItem item, int amount )
     {
+        if(!inventory.containsKey(item)) return false;
         int existingAmount = inventory.get( item );
         if ( amount > inventory.get( item ) )
         {

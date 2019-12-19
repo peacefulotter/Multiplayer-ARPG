@@ -29,6 +29,7 @@ public class NARPG extends AreaGame
     private List<NetworkEntity> networkEntities = new ArrayList<>();
     //store items that couldn't be registered and register as soon as possible;
     private List<NetworkEntity> leftToRegister = new ArrayList<>();
+    private List<NetworkEntity> leftToUnregister = new ArrayList<>();
     private Connection connection;
     private final boolean isServer;
     private String username;
@@ -104,12 +105,7 @@ public class NARPG extends AreaGame
     }
 
     public void updateObject(Packet03Update update) {
-        update.getObjectId();
         var entity = findEntity(update.getObjectId());
-        if ( entity == null )
-        {
-            System.out.println("NARPG UPDATEOBJECT ENTITY IS NULL");
-        }
         entity.updateState(update.getUpdateMap());
     }
 
@@ -182,7 +178,6 @@ public class NARPG extends AreaGame
 
     public void logout(Packet05Logout logoutPacket)
     {
-        System.out.println(logoutPacket.getConnectionId());
         for (Iterator<NetworkARPGPlayer> iter = players.listIterator(); iter.hasNext();)
         {
             NetworkARPGPlayer p = iter.next();
@@ -191,8 +186,7 @@ public class NARPG extends AreaGame
                 networkEntities.removeAll(Collections.singleton(p));
                 iter.remove();
                 if (isServer) {
-                    System.out.println(p.isDead());
-                    if(p.isDead() && p.getKiller()!=0){
+                    if(p.isDead()){
                         new Packet04Chat(((NetworkARPGPlayer)findEntity(p.getKiller())).getUsername() + "  killed " +p.getUsername()).writeData(connection);
                     }
                     else{
@@ -207,13 +201,8 @@ public class NARPG extends AreaGame
     public void despawnEntity( Packet06Despawn packet )
     {
         NetworkEntity entity = findEntity( packet.getObjectId() );
-        for ( NetworkEntity p : networkEntities )
-        {
-            if ( p.getId() == packet.getObjectId() )
-            {
-                getCurrentArea().unregisterActor( entity );
-            }
-        }
+        leftToUnregister.add(entity);
+
     }
 
     @Override
@@ -227,6 +216,10 @@ public class NARPG extends AreaGame
                 return;
             }
         }
+        for(NetworkEntity e: leftToUnregister){
+            getCurrentArea().unregisterActor(e);
+        }
+        networkEntities.removeAll(leftToUnregister);
         for( NetworkARPGPlayer p : players){
             if(p.isDead()&& p.isClientAuthority()){
                     getCurrentArea().end();
