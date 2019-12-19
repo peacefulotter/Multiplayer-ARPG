@@ -6,7 +6,7 @@ import javax.sound.sampled.*;
  * Play a single sound
  * https://bugs.openjdk.java.net/browse/JDK-8077019
  */
-public final class SoundItem implements LineListener {
+final class SoundItem implements LineListener {
 
     private final static float FADE_STEPS = 0.005f;
 

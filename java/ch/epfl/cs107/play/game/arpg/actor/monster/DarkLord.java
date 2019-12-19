@@ -64,7 +64,7 @@ public class DarkLord extends Monster
         TELEPORTING( false );
 
         // do we need to display the spellAnimation (true) or the normal animation (false)
-        public final boolean isSpellAnimation;
+        final boolean isSpellAnimation;
 
         DarkLordStates( boolean isSpellAnimation )
         {

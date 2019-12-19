@@ -27,7 +27,7 @@ public class ShapeGraphics extends Node implements Graphics {
      * @param alpha (float): transparency, between 0 (invisible) and 1 (opaque)
      * @param depth (float): render priority, lower-values drawn first
      */
-    public ShapeGraphics(Shape shape, Color fillColor, Color outlineColor, float thickness, float alpha, float depth) {
+    private ShapeGraphics(Shape shape, Color fillColor, Color outlineColor, float thickness, float alpha, float depth) {
         this.shape = shape;
         this.fillColor = fillColor;
         this.outlineColor = outlineColor;

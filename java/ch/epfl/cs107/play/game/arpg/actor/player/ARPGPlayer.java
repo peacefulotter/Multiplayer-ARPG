@@ -43,7 +43,7 @@ public class ARPGPlayer extends Player {
     protected PlayerStates state;
     protected float hp;
     private static final int maxHP = 5;
-    private Animation[][] animations;
+    private final Animation[][] animations;
     //Animation index that chooses between running, sword, bow or staff animation
     protected int currentAnimation = 0;
     //Animation index that chooses the correct orientation of currentAnimation
@@ -55,7 +55,7 @@ public class ARPGPlayer extends Player {
     // not private, and not final because it will be overwritten by NetworkARPGPlayer
     protected ARPGPlayerStatusGUI playerGUI;
     private Vector dashStartingPos;
-    private Animation dashAnimation;
+    private final Animation dashAnimation;
 
     /**
      * Default Player constructor
@@ -245,13 +245,13 @@ public class ARPGPlayer extends Player {
      * @param orientation (Orientation): given orientation, not null
      * @param btn         (Button): button corresponding to the given orientation, not null
      */
-    protected void moveOrientate(Orientation orientation, Button btn) {
+    private void moveOrientate(Orientation orientation, Button btn) {
         if (btn.isDown()) {
             moveOrientate(orientation);
         }
     }
 
-    protected void moveOrientate(Orientation orientation) {
+    private void moveOrientate(Orientation orientation) {
         if (getOrientation() == orientation) {
             move(ANIMATION_DURATION);
         } else {
@@ -263,7 +263,7 @@ public class ARPGPlayer extends Player {
         }
     }
 
-    public void setAnimationByOrientation(Orientation orientation) {
+    protected void setAnimationByOrientation(Orientation orientation) {
         switch (orientation) {
             case UP:
                 currentAnimationDirection = 0;
@@ -283,7 +283,7 @@ public class ARPGPlayer extends Player {
 
 
     // used in NetworkARPGPlayer to modify the bow animation duration
-    public Animation[] getBowAnimation()
+    protected Animation[] getBowAnimation()
     {
         return animations[ 2 ];
     }

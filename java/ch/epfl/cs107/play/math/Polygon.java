@@ -21,7 +21,7 @@ public final class Polygon extends Shape {
 	 * Creates a new polygon.
 	 * @param points (List of Vector): sequence of vertices, not null
 	 */
-	public Polygon(List<Vector> points) {
+    private Polygon(List<Vector> points) {
 		this.points = new ArrayList<>(points);
 		initialize();
 	}

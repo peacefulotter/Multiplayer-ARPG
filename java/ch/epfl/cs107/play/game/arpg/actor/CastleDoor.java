@@ -13,7 +13,7 @@ import ch.epfl.cs107.play.signal.logic.Logic;
 import ch.epfl.cs107.play.window.Canvas;
 
 public class CastleDoor extends Door {
-    private Sprite[] sprites;
+    private final Sprite[] sprites;
     public CastleDoor(Area area) {
         super("zelda/Chateau", new DiscreteCoordinates(7,1), Logic.FALSE, area, Orientation.UP, new DiscreteCoordinates(9,13),new DiscreteCoordinates(10,13));
         sprites = new Sprite[2];

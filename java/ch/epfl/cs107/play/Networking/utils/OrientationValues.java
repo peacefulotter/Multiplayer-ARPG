@@ -7,8 +7,8 @@ public enum OrientationValues {
     LEFT(2, Orientation.LEFT),
     RIGHT(3, Orientation.RIGHT);
 
-    private int value;
-    private Orientation orientation;
+    private final int value;
+    private final Orientation orientation;
 
     OrientationValues(int value, Orientation orientation) {
         this.value = value;
@@ -29,11 +29,11 @@ public enum OrientationValues {
         return Orientation.DOWN;
     }
 
-    public Orientation getOrientation() {
+    private Orientation getOrientation() {
         return orientation;
     }
 
-    public int getValue() {
+    private int getValue() {
         return value;
     }
 }

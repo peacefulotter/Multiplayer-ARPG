@@ -7,7 +7,7 @@ import ch.epfl.cs107.play.window.Window;
 
 public class MouseButtonReleasedRecordEntry extends RecordEntry{
 	private static final long serialVersionUID = 1;
-	private int keycode;
+	private final int keycode;
 	
 	public MouseButtonReleasedRecordEntry(long time, int keycode) {
 		super(time);

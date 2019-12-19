@@ -15,7 +15,7 @@ public class Packet03Update extends Packet {
     }
 
     public Packet03Update(byte[] data) {
-        super(packetId, data);
+        super(data);
         String[] dataArray = readData(data).split(";");
         updateMap = Packet.getHashMapFromString(dataArray[1]);
     }

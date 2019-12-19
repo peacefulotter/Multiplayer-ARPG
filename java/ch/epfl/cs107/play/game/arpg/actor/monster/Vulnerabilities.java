@@ -13,13 +13,8 @@ public enum Vulnerabilities
     CLOSE_RANGE( "Close Range", false ),
     LONG_RANGE( "Long Range", false );
 
-    private final String name;
-    private final boolean isType;
-
     Vulnerabilities( String name, boolean isType )
     {
-        this.name = name;
-        this.isType = isType;
     }
 
 }

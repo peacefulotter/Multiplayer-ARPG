@@ -27,7 +27,6 @@ import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkArrow;
 import ch.epfl.cs107.play.game.narpg.actor.projectiles.NetworkMagic;
 import ch.epfl.cs107.play.game.narpg.areas.NetworkArena;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
-import ch.epfl.cs107.play.game.narpg.inventory.items.NetworkHeart;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.TextAlign;
@@ -51,9 +50,9 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
     private final boolean clientAuthority;
     private final long connectionId;
     private boolean dead;
-    private Connection connection;
+    private final Connection connection;
     private int id;
-    private TextGraphics usernameText;
+    private final TextGraphics usernameText;
     //add updates to queue so they can be sent at the same time
     private HashMap<String, String> queuedUpdates;
     //to check if the packet that sets the correct position after movement has been sent
@@ -354,7 +353,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         return usernameText.getText();
     }
 
-    public void setState(PlayerStates state) {
+    private void setState(PlayerStates state) {
         this.state = state;
     }
 
@@ -428,7 +427,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
         }
 
 
-        public void interactWith(NetworkHeart heart) {
+        public void interactWith() {
             hp++;
             if (hp > getMaxHP()) {
                 hp = getMaxHP();

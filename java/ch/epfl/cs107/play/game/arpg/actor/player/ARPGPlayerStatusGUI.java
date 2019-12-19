@@ -9,28 +9,24 @@ import ch.epfl.cs107.play.window.Canvas;
 
 public class ARPGPlayerStatusGUI implements Graphics
 {
-    // anchors used to place the images
-    private Vector topLeftAnchor;
     private Vector bottomLeftAnchor;
 
     // the gui must be on top whatever is drawn
     private static final float DEPTH = 10000f;
 
     // the plate behing the equipped item
-    private ImageGraphics gearDisplay;
+    private final ImageGraphics gearDisplay;
     // equipped item
     private ImageGraphics itemDisplay;
-    private ImageGraphics moneyBackgroundDisplay;
-    private ImageGraphics[] moneyDigitsDisplay;
-    private ImageGraphics[] heartsDisplay;
+    private final ImageGraphics moneyBackgroundDisplay;
+    private final ImageGraphics[] moneyDigitsDisplay;
 
-    private final float itemSpriteSize = .8f;
     private final float gearDisplaySize = 1.5f;
     private final float moneyBackgroundDisplayWidth = 3f;
     private final float moneyBackgroundDisplayHeight = 1.5f;
-    private float digitsSize = .6f;
+    private final float digitsSize = .6f;
 
-    private ARPGPlayer player;
+    private final ARPGPlayer player;
 
     public ARPGPlayerStatusGUI( ARPGPlayer player, String currentItemSpriteName )
     {
@@ -64,7 +60,7 @@ public class ARPGPlayerStatusGUI implements Graphics
 
 
     // used in NetworkARPGPlayerGUI
-    public Vector getBottomLeftAnchor()
+    protected Vector getBottomLeftAnchor()
     {
         return bottomLeftAnchor;
     }
@@ -75,13 +71,14 @@ public class ARPGPlayerStatusGUI implements Graphics
         // get the canvas width and height
         float width = canvas.getScaledWidth();
         float height = canvas.getScaledHeight();
-        topLeftAnchor = canvas.getTransform().getOrigin().sub( new Vector(width / 2, (-height / 2) + gearDisplaySize ) );
+        // anchors used to place the images
+        Vector topLeftAnchor = canvas.getTransform().getOrigin().sub(new Vector(width / 2, (-height / 2) + gearDisplaySize));
         bottomLeftAnchor = canvas.getTransform().getOrigin().sub( new Vector(width / 2, height / 2 ) );
         // set the item sprite to the equipped item
         setItemSprite(player.getEquippedItem().getSpriteName());
 
         // set the anchor and draw the gear display at the top left corner
-        gearDisplay.setAnchor( topLeftAnchor );
+        gearDisplay.setAnchor(topLeftAnchor);
         gearDisplay.draw( canvas );
 
         // set the anchor and draw the money background at the bottom left corner
@@ -132,7 +129,7 @@ public class ARPGPlayerStatusGUI implements Graphics
     private void drawHearts( Canvas canvas ){
         float hp = player.getHp();
         int hearts = player.getMaxHP();
-        heartsDisplay = new ImageGraphics[ hearts ];
+        ImageGraphics[] heartsDisplay = new ImageGraphics[hearts];
 
         // for every hearts
         for( int i = 0; i < hearts; i++ )
@@ -166,9 +163,10 @@ public class ARPGPlayerStatusGUI implements Graphics
      */
     public void setItemSprite( String spriteName )
     {
+        float itemSpriteSize = .8f;
         itemDisplay = new ImageGraphics(
                 ResourcePath.getSprite( spriteName ),
-                itemSpriteSize,itemSpriteSize, new RegionOfInterest(0,0,16,16),
+                itemSpriteSize, itemSpriteSize, new RegionOfInterest(0,0,16,16),
                 Vector.ZERO,1f,DEPTH );
     }
 

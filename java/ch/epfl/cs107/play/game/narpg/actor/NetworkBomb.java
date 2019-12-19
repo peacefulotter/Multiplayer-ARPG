@@ -8,12 +8,11 @@ import ch.epfl.cs107.play.game.arpg.actor.Bomb;
 import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.game.narpg.handler.NARPGInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import org.apache.commons.beanutils.converters.StringArrayConverter;
 
 import java.util.HashMap;
 
 public class NetworkBomb extends Bomb implements NetworkEntity {
-    private int spawnedBy;
+    private final int spawnedBy;
     public NetworkBomb(Area area, Orientation orientation, DiscreteCoordinates position, int spawnedBy ) {
         super(area, orientation, position);
         handler = new NetworkBombHandler();

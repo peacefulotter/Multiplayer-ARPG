@@ -7,8 +7,8 @@ import ch.epfl.cs107.play.window.Window;
 
 public class MouseMoveRecordEntry extends RecordEntry{
 	private static final long serialVersionUID = 1;
-	private float x;
-	private float y;
+	private final float x;
+	private final float y;
 	
 	public MouseMoveRecordEntry(long time, float x, float y) {
 		super(time);

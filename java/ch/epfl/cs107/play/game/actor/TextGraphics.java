@@ -71,7 +71,7 @@ public class TextGraphics extends Node implements Attachable, Graphics {
      * @param italics (boolean): whether to use italics font
      * @param anchor (Vector): text anchor
      */
-    public TextGraphics(String text, float fontSize, Color fillColor, Color outlineColor, float thickness, boolean bold, boolean italics, Vector anchor) {
+    private TextGraphics(String text, float fontSize, Color fillColor, Color outlineColor, float thickness, boolean bold, boolean italics, Vector anchor) {
         this(text, fontSize, fillColor, outlineColor, thickness, bold, italics, anchor, TextAlign.Horizontal.LEFT, TextAlign.Vertical.BOTTOM, 1.0f, 0.0f);
     }
     

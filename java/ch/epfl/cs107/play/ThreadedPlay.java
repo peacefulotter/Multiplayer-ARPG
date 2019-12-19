@@ -8,7 +8,7 @@ import ch.epfl.cs107.play.io.XMLTexts;
 import ch.epfl.cs107.play.window.Window;
 import ch.epfl.cs107.play.window.swing.SwingWindow;
 
-public class ThreadedPlay implements Runnable {
+class ThreadedPlay implements Runnable {
 
 
     /**
@@ -20,11 +20,9 @@ public class ThreadedPlay implements Runnable {
     private final FileSystem fileSystem;
     private final NARPG game;
     private final Window window;
-    private boolean isServer;
     private boolean stopGame;
 
     public ThreadedPlay(NARPG game, boolean isServer) {
-        this.isServer=isServer;
         // Define cascading file system
         fileSystem = new ResourceFileSystem(DefaultFileSystem.INSTANCE);
         // Create a demo game and initialize corresponding texts

@@ -11,7 +11,10 @@ public final class RegionOfInterest implements Serializable{
 	private static final long serialVersionUID = 1;
 
     /// Top left corner coordinates, width and height of the RoI
-    public int x, y, w, h;
+    public final int x;
+    public final int y;
+    public final int w;
+    public final int h;
 
     /**
      * Create A new RegionOfInterest

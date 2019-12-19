@@ -37,7 +37,7 @@ public class Sign extends AreaEntity {
      * @param orientation (Orientation): Initial orientation of the entity, not null
      * @param position    (DiscreteCoordinate): Initial position of the entity, not null
      */
-    public Sign(String textMessage, Area area, Orientation orientation, DiscreteCoordinates position) {
+    private Sign(String textMessage, Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area, orientation, position);
         this.textMessage = textMessage;
         this.currentCells = new ArrayList<>();

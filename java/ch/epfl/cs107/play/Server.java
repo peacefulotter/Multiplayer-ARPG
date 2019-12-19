@@ -7,15 +7,14 @@ import ch.epfl.cs107.play.game.narpg.NARPG;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class Server implements Connection {
-    private List<ConnectionHandler> connections = new ArrayList<ConnectionHandler>();
+    private final List<ConnectionHandler> connections = new ArrayList<ConnectionHandler>();
 
-    public Server(int port) {
+    private Server(int port) {
         NARPG game = new NARPG(true, this);
         Thread GameThread = new Thread(new ThreadedPlay(game, true));
         GameThread.start();
@@ -41,7 +40,7 @@ public class Server implements Connection {
         new Server(Integer.parseInt(args[0]));
     }
 
-    public void sendDataToAllClients(byte[] data) {
+    private void sendDataToAllClients(byte[] data) {
         for(Iterator<ConnectionHandler> iterator= connections.iterator();iterator.hasNext();){
             try{
                 iterator.next().sendData(data);

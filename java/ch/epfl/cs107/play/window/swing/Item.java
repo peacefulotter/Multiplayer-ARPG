@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 /**
  * Represent a renderable element in a Swing context.
  */
-public interface Item extends Comparable<Item> {
+interface Item extends Comparable<Item> {
 
     /** @return render priority, lower-values drawn first */
     float getDepth();

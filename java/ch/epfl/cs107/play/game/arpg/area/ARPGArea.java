@@ -10,7 +10,7 @@ import ch.epfl.cs107.play.window.Window;
 public abstract class ARPGArea extends Area
 {
     // protected because the server overwrites it
-    protected static int SCALE_FACTOR = 15;
+    protected static final int SCALE_FACTOR = 15;
     private Window window;
     private ARPGBehavior behavior;
 

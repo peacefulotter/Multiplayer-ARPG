@@ -1,25 +1,22 @@
 package ch.epfl.cs107.play.Networking.Packets;
 
 import ch.epfl.cs107.play.Networking.Connection;
-import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.utils.OrientationValues;
-import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.narpg.actor.NetworkEntities;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.math.Vector;
 
 import java.util.HashMap;
 
 public class Packet00Spawn extends Packet {
-    private NetworkEntities object;
-    private Orientation orientation;
-    private int startX;
-    private int startY;
-    private HashMap<String,String> initialState;
+    private final NetworkEntities object;
+    private final Orientation orientation;
+    private final int startX;
+    private final int startY;
+    private final HashMap<String,String> initialState;
 
     public Packet00Spawn(byte[] data) {
-        super(00, data);
+        super(data);
         String[] dataArray = readData(data).split(";");
         this.object = NetworkEntities.lookUpEntity(Integer.parseInt(dataArray[1]));
         this.orientation= OrientationValues.getOrientationByValue(Integer.parseInt(dataArray[2]));

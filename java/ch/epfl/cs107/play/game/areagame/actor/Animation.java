@@ -18,7 +18,7 @@ public class Animation implements Updatable, Graphics{
     /// Frames sequence of Sprite
     private final Sprite[] frames;
 
-    private boolean repeat;
+    private final boolean repeat;
     private boolean isCompleted;
 
     /// counts for the animation

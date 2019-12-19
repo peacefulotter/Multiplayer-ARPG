@@ -38,7 +38,7 @@ public class RPGSprite extends Sprite {
 	 * @param roi (RegionOfInterest): region of interest into the image as a rectangle in the image. May be null
 	 * @param anchor (Vector): image anchor, not null
 	 */
-	public RPGSprite(String name, float width, float height, Positionable parent, RegionOfInterest roi, Vector anchor) {
+    private RPGSprite(String name, float width, float height, Positionable parent, RegionOfInterest roi, Vector anchor) {
 		super(name, width, height, parent, roi, anchor);
 		this.depthCorrection = 0;
 	}

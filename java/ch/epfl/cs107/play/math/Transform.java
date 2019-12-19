@@ -97,7 +97,7 @@ public final class Transform implements Serializable {
      * @param y (float): ordinate
      * @return (Vector): transformed vector, not null
      */
-    public Vector onVector(float x, float y) {
+    private Vector onVector(float x, float y) {
         return new Vector(
             x * m00 + y * m01,
             x * m10 + y * m11
@@ -178,7 +178,7 @@ public final class Transform implements Serializable {
      * @param a (float): angle, in radians
      * @return (Transform): extended transform, not null
      */
-    public Transform rotated(float a) {
+    private Transform rotated(float a) {
         float c = (float)Math.cos(a);
         float s = (float)Math.sin(a);
         return new Transform(

@@ -20,7 +20,7 @@ public abstract class Player extends MovableAreaEntity implements Interactor {
      * @param orientation (Orientation): Initial player orientation, not null
      * @param coordinates (Coordinates): Initial position, not null
      */
-    public Player(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
+    protected Player(Area area, Orientation orientation, DiscreteCoordinates coordinates) {
         super(area, orientation, coordinates);
         passedDoor = null;
         isPassingADoor = false;

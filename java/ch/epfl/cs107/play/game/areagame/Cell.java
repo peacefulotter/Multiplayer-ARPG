@@ -12,8 +12,8 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 public abstract class Cell implements Interactable {
 
     /// Content of the cell as a set of Interactable
-    private Set<Interactable> entities;
-    private DiscreteCoordinates coordinates;
+    private final Set<Interactable> entities;
+    private final DiscreteCoordinates coordinates;
 
 
     /**

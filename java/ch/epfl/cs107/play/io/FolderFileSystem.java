@@ -20,7 +20,7 @@ public class FolderFileSystem implements FileSystem {
      * @param fallback (FileSystem): secondary file system used on error, not null
      * @param folder (File): root, may be null
      */
-    public FolderFileSystem(FileSystem fallback, File folder) {
+    private FolderFileSystem(FileSystem fallback, File folder) {
         if (fallback == null )
             throw new NullPointerException();
         this.fallback = fallback;

@@ -3,7 +3,7 @@ package ch.epfl.cs107.play.game.actor;
 import ch.epfl.cs107.play.window.Audio;
 
 
-public interface Acoustics {
+interface Acoustics {
 
     /**
      * Play itself on specified Audio context.

@@ -23,12 +23,11 @@ import java.util.*;
 
 public class NARPG extends AreaGame {
     private final boolean isServer;
-    private List<NetworkARPGPlayer> players = new ArrayList<NetworkARPGPlayer>();
+    private final List<NetworkARPGPlayer> players = new ArrayList<NetworkARPGPlayer>();
     //store items that couldn't be registered and register as soon as possible;
-    private List<NetworkEntity> leftToRegister = new ArrayList<>();
-    private List<NetworkEntity> leftToUnregister = new ArrayList<>();
-    private Connection connection;
-    private String username;
+    private final List<NetworkEntity> leftToRegister = new ArrayList<>();
+    private final List<NetworkEntity> leftToUnregister = new ArrayList<>();
+    private final Connection connection;
     private NetworkARPGPlayer player;
 
     private double time = 0;
@@ -53,7 +52,7 @@ public class NARPG extends AreaGame {
             setCurrentArea("custom/Arena", true);
             if (!isServer) {
                 ((Client) connection).login();
-                username = ((Client) connection).getUsername();
+                String username = ((Client) connection).getUsername();
                 DiscreteCoordinates spawnCoords = findRandomSpawn();
                 player = new NetworkARPGPlayer(area, Orientation.DOWN, spawnCoords, connection, true, ((Client) connection).getMainId(), username, 0);
                 new Packet04Chat(username + " has connected").writeData(connection);
@@ -69,7 +68,7 @@ public class NARPG extends AreaGame {
     }
 
     private DiscreteCoordinates findRandomSpawn() {
-        boolean canSpawnTo = false;
+        boolean canSpawnTo;
         DiscreteCoordinates coords;
         NetworkBomb dummy = new NetworkBomb(area, Orientation.DOWN, new DiscreteCoordinates(1, 1), 0);
 
@@ -203,7 +202,7 @@ public class NARPG extends AreaGame {
         super.update(deltaTime);
     }
 
-    public NetworkEntity findEntity(int objectId) {
+    private NetworkEntity findEntity(int objectId) {
         for (NetworkEntity e : area.getNetworkEntities()) {
             if (e.getId() == objectId) return e;
         }

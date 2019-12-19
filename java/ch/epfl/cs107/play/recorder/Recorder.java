@@ -17,17 +17,14 @@ import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Mouse;
 import ch.epfl.cs107.play.window.Window;
 
-public class Recorder{
-	private Keyboard keyboard;
-	private Mouse mouse;
+class Recorder{
+	private final Keyboard keyboard;
+	private final Mouse mouse;
 	private long startTime;
 	private Record record;
 	private Vector lastMousePosition;
-	
-	private static int KEYBOARD_MAX_KEYCODE = KeyEvent.KEY_LAST;
-	private static int MOUSE_BUTTON_MAX_KEYCODE = 2;
-	
-	public static String RECORD_DIRECTORY = "records";
+
+    public static final String RECORD_DIRECTORY = "records";
 	
 	public Recorder(Window window) {
 		this.keyboard = window.getKeyboard();
@@ -64,7 +61,8 @@ public class Recorder{
 		
 		long time = System.currentTimeMillis() - startTime;
 
-		for(int key = 0; key <= KEYBOARD_MAX_KEYCODE; ++key) {
+        int KEYBOARD_MAX_KEYCODE = KeyEvent.KEY_LAST;
+        for(int key = 0; key <= KEYBOARD_MAX_KEYCODE; ++key) {
 			Button button = keyboard.get(key);
 			
 			if(button.isPressed())
@@ -72,7 +70,8 @@ public class Recorder{
 			if(button.isReleased())
 				record.addEntry(new KeyboardReleasedRecordEntry(time, key));
 		}
-		for(int key = 0; key <= MOUSE_BUTTON_MAX_KEYCODE; ++key) {
+        int MOUSE_BUTTON_MAX_KEYCODE = 2;
+        for(int key = 0; key <= MOUSE_BUTTON_MAX_KEYCODE; ++key) {
 			Button button = mouse.getButton(key);			
 			if(button.isPressed())
 				record.addEntry(new MouseButtonPressedRecordEntry(time, key));

@@ -29,8 +29,8 @@ public class Grass extends AreaEntity {
             1, 1,
             this, new RegionOfInterest(0, 0, 16, 16), new Vector(0, 0), 1f, GRASS_DEPTH
     );
-    public boolean isCut = false;
-    private Animation grassAnimation;
+    private boolean isCut = false;
+    private final Animation grassAnimation;
 
     public Grass(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area, orientation, position);

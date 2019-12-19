@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProjectile {
     private final int spawnedBy;
-    private Connection connection;
+    private final Connection connection;
     private final int id;
     private final float arrowDamage;
     /**
@@ -93,7 +93,7 @@ public class NetworkArrow extends Arrow implements NetworkEntity, NetworkProject
 
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
-        ((NARPGInteractionVisitor)v).interactWith(this);
+        ((NARPGInteractionVisitor)v).interactWith();
     }
 
     @Override

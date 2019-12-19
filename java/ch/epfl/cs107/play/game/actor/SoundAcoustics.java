@@ -24,7 +24,7 @@ public class SoundAcoustics implements Acoustics {
      * @param loop (boolean): indicate if the sound must loop on self ending
      * @param stopOthersOnStart (boolean): indicate if all other sound are stopped on given sound's start
      */
-    public SoundAcoustics(String name, float volume, boolean fadeIn, boolean randomFirstStart, boolean loop, boolean stopOthersOnStart) {
+    private SoundAcoustics(String name, float volume, boolean fadeIn, boolean randomFirstStart, boolean loop, boolean stopOthersOnStart) {
         this.name = name;
         this.volume = volume;
         this.fadeIn = fadeIn;

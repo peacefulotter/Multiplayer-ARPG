@@ -5,7 +5,6 @@ import ch.epfl.cs107.play.game.Game;
 import ch.epfl.cs107.play.io.FileSystem;
 
 import java.util.*;
-import java.util.Map;
 
 
 /**
@@ -56,7 +55,7 @@ abstract public class AreaGame implements Game//, PauseMenu.Pausable
             if (forceBegin || !currentArea.isStarted()) {
                 currentArea.begin(window, fileSystem);
             } else {
-                currentArea.resume(window, fileSystem);
+                currentArea.resume();
             }
     	}
     	

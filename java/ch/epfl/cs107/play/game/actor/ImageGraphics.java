@@ -39,7 +39,7 @@ public class ImageGraphics extends Node implements Graphics {
      * @param depth (float): render priority, lower-values drawn first
      * @param removeBackground (boolean): indicate if we need to remove the uniform color background before using this image
      */
-    public ImageGraphics(String name, float width, float height, RegionOfInterest roi, Vector anchor, float alpha, float depth, boolean removeBackground) {
+    private ImageGraphics(String name, float width, float height, RegionOfInterest roi, Vector anchor, float alpha, float depth, boolean removeBackground) {
         this.name = name;
         this.width = width;
         this.height = height;
@@ -72,7 +72,7 @@ public class ImageGraphics extends Node implements Graphics {
      * @param roi (RegionOfInterest): region of interest as a rectangle in the image
      * @param anchor (Vector): image anchor, not null
      */
-    public ImageGraphics(String name, float width, float height, RegionOfInterest roi, Vector anchor) {
+    private ImageGraphics(String name, float width, float height, RegionOfInterest roi, Vector anchor) {
         this(name, width, height, roi, anchor, 1.0f, 0.0f, false);
     }
 

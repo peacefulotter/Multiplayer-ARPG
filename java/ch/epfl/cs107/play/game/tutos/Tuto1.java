@@ -14,12 +14,12 @@ import ch.epfl.cs107.play.window.Window;
 public class Tuto1 extends AreaGame {
 	
 	  public final static float CAMERA_SCALE_FACTOR = 10.f;
-	  public final static float STEP = 0.05f;
+	  private final static float STEP = 0.05f;
 	  
 	  private final String[] areas = {"zelda/Ferme", "zelda/Village"};
 	  private int areaIndex;
 	  
-	  SimpleGhost player;
+	  private SimpleGhost player;
 	
 		/**
 	     * Add all the areas
@@ -77,7 +77,7 @@ public class Tuto1 extends AreaGame {
 			return "Tuto1";
 		}
 
-		protected void switchArea() {
+		private void switchArea() {
 			Area currentArea = getCurrentArea();
 			
 			currentArea.unregisterActor(player);

@@ -4,8 +4,8 @@ import ch.epfl.cs107.play.Networking.Connection;
 
 public class Packet01Login extends Packet {
 
-    private long connectionId;
-    private String username;
+    private final long connectionId;
+    private final String username;
 
     public Packet01Login(long connectionId, String username) {
         super(01, 0);

@@ -26,7 +26,7 @@ public abstract class AreaEntity extends Entity implements Interactable {
      * @param orientation (Orientation): Initial orientation of the entity in the Area. Not null
      * @param position (DiscreteCoordinate): Initial position of the entity in the Area. Not null
      */
-    public AreaEntity(Area area, Orientation orientation, DiscreteCoordinates position) {
+    protected AreaEntity(Area area, Orientation orientation, DiscreteCoordinates position) {
 
         super(position.toVector());
 
@@ -59,7 +59,7 @@ public abstract class AreaEntity extends Entity implements Interactable {
      * Getter for the orientation
      * @return (Orientation): current orientation
      */
-    public Orientation getOrientation() {
+    protected Orientation getOrientation() {
         return orientation;
     }
 
@@ -68,7 +68,7 @@ public abstract class AreaEntity extends Entity implements Interactable {
      * @param orientation (Orientation): The new orientation. Not null
      * @return (boolean): if the orientation change happens, by default always true
      */
-    protected boolean orientate(Orientation orientation) {
+    boolean orientate(Orientation orientation) {
         this.orientation = orientation;
         return true;
     }

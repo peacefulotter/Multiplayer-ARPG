@@ -3,10 +3,8 @@ package ch.epfl.cs107.play;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.ConnectionHandler;
 import ch.epfl.cs107.play.Networking.Packets.Packet01Login;
-import ch.epfl.cs107.play.Networking.Packets.Packet05Logout;
 import ch.epfl.cs107.play.game.narpg.NARPG;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Random;
@@ -17,7 +15,7 @@ public class Client extends Play implements Connection {
     private ConnectionHandler connection;
     private NARPG game;
 
-    public Client(String adress, int port, String username) {
+    private Client(String adress, int port, String username) {
         boolean connected = false;
         this.username = username;
         while (!connected) {

@@ -3,7 +3,6 @@ package ch.epfl.cs107.play.game.narpg.actor.projectiles;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.NetworkEntity;
 import ch.epfl.cs107.play.Networking.Packets.Packet00Spawn;
-import ch.epfl.cs107.play.Networking.Packets.Packet03Update;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
@@ -22,11 +21,11 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
     private final Connection connection;
     private final int spawnedBy;
     private enum stateProperties{
-        MAX_DISTANCE("maxDistance"),
-        SPEED("speed"),
-        SPAWNED_BY("spawnedBy");
+        MAX_DISTANCE(),
+        SPEED(),
+        SPAWNED_BY();
 
-        stateProperties(String spawnedBy) {
+        stateProperties() {
         }
     }
     /**
@@ -77,7 +76,7 @@ public class NetworkMagic extends MagicProjectile implements NetworkEntity,Netwo
     public void acceptInteraction( AreaInteractionVisitor v )
     {
         System.out.println("accept interaction magic projectile");
-        ((NARPGInteractionVisitor) v).interactWith(this);
+        ((NARPGInteractionVisitor) v).interactWith();
     }
 
     @Override

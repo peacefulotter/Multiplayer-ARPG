@@ -29,7 +29,7 @@ public class Grid extends Entity {
      * @param width (int): of the desired grid
      * @param height (int): of the desired grid
      */
-    public Grid(int width, int height){
+    private Grid(int width, int height){
         super(DiscreteCoordinates.ORIGIN.toVector());
 
         final List<Vector> points = new ArrayList<>();

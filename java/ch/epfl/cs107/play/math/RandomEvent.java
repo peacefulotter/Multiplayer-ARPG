@@ -4,14 +4,14 @@ package ch.epfl.cs107.play.math;
 /**
  * Random Event implement notion of Bernoulli experiment with probability p of success
  */
-public final class RandomEvent {
+final class RandomEvent {
 
     // Probability of success of the Bernoulli experiment
-    private float p;
+    private final float p;
     // Indicate if the experiment already happened at least once
     private boolean happened;
     // Indicate if the experiment can happen only once (i.e always fails after first success)
-    private boolean onlyOnce;
+    private final boolean onlyOnce;
 
 
     /**
@@ -28,7 +28,7 @@ public final class RandomEvent {
      * @param p (float): the probability of success
      * @param onlyOnce (boolean): Specify if event can happen only once
      */
-    public RandomEvent(float p, boolean onlyOnce){
+    private RandomEvent(float p, boolean onlyOnce){
         this.p = Math.max(0.0f, Math.min(1.0f, p));
         this.onlyOnce = onlyOnce;
         this.happened = false;

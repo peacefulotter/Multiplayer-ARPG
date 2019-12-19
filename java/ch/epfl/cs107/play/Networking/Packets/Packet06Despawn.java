@@ -16,7 +16,7 @@ public class Packet06Despawn extends Packet
 
     public Packet06Despawn(byte[] data)
     {
-        super(packetId, data);
+        super(data);
     }
 
     @Override

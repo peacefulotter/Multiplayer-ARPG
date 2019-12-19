@@ -26,7 +26,7 @@ public final class SwingImage implements Image {
      * @param roi (RegionOfInterest): rectangle of interest in the image, may be null
      * @param removeBackground (boolean): which indicate if need to remove an uniform background
      */
-	public SwingImage(java.awt.Image image, RegionOfInterest roi, boolean removeBackground) {
+    private SwingImage(java.awt.Image image, RegionOfInterest roi, boolean removeBackground) {
 		// See
 		// http://stackoverflow.com/questions/196890/java2d-performance-issues
 		// http://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage

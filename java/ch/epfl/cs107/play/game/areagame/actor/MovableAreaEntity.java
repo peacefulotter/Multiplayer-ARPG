@@ -35,7 +35,7 @@ public abstract class MovableAreaEntity extends AreaEntity {
      * @param position (Coordinate): Initial position of the entity. Not null
      * @param orientation (Orientation): Initial orientation of the entity. Not null
      */
-    public MovableAreaEntity(Area area, Orientation orientation, DiscreteCoordinates position) {
+    protected MovableAreaEntity(Area area, Orientation orientation, DiscreteCoordinates position) {
         super(area, orientation, position);
         resetMotion();
     }
@@ -74,7 +74,7 @@ public abstract class MovableAreaEntity extends AreaEntity {
      * @param startingFrame (int): start the movement directly from this frame
      * @return (boolean): indicate if the move is initiated
      */
-    protected final boolean move(int frameForMove, int startingFrame){
+    private boolean move(int frameForMove, int startingFrame){
     	if(!displacementOccurs || isTargetReached() ) {
 
         	List<DiscreteCoordinates> leavingCells = getLeftCells();
@@ -101,7 +101,7 @@ public abstract class MovableAreaEntity extends AreaEntity {
         }
         return false;
     }
-    protected final void forceMove(int frameForMove, int startingFrame, DiscreteCoordinates start, DiscreteCoordinates end){
+    protected final void forceMove(){
 
     }
     

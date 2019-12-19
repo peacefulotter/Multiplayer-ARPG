@@ -41,8 +41,8 @@ public class LogMonster extends Monster
     // time it attacks
     private float timeAttack;
 
-    private Animation sleepingAnimation;
-    private Animation wakingAnimation;
+    private final Animation sleepingAnimation;
+    private final Animation wakingAnimation;
 
     // the log monster states
     private enum LogMonsterState {
@@ -52,9 +52,9 @@ public class LogMonster extends Monster
         IS_ATTACKING( false, true );
 
         // the log monster can reorientate
-        public final boolean allowReorientation;
+        final boolean allowReorientation;
         // do we need to draw monster default animation
-        public final boolean drawMonster;
+        final boolean drawMonster;
 
         LogMonsterState( boolean allowReorientation, boolean drawMonster )
         {
@@ -186,7 +186,7 @@ public class LogMonster extends Monster
      * Change the logMonster to the state Sleeping
      *  and redefine a new sleeping time bound based on randomness
      */
-    public void setSleeping()
+    private void setSleeping()
     {
         state = LogMonsterState.IS_SLEEPING;
         sleepingTime = 0;
@@ -197,7 +197,7 @@ public class LogMonster extends Monster
      * After an attack, the logMonster falls asleep
      *  and his time it attacked resets to 0
      */
-    public void resetAttack()
+    private void resetAttack()
     {
         setSleeping();
         timeAttack = 0;

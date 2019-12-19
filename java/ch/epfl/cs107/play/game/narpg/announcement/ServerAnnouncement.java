@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerAnnouncement implements Actor {
-    private List<TextGraphics> announcements = new ArrayList<>();
-    private List<Integer> removeQueue = new ArrayList<>();
+    private final List<TextGraphics> announcements = new ArrayList<>();
+    private final List<Integer> removeQueue = new ArrayList<>();
 
     public void addAnnouncement(String text) {
         TextGraphics graphics = new TextGraphics(text, 0.6f, Color.GRAY, Color.BLACK, 0.05f, true, false, Vector.ZERO, TextAlign.Horizontal.RIGHT, TextAlign.Vertical.MIDDLE, 1f, 1000);

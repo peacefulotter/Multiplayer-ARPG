@@ -10,8 +10,8 @@ import ch.epfl.cs107.play.window.Canvas;
 
 public class SimpleGhost extends Entity {
 	 private float hp;
-	 private TextGraphics message;
-	 private Sprite sprite;
+	 private final TextGraphics message;
+	 private final Sprite sprite;
 	    /**
 	     * Default DemoActor constructor
 	     * @param position (Vector): initial position vector of the ghost

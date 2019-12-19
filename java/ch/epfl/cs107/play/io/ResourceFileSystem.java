@@ -17,7 +17,7 @@ public class ResourceFileSystem implements FileSystem {
      * @param fallback (FileSystem): secondary file system used on error, not null
      * @param loader (ClassLoader): specific binary to use, not null
      */
-    public ResourceFileSystem(FileSystem fallback, ClassLoader loader) {
+    private ResourceFileSystem(FileSystem fallback, ClassLoader loader) {
         if (fallback == null || loader == null)
             throw new NullPointerException();
         this.fallback = fallback;

@@ -14,14 +14,13 @@ import java.net.Socket;
 public class ConnectionHandler implements Runnable {
     private final static double MAX_TIMEOUT = 3d;
     private long lastConnectionTime;
-    private boolean isServer;
-    private NARPG game;
-    private Socket socket;
+    private final boolean isServer;
+    private final NARPG game;
+    private final Socket socket;
     private OutputStream out;
     private BufferedReader in;
-    private Connection connection;
+    private final Connection connection;
     private long connectionId;
-    private String username;
 
     public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection, long connectionId, String username) {
         this.socket = socket;
@@ -29,11 +28,10 @@ public class ConnectionHandler implements Runnable {
         this.game = arpg;
         this.connection = connection;
         this.connectionId = connectionId;
-        this.username = username;
     }
 
     public ConnectionHandler(Socket socket, NARPG arpg, boolean isServer, Connection connection) {
-        this(socket, arpg, isServer, connection, 0l, "");
+        this(socket, arpg, isServer, connection, 0L, "");
     }
 
     public long getConnectionId() {

@@ -15,9 +15,6 @@ import java.util.List;
 
 public class FlameSkull extends Monster implements FlyableEntity
 {
-    // the flame skull can live a certain time between these constants
-    private final float MIN_LIFE_TIME = 6f;
-    private final float MAX_LIFE_TIME = 15f;
     private final flameSkullHandler handler;
 
     private float lifeTime;
@@ -28,6 +25,8 @@ public class FlameSkull extends Monster implements FlyableEntity
                 "zelda/flameSkull", 3f, 1f, 3,
                 new Vector( -0.5f, 0 ), Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
         // initialise the time the flameskull will live
+        float MAX_LIFE_TIME = 15f;// the flame skull can live a certain time between these constants
+        float MIN_LIFE_TIME = 6f;
         lifeTime = (float) (MIN_LIFE_TIME + Math.random() * (MAX_LIFE_TIME - MIN_LIFE_TIME));
         handler = new flameSkullHandler();
     }

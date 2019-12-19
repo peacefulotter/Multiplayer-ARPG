@@ -42,7 +42,7 @@ public final class Polyline extends Shape {
      * @param closed (boolean): whether last point is connected to the first one
      * @param points (Array of Vector): at least two points, not null
      */
-    public Polyline(boolean closed, Vector... points) {
+    private Polyline(boolean closed, Vector... points) {
         this(closed, Arrays.asList(points));
     }
     

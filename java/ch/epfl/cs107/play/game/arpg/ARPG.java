@@ -27,7 +27,7 @@ public class ARPG extends RPG {
     /**
      * Add all the areas
      */
-    protected void createAreas()
+    private void createAreas()
     {
         addArea( new Ferme() );
         addArea( new Village() );

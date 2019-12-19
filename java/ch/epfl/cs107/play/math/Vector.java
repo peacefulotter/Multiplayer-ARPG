@@ -14,7 +14,7 @@ public final class Vector implements Serializable {
     /** The zero vector (0, 0) */
     public static final Vector ZERO = new Vector(0.0f, 0.0f);
     /** The unit X vector (1, 0) */
-    public static final Vector X = new Vector(1.0f, 0.0f);
+    private static final Vector X = new Vector(1.0f, 0.0f);
     /** The unit Y vector (0, 1) */
     public static final Vector Y = new Vector(0.0f, 1.0f);
 
@@ -136,7 +136,7 @@ public final class Vector implements Serializable {
      * @param s (float): right-hand operand
      * @return  (Vector):scaled vector, not null
      */
-    public Vector div(float s) {
+    private Vector div(float s) {
         return new Vector(this.x / s, this.y / s);
     }
     
@@ -144,7 +144,7 @@ public final class Vector implements Serializable {
      * @param other (Vector): right-hand operand, not null
      * @return (Vector): dot product
      */
-    public float dot(Vector other) {
+    private float dot(Vector other) {
         return x * other.x + y * other.y;
     }
     
@@ -178,7 +178,7 @@ public final class Vector implements Serializable {
      * Computes unit vector of same direction, or (1, 0) if zero.
      * @return (Vector): rescaled vector, not null
      */
-    public Vector normalized() {
+    private Vector normalized() {
         float length = getLength();
         if (length > 1e-6)
             return div(length);

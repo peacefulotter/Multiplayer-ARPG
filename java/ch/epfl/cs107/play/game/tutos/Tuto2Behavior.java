@@ -24,7 +24,7 @@ public class Tuto2Behavior extends AreaBehavior {
 			this.isWalkable = isWalkable;
 		}
 
-		public static Tuto2CellType toType(int type){
+		static Tuto2CellType toType(int type){
 			for(Tuto2CellType ict : Tuto2CellType.values()){
 				if(ict.type == type)
 					return ict;
@@ -67,15 +67,15 @@ public class Tuto2Behavior extends AreaBehavior {
 		 * @param y (int): y coordinate of the cell
 		 * @param type (EnigmeCellType), not null
 		 */
-		public  Tuto2Cell(int x, int y, Tuto2CellType type){
+        Tuto2Cell(int x, int y, Tuto2CellType type){
 			super(x, y);
 			this.type = type;
 		}
-		public boolean isDoor() {
+		boolean isDoor() {
 			return type == Tuto2CellType.DOOR;
 		}
 		@Override
-		protected boolean canLeave(Interactable entity) {
+		protected boolean canLeave() {
 			return true;
 		}
 

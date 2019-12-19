@@ -3,7 +3,6 @@ package ch.epfl.cs107.play.game.arpg.inventory;
 
 import ch.epfl.cs107.play.game.rpg.inventory.InventoryItem;
 import ch.epfl.cs107.play.game.actor.Actor;
-import ch.epfl.cs107.play.game.areagame.actor.AreaEntity;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.rpg.inventory.Inventory;
 import ch.epfl.cs107.play.math.Transform;
@@ -15,13 +14,13 @@ public class ARPGInventory extends Inventory implements Actor
     private int playerFortune;
     private int playerMoney;
 
-    private Sprite sprite;
+    private final Sprite sprite;
     private boolean isDisplaying = false;
 
     //item order contains the order in which the items will be displayed on the player GUI
-    private InventoryItem[] itemOrder;
+    private final InventoryItem[] itemOrder;
 
-    private int inventorySize;
+    private final int inventorySize;
     private Integer itemOrderIndex;
 
     //No inventory holder as we used the inventory on only the ARPGPlayer and NetworkARPGLPlayer
@@ -105,7 +104,7 @@ public class ARPGInventory extends Inventory implements Actor
     }
 
     @Override
-    public boolean removeItemFromInventory( InventoryItem item, int amount )
+    protected boolean removeItemFromInventory(InventoryItem item, int amount)
     {
         boolean removed = super.removeItemFromInventory( item, amount );
         if ( removed )

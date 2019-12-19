@@ -10,7 +10,7 @@ import ch.epfl.cs107.play.recorder.recordEntry.RecordEntry;
 import ch.epfl.cs107.play.math.RandomGenerator;
 import ch.epfl.cs107.play.window.Window;
 
-public class RecordReplayer {
+class RecordReplayer {
 	private Record record;
 	private Robot robot;
 	private long startTime;

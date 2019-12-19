@@ -6,9 +6,9 @@ import ch.epfl.cs107.play.window.Window;
 
 public abstract class RecordEntry implements java.io.Serializable{
 	private static final long serialVersionUID = 1;
-	private long time;
+	private final long time;
 	
-	public RecordEntry(long time) {
+	RecordEntry(long time) {
 		this.time = time;
 	}
 	

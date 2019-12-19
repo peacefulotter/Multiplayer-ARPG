@@ -29,13 +29,13 @@ public enum ARPGItem implements InventoryItem {
             1f, 10,
             true, 1, Vulnerabilities.CLOSE_RANGE);
 
-    protected String name;
-    protected String spriteName;
-    protected float weight;
-    protected int price;
-    private boolean equippable;
-    private float damage;
-    private Vulnerabilities weaponType;
+    private final String name;
+    private final String spriteName;
+    private final float weight;
+    private final int price;
+    private final boolean equippable;
+    private final float damage;
+    private final Vulnerabilities weaponType;
 
     ARPGItem(String name, String spriteName, float weight, int price, boolean equippable, float damage) {
         this(name, spriteName, weight, price, equippable, damage, null);

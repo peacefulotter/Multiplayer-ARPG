@@ -1,16 +1,15 @@
 package ch.epfl.cs107.play.game.areagame;
 
-import java.util.*;
-
 import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactor;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
-import ch.epfl.cs107.play.game.narpg.actor.player.NetworkARPGPlayer;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Image;
 import ch.epfl.cs107.play.window.Window;
+
+import java.util.*;
 
 
 /**
@@ -29,7 +28,7 @@ public abstract class AreaBehavior
      * @param window (Window): graphic context, not null
      * @param name (String): name of the behavior image, not null
      */
-    public AreaBehavior(Window window, String name){
+    protected AreaBehavior(Window window, String name){
         // Load the image
         behaviorMap = window.getImage(ResourcePath.getBehaviors(name), null, false);
         // Get the corresponding dimension and init the array
@@ -53,14 +52,14 @@ public abstract class AreaBehavior
         for(int i = 0; i<width;i++){
             for(int j =0; j<height;j++){
                 var entities=cells[i][j].getEntities();
-                if(entities.contains(clearObject) && clearObject.getPosition()!=new Vector(i,j)){
+                if(entities.contains(clearObject) && !Objects.equals(clearObject.getPosition(), new Vector(i, j))){
                     cells[i][j].leave((Interactable)clearObject);
                 }
             }
         }
     }
 
-    protected void cellInteractionOf(Interactor interactor){
+    void cellInteractionOf(Interactor interactor){
         for(DiscreteCoordinates dc : interactor.getCurrentCells()){
             if(dc.x < 0 || dc.y < 0 || dc.x >= width || dc.y >= height)
                 continue;
@@ -69,7 +68,7 @@ public abstract class AreaBehavior
     }
 
 
-    protected void viewInteractionOf(Interactor interactor){
+    void viewInteractionOf(Interactor interactor){
         for(DiscreteCoordinates dc : interactor.getFieldOfViewCells()){
             if(dc.x < 0 || dc.y < 0 || dc.x >= width || dc.y >= height)
                 continue;
@@ -79,12 +78,12 @@ public abstract class AreaBehavior
 
 
 
-    protected boolean canLeave(Interactable entity, List<DiscreteCoordinates> coordinates) {
+    boolean canLeave(Interactable entity, List<DiscreteCoordinates> coordinates) {
 
         for(DiscreteCoordinates c : coordinates){
             if(c.x < 0 || c.y < 0 || c.x >= width || c.y >= height)
                 return false;
-            if(!cells[c.x][c.y].canLeave(entity))
+            if(!cells[c.x][c.y].canLeave())
                 return false;
         }
         return true;
@@ -109,7 +108,7 @@ public abstract class AreaBehavior
 
     }
 
-    protected void enter(Interactable entity, List<DiscreteCoordinates> coordinates) {
+    void enter(Interactable entity, List<DiscreteCoordinates> coordinates) {
         for(DiscreteCoordinates c : coordinates){
             cells[c.x][c.y].enter(entity);
         }
@@ -139,11 +138,11 @@ public abstract class AreaBehavior
     public abstract class Cell implements Interactable{
 
         /// Content of the cell as a set of Interactable
-        protected Set<Interactable> entities;
-        private DiscreteCoordinates coordinates;
+        final Set<Interactable> entities;
+        private final DiscreteCoordinates coordinates;
 
 
-        public Set<Interactable> getEntities(){
+        Set<Interactable> getEntities(){
             return entities;
         }
         /**
@@ -192,7 +191,7 @@ public abstract class AreaBehavior
          * Do the given interactable enter into this Cell
          * @param entity (Interactable), not null
          */
-        protected void enter(Interactable entity) {
+        void enter(Interactable entity) {
             entities.add(entity);
         }
 
@@ -200,16 +199,15 @@ public abstract class AreaBehavior
          * Do the given Interactable leave this Cell
          * @param entity (Interactable), not null
          */
-        protected void leave(Interactable entity) {
+        void leave(Interactable entity) {
             entities.remove(entity);
         }
 
         /**
          * Indicate if the given Interactable can leave this Cell
-         * @param entity (Interactable), not null
          * @return (boolean): true if entity can leave
          */
-        protected abstract boolean canLeave(Interactable entity);
+        protected abstract boolean canLeave();
 
         /**
          * Indicate if the given Interactable can enter this Cell

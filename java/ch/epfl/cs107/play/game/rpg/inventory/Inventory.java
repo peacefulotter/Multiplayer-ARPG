@@ -7,10 +7,10 @@ public class Inventory
 {
     private final float maxWeight;
     private float inventoryWeight;
-    protected Hashtable<InventoryItem, Integer> inventory;
+    protected final Hashtable<InventoryItem, Integer> inventory;
     private int currentIndex = 0;
 
-    public Inventory( float maxWeight )
+    protected Inventory(float maxWeight)
     {
         this.maxWeight = maxWeight;
         inventory = new Hashtable<InventoryItem, Integer>();

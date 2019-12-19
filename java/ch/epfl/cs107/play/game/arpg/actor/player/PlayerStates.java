@@ -9,12 +9,10 @@ public enum PlayerStates {
     IS_DASHING( true, false ),
     UNREACTIVE(true,false);
 
-    private boolean vulnerable;
-    private boolean closeRangeAttack;
+    private final boolean closeRangeAttack;
 
     PlayerStates( boolean vulnerable, boolean closeRangeAttack )
     {
-        this.vulnerable = vulnerable;
         this.closeRangeAttack = closeRangeAttack;
     }
 

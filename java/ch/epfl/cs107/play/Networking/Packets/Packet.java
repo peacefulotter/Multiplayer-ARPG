@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Properties;
 
 public abstract class Packet {
-    public byte packetId;
-    protected int objectId;
+    private byte packetId;
+    int objectId;
 
-    public Packet(int packetId, int objectId) {
+    Packet(int packetId, int objectId) {
         this.packetId = (byte) packetId;
         this.objectId = objectId;
     }
-    public Packet(int packetId,byte[] data){
+    Packet(byte[] data){
         String message[]=readData(data).split(";");
         this.objectId= Integer.parseInt(message[0]);
     }
@@ -28,7 +28,7 @@ public abstract class Packet {
             return PacketTypes.INVALID;
         }
     }
-    public static PacketTypes lookUpPacket(int id) {
+    private static PacketTypes lookUpPacket(int id) {
         for (PacketTypes p : PacketTypes.values()) {
             if (p.getPacketID() == id) {
                 return p;
@@ -44,7 +44,7 @@ public abstract class Packet {
     public abstract void writeData(Connection connection);
 
     //converting string of a HashMap to an actual hash map as seen here : https://stackoverflow.com/questions/3957094/convert-hashmap-tostring-back-to-hashmap-in-java
-    public static HashMap<String,String> getHashMapFromString(String hashMapString){
+    static HashMap<String,String> getHashMapFromString(String hashMapString){
         Properties props = new Properties();
         try {
             props.load(new StringReader(hashMapString.substring(1, hashMapString.length() - 1).replace(", ", "\n")));
@@ -62,12 +62,12 @@ public abstract class Packet {
         connection.sendDataTo(connectionId,getData());
     }
 
-    public String readData(byte[] data) {
+    String readData(byte[] data) {
         String message = new String(data).trim();
         return message.substring(2);
     }
 
-    public abstract byte[] getData();
+    protected abstract byte[] getData();
 
     public static enum PacketTypes {
         INVALID(-1),
@@ -79,7 +79,7 @@ public abstract class Packet {
         LOGOUT( 05 ),
         DESPAWN( 06 );
 
-        private int packetID;
+        private final int packetID;
 
         PacketTypes(int packetID) {
             this.packetID = packetID;

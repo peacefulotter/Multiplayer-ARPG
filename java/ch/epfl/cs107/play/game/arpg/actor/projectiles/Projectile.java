@@ -15,13 +15,13 @@ import java.util.List;
 
 public abstract class Projectile extends MovableAreaEntity implements Interactor, FlyableEntity {
 
-    private int speed;
+    private final int speed;
 
-    public int getSpeed() {
+    protected int getSpeed() {
         return speed;
     }
 
-    public float getMaxDistance() {
+    protected float getMaxDistance() {
         return maxDistance;
     }
 
@@ -35,14 +35,14 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
      * @param orientation (Orientation): Initial orientation of the entity. Not null
      * @param position    (Coordinate): Initial position of the entity. Not null
      */
-    public Projectile(Area area, Orientation orientation, DiscreteCoordinates position, int speed, float maxDistance) {
+    Projectile(Area area, Orientation orientation, DiscreteCoordinates position, int speed, float maxDistance) {
         super(area, orientation, position);
         this.speed = speed;
         this.maxDistance = maxDistance;
         startingPos=getPosition();
     }
 
-    public void stopProjectile() {
+    protected void stopProjectile() {
         getOwnerArea().unregisterActor(this);
     }
 

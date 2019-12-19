@@ -17,7 +17,7 @@ import ch.epfl.cs107.play.window.Canvas;
 public class MagicProjectile extends Projectile
 {
     private final static float MAGIC_DAMAGE = 1;
-    private Animation animation;
+    private final Animation animation;
     // protected and not final because NetworkMagic overrides it
     protected ARPGInteractionVisitor handler;
     /**
@@ -61,7 +61,7 @@ public class MagicProjectile extends Projectile
 
     @Override
     public void acceptInteraction( AreaInteractionVisitor v ) {
-        ((ARPGInteractionVisitor)v).interactWith(this );
+        ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
 

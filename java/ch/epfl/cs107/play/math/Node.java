@@ -9,7 +9,7 @@ public class Node implements Attachable {
     private Transform transform;
 
     /** Creates a new node at origin. */
-    public Node() {
+    protected Node() {
         parent = null;
         transform = Transform.I;
     }

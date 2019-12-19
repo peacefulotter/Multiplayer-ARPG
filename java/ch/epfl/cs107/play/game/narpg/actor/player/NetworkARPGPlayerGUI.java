@@ -9,7 +9,7 @@ import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
 public class NetworkARPGPlayerGUI extends ARPGPlayerStatusGUI {
-    private NetworkARPGPlayer owner;
+    private final NetworkARPGPlayer owner;
     private static final ImageGraphics upgradedSprite  = new ImageGraphics(
             ResourcePath.getSprite("custom/upgrade"),
             12, 4, new RegionOfInterest(0, 0, 240, 80),

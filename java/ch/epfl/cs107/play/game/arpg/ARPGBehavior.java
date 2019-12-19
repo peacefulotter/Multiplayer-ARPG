@@ -29,7 +29,7 @@ public class ARPGBehavior extends AreaBehavior
             this.isFlyable = isFlyable;
         }
 
-        public static ARPGBehavior.ARPGCellType toType( int type )
+        static ARPGBehavior.ARPGCellType toType(int type)
         {
             for ( ARPGBehavior.ARPGCellType ict : ARPGBehavior.ARPGCellType.values() )
             {
@@ -59,7 +59,7 @@ public class ARPGBehavior extends AreaBehavior
 
     public class ARPGCell extends Cell
     {
-        private ARPGCellType type;
+        private final ARPGCellType type;
 
         /**
          * Default Cell constructor
@@ -79,7 +79,7 @@ public class ARPGBehavior extends AreaBehavior
         }
 
         @Override
-        protected boolean canLeave( Interactable entity )
+        protected boolean canLeave()
         {
             return true;
         }

@@ -1,11 +1,10 @@
 package ch.epfl.cs107.play.Networking.Packets;
 
 import ch.epfl.cs107.play.Networking.Connection;
-import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 
 public class Packet05Logout extends Packet
 {
-        private long connectionId;
+        private final long connectionId;
 
         public Packet05Logout( int objectId,long connectionId)
         {
@@ -15,7 +14,7 @@ public class Packet05Logout extends Packet
 
         public Packet05Logout( byte[] data )
         {
-            super(05, data);
+            super(data);
             String[] dataArray = readData(data).split(";");
             connectionId = Long.parseLong(dataArray[1]);
         }

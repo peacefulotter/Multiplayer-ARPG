@@ -18,13 +18,13 @@ import java.util.List;
 
 public class Bomb extends AreaEntity implements Interactor {
 
-    private Sprite[] bombSprite;
+    private final Sprite[] bombSprite;
     // the bomb range
     private final static int BOMB_DIAMETER = 3;
     // The time it will take to the bomb to explode
     //is decremented until it reaches 0
     private float fuseTime;
-    private Animation animation;
+    private final Animation animation;
     //exploded needed to make sure explosions only deals damage once while animation plays
     private boolean exploded = false;
     private static final float BOMB_DAMAGE = .5f;

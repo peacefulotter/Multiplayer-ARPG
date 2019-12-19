@@ -19,8 +19,8 @@ import ch.epfl.cs107.play.window.Keyboard;
 
 public class GhostPlayer extends MovableAreaEntity {
 	private float hp;
-	private TextGraphics message;
-	private Sprite sprite;
+	private final TextGraphics message;
+	private final Sprite sprite;
 	private boolean isPassingADoor;
 	/// Animation duration in frame number
     private final static int ANIMATION_DURATION = 8;
@@ -78,7 +78,7 @@ public class GhostPlayer extends MovableAreaEntity {
 	    /**
 	     * Indicate the player just passed a door
 	     */
-	    protected void setIsPassingADoor(){ // 
+		private void setIsPassingADoor(){ //
 	        isPassingADoor = true;
 	    }
 

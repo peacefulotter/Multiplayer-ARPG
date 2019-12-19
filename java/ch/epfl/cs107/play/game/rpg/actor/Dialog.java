@@ -59,7 +59,7 @@ public class Dialog implements Graphics {
      * Reset the dialog window with a new dialog text
      * @param newText (String), not null
      */
-    public void resetDialog(String newText){
+    private void resetDialog(String newText){
         this.text = newText;
         this.cursor = 0;
         push();
@@ -70,7 +70,7 @@ public class Dialog implements Graphics {
      * Notice: this method assume it will never face to single word longer or equals than MAX_LINE_SIZE
      * @return (boolean) if the dialog can be closed or not
      */
-    public boolean push(){
+    private boolean push(){
 
         int lengthToPush = text.length()-cursor;
         // Simply close the dialog

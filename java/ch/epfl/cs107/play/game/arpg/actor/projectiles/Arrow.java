@@ -16,7 +16,7 @@ import ch.epfl.cs107.play.window.Canvas;
 public class Arrow extends Projectile
 {
     private final static float ARROW_DAMAGE = 0.5f;
-    private Sprite sprite;
+    private final Sprite sprite;
     // type ARPGInteractionVisitor, not private and not final because it will be overwritten by NetworkArrow
     protected ARPGInteractionVisitor handler;
 
@@ -26,14 +26,14 @@ public class Arrow extends Projectile
         RIGHT( 1 ),
         DOWN( 2 ),
         LEFT( 3 );
-        private int directionIndex;
+        private final int directionIndex;
 
         Directions( int directionIndex )
         {
             this.directionIndex = directionIndex;
         }
 
-        public int value() {
+        int value() {
             return this.directionIndex;
         }
 
@@ -87,7 +87,7 @@ public class Arrow extends Projectile
 
     @Override
     public void acceptInteraction( AreaInteractionVisitor v ) {
-        ((ARPGInteractionVisitor)v).interactWith( this );
+        ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
 

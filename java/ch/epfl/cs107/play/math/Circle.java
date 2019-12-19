@@ -16,7 +16,7 @@ public final class Circle extends Shape {
      * @param radius (float): size, not negative
      * @param center (Vector): origin, not null
      */
-    public Circle(float radius, Vector center) {
+    private Circle(float radius, Vector center) {
         if (center == null)
             throw new NullPointerException();
         this.radius = radius;

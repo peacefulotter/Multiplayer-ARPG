@@ -19,7 +19,7 @@ public abstract class Entity implements Actor {
      * Default Entity constructor
      * @param position (Coordinate): Initial position of the entity. Not null
      */
-    public Entity(Vector position) {
+    protected Entity(Vector position) {
 
         if (position == null )
             throw new NullPointerException();

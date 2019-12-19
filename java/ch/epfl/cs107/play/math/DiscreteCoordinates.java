@@ -17,7 +17,7 @@ import java.util.List;
 public final class DiscreteCoordinates implements Serializable {
 	private static final long serialVersionUID = 1;
 
-    public static DiscreteCoordinates ORIGIN = new DiscreteCoordinates(0, 0);
+    public static final DiscreteCoordinates ORIGIN = new DiscreteCoordinates(0, 0);
     /// A coordinate pair is defined by the x and y graduation
     public final int x, y;
 
@@ -32,22 +32,22 @@ public final class DiscreteCoordinates implements Serializable {
     }
 
     /** @return (DiscreteCoordinates): one coordinate left */
-    public DiscreteCoordinates left(){
+    private DiscreteCoordinates left(){
         return new DiscreteCoordinates(x-1, y);
     }
 
     /** @return (DiscreteCoordinates): one coordinate right */
-    public DiscreteCoordinates right(){
+    private DiscreteCoordinates right(){
         return new DiscreteCoordinates(x+1, y);
     }
 
     /** @return (DiscreteCoordinates): one coordinate above */
-    public DiscreteCoordinates up(){
+    private DiscreteCoordinates up(){
         return new DiscreteCoordinates(x, y+1);
     }
 
     /** @return (DiscreteCoordinates): one coordinate below */
-    public DiscreteCoordinates down(){
+    private DiscreteCoordinates down(){
         return new DiscreteCoordinates(x, y-1);
     }
 

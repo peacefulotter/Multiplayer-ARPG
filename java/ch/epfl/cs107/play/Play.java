@@ -14,7 +14,7 @@ import java.awt.*;
 /**
  * Main entry point.
  */
-public class Play {
+class Play {
 
 	/** One second in nano second */
     private static final float ONE_SEC = 1E9f;

@@ -25,21 +25,21 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
     // the sprite of the critical shot
     private final Sprite critsSprite;
     // List of all the vulnerabilities the monster has
-    private List<Vulnerabilities> vulnerabilities;
-    private Animation[] movementAnimation;
+    private final List<Vulnerabilities> vulnerabilities;
+    private final Animation[] movementAnimation;
     // how many damage the monster can deal
     private final float inflictDamage;
     private float currentHealth;
     private float timeAttack;
     // did the monster has received a critical hit
     private boolean dealtCrits;
-    public boolean hasAttacked;
+    boolean hasAttacked;
 
-    protected int currentAnimationIndex = 2;
-    protected Animation deathAnimation;
-    protected boolean isDead;
+    int currentAnimationIndex = 2;
+    final Animation deathAnimation;
+    boolean isDead;
 
-    public Monster(
+    Monster(
             Area area, DiscreteCoordinates position, Orientation[] orientations,
             String spriteName, float maxHealth, float damage, int nbFrames,
             Vector spriteOffset, Vulnerabilities... vulnerabilities)
@@ -82,7 +82,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         update( deltaTime, true );
     }
 
-    public void update(float deltaTime, boolean allowReorientation )
+    void update(float deltaTime, boolean allowReorientation)
     {
         if ( !isDead )
         {
@@ -156,7 +156,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         draw( canvas, true );
     }
 
-    public void draw( Canvas canvas, boolean drawMonster )
+    void draw(Canvas canvas, boolean drawMonster)
     {
         if ( !isDead )
         {
@@ -203,14 +203,14 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
      * Get a random orientation
      * @return Orientation
      */
-    protected Orientation getRandomOrientation()
+    Orientation getRandomOrientation()
     {
         int random = RandomGenerator.getInstance().nextInt( 4 );
         return Orientation.fromInt( random );
     }
 
     // getter for the damage the monster can deal
-    public float getDamage()
+    float getDamage()
     {
         return inflictDamage;
     }

@@ -67,7 +67,7 @@ public class Tuto2 extends AreaGame {
 		return "Tuto2";
 	}
 
-	protected void switchArea()
+	private void switchArea()
 	{
 		player.leaveArea();
 

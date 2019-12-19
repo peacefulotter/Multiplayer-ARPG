@@ -45,8 +45,8 @@ public class Text extends Entity {
      * @param alpha (float): transparency of the text (0 is full invisible and 1 is full opaque)
      * @param depth (float): the depth of the text, small depth draw first
      */
-    public Text(String text, DiscreteCoordinates position, Area area, boolean isScreenRelative, float fontSize, Color color, boolean bold, boolean italics,
-                TextAlign.Horizontal hAlign, TextAlign.Vertical vAlign, float alpha, float depth) {
+    private Text(String text, DiscreteCoordinates position, Area area, boolean isScreenRelative, float fontSize, Color color, boolean bold, boolean italics,
+                 TextAlign.Horizontal hAlign, TextAlign.Vertical vAlign, float alpha, float depth) {
         super(position.toVector());
 
         DX = area.getCameraScaleFactor()/2;

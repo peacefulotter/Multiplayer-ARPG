@@ -190,7 +190,7 @@ public abstract class Area implements Playable {
     /**
      * @return the mouse position relatively to the area and the cells
      */
-    public Vector getRelativeMousePosition() {
+    private Vector getRelativeMousePosition() {
         return getMouse().getPosition();
     			/*.max(new Vector(0,0))
 				.min(new Vector(getWidth(),getHeight()));*/
@@ -279,11 +279,9 @@ public abstract class Area implements Playable {
     /**
      * Resume method: Can be overridden
      *
-     * @param window     (Window): display context, not null
-     * @param fileSystem (FileSystem): given file system, not null
      * @return (boolean) : if the resume succeed, true by default
      */
-    public boolean resume(Window window, FileSystem fileSystem) {
+    public boolean resume() {
         return true;
     }
 
@@ -318,7 +316,7 @@ public abstract class Area implements Playable {
 
     }
     //updates actors and handles interactions between them
-    public void handleInteractions(float deltaTime) {
+    private void handleInteractions(float deltaTime) {
         // update actors
         for (Actor actor : actors) {
             actor.update(deltaTime);

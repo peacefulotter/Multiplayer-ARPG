@@ -1,17 +1,15 @@
 package ch.epfl.cs107.play.Networking.Packets;
 
-import ch.epfl.cs107.play.Client;
 import ch.epfl.cs107.play.Networking.Connection;
 import ch.epfl.cs107.play.Networking.utils.OrientationValues;
-import ch.epfl.cs107.play.Server;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 
 public class Packet02Move extends Packet {
-    private Orientation orientation;
-    private int startX;
-    private int startY;
-    private int speed;
+    private final Orientation orientation;
+    private final int startX;
+    private final int startY;
+    private final int speed;
     public Packet02Move(int objectId, Orientation orientation, DiscreteCoordinates start, int speed) {
         super(02, objectId);
         this.objectId = objectId;
@@ -22,7 +20,7 @@ public class Packet02Move extends Packet {
     }
 
     public Packet02Move(byte[] data) {
-        super(02, data);
+        super(data);
         String[] dataArray = readData(data).split(";");
         this.orientation = OrientationValues.getOrientationByValue(Integer.parseInt(dataArray[1]));
         this.startX = Integer.parseInt(dataArray[2]);

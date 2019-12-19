@@ -11,14 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkArena extends ARPGArea {
-    private final Connection connection;
     private final boolean isServer;
     private final List<NetworkEntity> networkEntities;
-    private ServerAnnouncement announcement;
+    private final ServerAnnouncement announcement;
 
     public NetworkArena(Connection connection, boolean isServer) {
         networkEntities = new ArrayList<>();
-        this.connection = connection;
         this.isServer = isServer;
         announcement = new ServerAnnouncement();
     }
