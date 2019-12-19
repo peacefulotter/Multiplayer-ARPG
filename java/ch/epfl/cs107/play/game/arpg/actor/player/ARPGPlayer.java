@@ -185,6 +185,8 @@ public class ARPGPlayer extends Player {
         if (state != state.IDLE || currentItem == null ) { return; }
         switch (currentItem) {
             case BOMB:
+                //Makes sure bomb is only placed if the use item key was just pressed and not when just  held down
+                if(!getOwnerArea().getKeyboard().get(PlayerInput.USE_ITEM.getKeyCode()).isPressed()) return;
                 //handles adding a bomb to the area and removing it from inventory
                 DiscreteCoordinates bombCoordinates = getFieldOfViewCells().get(0);
                 if ( isDisplacementOccurs() )

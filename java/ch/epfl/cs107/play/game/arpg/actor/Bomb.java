@@ -20,14 +20,16 @@ public class Bomb extends AreaEntity implements Interactor {
 
     private Sprite[] bombSprite;
     // the bomb range
-    private int bombDiameter = 3;
-    // The tie it will take to the bomb to explode
+    private final static int BOMB_DIAMETER = 3;
+    // The time it will take to the bomb to explode
+    //is decremented until it reaches 0
     private float fuseTime;
     private Animation animation;
+    //exploded needed to make sure explosions only deals damage once while animation plays
     private boolean exploded = false;
     private static final float BOMB_DAMAGE = .5f;
     // type ArpgInteractionVisitor and  not final because its overwritten by NetworkBomb
-    private ARPGInteractionVisitor handler;
+    protected ARPGInteractionVisitor handler;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
         super( area, orientation, position );
@@ -37,7 +39,7 @@ public class Bomb extends AreaEntity implements Interactor {
         bombSprite[1]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16), new Vector( 0, 0.25f ),1f,-100);
         Sprite[] animationSprites= new Sprite[7];
         for(int i=0; i<7;i++){
-            animationSprites[i] = new Sprite("zelda/explosion", bombDiameter,bombDiameter,this, new RegionOfInterest(i*32,0,32,32), new Vector(-bombDiameter/2,-bombDiameter/2));
+            animationSprites[i] = new Sprite("zelda/explosion", BOMB_DIAMETER, BOMB_DIAMETER,this, new RegionOfInterest(i*32,0,32,32), new Vector(-BOMB_DIAMETER /2,-BOMB_DIAMETER /2));
         }
         animation = new Animation(4,animationSprites, false);
         handler = new BombHandler();
@@ -121,8 +123,11 @@ public class Bomb extends AreaEntity implements Interactor {
     public List<DiscreteCoordinates> getFieldOfViewCells() {
         List<DiscreteCoordinates> fieldOfViewCells = new ArrayList<>();
         DiscreteCoordinates mainCell = getCurrentCells().get(0);
-        int offsetFromMainCell = (bombDiameter-1) / 2;
+        //offsetFromMainCell is how many cells we need to look from the MainCell to get a bomb explosion diameter of bombDiameter
+        int offsetFromMainCell = (BOMB_DIAMETER -1) / 2;
+        //goes from one side of bomb effect area to the other
         for (int i = mainCell.x - offsetFromMainCell; i < mainCell.x + offsetFromMainCell + 1; i++) {
+            //goes from top to bottom of bomb effect area
             for (int j = mainCell.y - offsetFromMainCell; j < mainCell.y + offsetFromMainCell + 1; j++) {
                 // ensure the coordinates are in the area
                 if ( i >= 0 && j >= 0) {
