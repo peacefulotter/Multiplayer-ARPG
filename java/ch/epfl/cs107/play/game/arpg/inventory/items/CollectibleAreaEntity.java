@@ -11,6 +11,7 @@ import java.util.List;
 
 public abstract class CollectibleAreaEntity extends AreaEntity implements Interactable
 {
+    //used to check if item has already been collected to avoid duplication
     private boolean collected = false;
     /**
      * Default AreaEntity constructor
@@ -45,7 +46,6 @@ public abstract class CollectibleAreaEntity extends AreaEntity implements Intera
     }
 
     //boolean collected necessary because otherwise item may be collected multiple times before actor is unregistered
-    //may actually not be necessary though
     public boolean collect(){
         if(!collected){
             getOwnerArea().unregisterActor(this);

@@ -17,6 +17,7 @@ public class CastleDoor extends Door {
     public CastleDoor(Area area) {
         super("zelda/Chateau", new DiscreteCoordinates(7,1), Logic.FALSE, area, Orientation.UP, new DiscreteCoordinates(9,13),new DiscreteCoordinates(10,13));
         sprites = new Sprite[2];
+        //Custom sprites used only for CastleDoor
         sprites[0]= new Sprite("zelda/castleDoor.close",2,2,this, new RegionOfInterest(0,0,32,32), Vector.ZERO,1,-100f);
         sprites[1]= new Sprite("zelda/castleDoor.open",2,2,this, new RegionOfInterest(0,0,32,32), Vector.ZERO,1,-100f);
     }
@@ -35,6 +36,7 @@ public class CastleDoor extends Door {
         ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
+    //closes the door as by instructions
     public void passDoor(){
         setSignal(Logic.FALSE);
     }
@@ -43,6 +45,7 @@ public class CastleDoor extends Door {
     }
     @Override
     public void draw(Canvas canvas) {
+        //draw correct sprite
         if(isOpen()){
             sprites[1].draw(canvas);
         }else{

@@ -9,7 +9,6 @@ import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.handler.ARPGInteractionVisitor;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Coin;
 import ch.epfl.cs107.play.game.arpg.inventory.items.Heart;
-import ch.epfl.cs107.play.game.rpg.actor.RPGSprite;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
@@ -22,14 +21,15 @@ import java.util.Random;
 
 public class Grass extends AreaEntity {
     private static final Random random = new Random();
+    private final static float GRASS_DEPTH = -100f;
+    private final static double DROP_CHANCE = 0.75;
     private final List<DiscreteCoordinates> currentCells;
-    public boolean isCut = false;
-    private float grassDepth = -100f;
     private final Sprite sprite = new Sprite(
             "zelda/grass",
             1, 1,
-            this, new RegionOfInterest(0, 0, 16, 16), new Vector(0, 0), 1f, grassDepth
+            this, new RegionOfInterest(0, 0, 16, 16), new Vector(0, 0), 1f, GRASS_DEPTH
     );
+    public boolean isCut = false;
     private Animation grassAnimation;
 
     public Grass(Area area, Orientation orientation, DiscreteCoordinates position) {
@@ -39,7 +39,7 @@ public class Grass extends AreaEntity {
         Sprite[] animationSprites = new Sprite[4];
 
         for (int i = 0; i < 4; i++) {
-            animationSprites[i] = new Sprite("zelda/grass.sliced", 1.5f, 1.5f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, grassDepth);
+            animationSprites[i] = new Sprite("zelda/grass.sliced", 1.5f, 1.5f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, GRASS_DEPTH);
         }
 
         grassAnimation = new Animation(8, animationSprites, false);
@@ -52,6 +52,7 @@ public class Grass extends AreaEntity {
         } else if (!grassAnimation.isCompleted()) {
             grassAnimation.draw(canvas);
         } else {
+            //Unregisters grass only once it has finished its falling leaves animation
             getOwnerArea().unregisterActor(this);
         }
     }
@@ -62,36 +63,44 @@ public class Grass extends AreaEntity {
             grassAnimation.update(deltaTime);
     }
 
-    public void cutGrass()
-    {
-        if ( isCut ) { return; }
+    public void cutGrass() {
+        if (isCut) {
+            return;
+        }
         isCut = true;
-        if (random.nextBoolean() )
-        {
-            if ( random.nextDouble() < .75 )
-            {
-                getOwnerArea().registerActor( new Coin( getOwnerArea(), getCurrentMainCellCoordinates(), 50 ) );
+        if (random.nextBoolean()) {
+            //once cut has a 50/50 chance of dropping a collectible of which DROP_CHANCE % will be coins and the rest hearts
+            if (random.nextDouble() < DROP_CHANCE) {
+                getOwnerArea().registerActor(new Coin(getOwnerArea(), getCurrentMainCellCoordinates(), 50));
             } else {
-                getOwnerArea().registerActor( new Heart( getOwnerArea(), getCurrentMainCellCoordinates() ) );
+                getOwnerArea().registerActor(new Heart(getOwnerArea(), getCurrentMainCellCoordinates()));
             }
         }
     }
 
 
     @Override
-    public List<DiscreteCoordinates> getCurrentCells() { return currentCells; }
+    public List<DiscreteCoordinates> getCurrentCells() {
+        return currentCells;
+    }
 
     @Override
-    public boolean takeCellSpace() { return true; }
+    public boolean takeCellSpace() {
+        return true;
+    }
 
     @Override
-    public boolean isCellInteractable() { return !isCut; }
+    public boolean isCellInteractable() {
+        return !isCut;
+    }
 
     @Override
-    public boolean isViewInteractable() { return !isCut; }
+    public boolean isViewInteractable() {
+        return !isCut;
+    }
 
     @Override
-    public void acceptInteraction( AreaInteractionVisitor v ) {
+    public void acceptInteraction(AreaInteractionVisitor v) {
         ((ARPGInteractionVisitor) v).interactWith(this);
     }
 

@@ -50,8 +50,10 @@ public abstract class Projectile extends MovableAreaEntity implements Interactor
     public void update(float deltaTime) {
         super.update(deltaTime);
         Vector currentPos= getPosition().mul(-1);
+        //effectively subtract the current position from starting position to get travel vector
         if(currentPos.add(startingPos).getLength()>maxDistance)stopProjectile();
         move(speed);
+        //if projectile encouters a wall or impassable object
         if(!isDisplacementOccurs()){
             stopProjectile();
         }

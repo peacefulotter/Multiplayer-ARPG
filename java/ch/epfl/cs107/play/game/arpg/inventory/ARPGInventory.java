@@ -18,16 +18,16 @@ public class ARPGInventory extends Inventory implements Actor
     private Sprite sprite;
     private boolean isDisplaying = false;
 
-    private AreaEntity holder;
+    //item order contains the order in which the items will be displayed on the player GUI
     private InventoryItem[] itemOrder;
 
     private int inventorySize;
     private Integer itemOrderIndex;
 
-    public ARPGInventory( AreaEntity holder, float maxWeight, int inventorySize, int initialCoins )
+    //No inventory holder as we used the inventory on only the ARPGPlayer and NetworkARPGLPlayer
+    public ARPGInventory( float maxWeight, int inventorySize, int initialCoins )
     {
         super( maxWeight );
-        this.holder = holder;
         playerFortune = initialCoins;
         playerMoney = initialCoins;
         sprite = new Sprite( "zelda/inventory.background", 7f, 10f, this );
@@ -41,11 +41,6 @@ public class ARPGInventory extends Inventory implements Actor
     {
         playerMoney += money;
         playerFortune += money;
-    }
-    public void setMoney(int money){
-        int difference= money-playerMoney;
-        playerMoney +=difference;
-        playerFortune+=money;
     }
 
     public int getMoney() {
@@ -81,10 +76,12 @@ public class ARPGInventory extends Inventory implements Actor
         boolean existedBefore = isItemInInventory(item);
         boolean added = super.addItemToInventory(item, amount);
         boolean addedToOrder = true;
+        //makes sure that we only try to add the item to the item order if we successfully added it to the inventory hashMap
         if ( added && !existedBefore )
         {
             playerFortune += item.getPrice();
             addedToOrder = false;
+            //adds item to first available slot in order
             for(int i=0; i< inventorySize;i++){
                 if(itemOrder[i]==null){
                     itemOrder[i]=item;
@@ -93,6 +90,7 @@ public class ARPGInventory extends Inventory implements Actor
                 }
             }
         }
+        //makes sure there was space in the order
         if(added && !addedToOrder){
             removeItemFromInventory(item, amount);
             return false;
@@ -113,6 +111,7 @@ public class ARPGInventory extends Inventory implements Actor
         if ( removed )
         {
             playerFortune -= item.getPrice();
+            //if no items in inventory we need to remove it from the item order
             if ( inventory.get( item ) == 0 )
             {
                 for ( int i = 0; i < inventorySize; i++ )
@@ -120,6 +119,7 @@ public class ARPGInventory extends Inventory implements Actor
                     if ( item == itemOrder[ i ] )
                     {
                         itemOrder[ i ] = null;
+                        //sets the current item that the player is holding to the next one to avoid empty space in hand
                         getNextItem( 1 );
                     }
                 }
@@ -134,10 +134,12 @@ public class ARPGInventory extends Inventory implements Actor
         for ( int i = 0; i < inventorySize; i++ )
         {
             searchIndex += direction;
+            //makes sure that the searchIndex loops back to the start of the item order when searching
             if ( searchIndex >= inventorySize )
             {
                 searchIndex -= inventorySize;
             }
+            //makes sure that the searchIndex loops back to the end of the item order when searching
             if ( searchIndex < 0 )
             {
                 searchIndex += inventorySize;

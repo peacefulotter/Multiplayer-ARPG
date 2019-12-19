@@ -44,9 +44,13 @@ public class ARPGPlayer extends Player {
     protected float hp;
     private static final int maxHP = 5;
     private Animation[][] animations;
+    //Animation index that chooses between running, sword, bow or staff animation
     protected int currentAnimation = 0;
-    private int currentAnimationIndex = 2;
-    private boolean wantsInteraction = false;
+    //Animation index that chooses the correct orientation of currentAnimation
+    private int currentAnimationDirection = 2;
+    //wanteViewInteraction can change based on if the player is attacking with sword or not
+    private boolean wantsViewInteraction = false;
+    //Item currently equipped
     private ARPGItem currentItem;
     // not private, and not final because it will be overwritten by NetworkARPGPlayer
     protected ARPGPlayerStatusGUI playerGUI;
@@ -70,12 +74,14 @@ public class ARPGPlayer extends Player {
         Sprite[][] swordSprites = RPGSprite.extractSprites("zelda/player.sword", 4, 2, 2, this, 32, 32, new Vector(-0.5f, 0), new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
         Sprite[][] bowSprites = RPGSprite.extractSprites("zelda/player.bow", 4, 2, 2, this, 32, 32, new Vector(-0.5f, 0), new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
         Sprite[][] staffSprites = RPGSprite.extractSprites("zelda/player.staff_water", 4, 2, 2, this, 32, 32, new Vector(-0.5f, 0), new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT});
+        //Custom dash sprites;
         Sprite[] dashAnimationSprites = new Sprite[5];
         for (int i = 2; i < 7; i++) {
             dashAnimationSprites[i - 2] = new Sprite("zelda/vanish", 1f, 1f, this, new RegionOfInterest(i * 32, 0, 32, 32), Vector.ZERO, 1f, -100);
         }
         dashAnimation = new Animation(5, dashAnimationSprites, false);
 
+        //creates running, sword swinging, bow and staff shooting animations
         animations = new Animation[][]{
                 RPGSprite.createAnimations(ANIMATION_DURATION / 2, sprites, true),
                 RPGSprite.createAnimations(ANIMATION_DURATION / 2, swordSprites, false),
@@ -83,15 +89,18 @@ public class ARPGPlayer extends Player {
                 RPGSprite.createAnimations(ANIMATION_DURATION / 2, staffSprites, false)
         };
 
-        inventory = new ARPGInventory(this, 100, 10, 1234);
+        inventory = new ARPGInventory( 100, 10, 1234);
+        setInitialInventory();
+        playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
+    }
+
+    private void setInitialInventory(){
         inventory.addItemToInventory(ARPGItem.BOMB, 10);
         inventory.addItemToInventory(ARPGItem.SWORD);
         inventory.addItemToInventory(ARPGItem.BOW);
         inventory.addItemToInventory(ARPGItem.STAFF);
         inventory.addItemToInventory(ARPGItem.ARROW, 10);
-        playerGUI = new ARPGPlayerStatusGUI(this, inventory.getCurrentItem().getSpriteName());
     }
-
     public void update(float deltaTime) {
         if (state == PlayerStates.IS_DASHING) {
             if (dashAnimation.isCompleted()) {
@@ -102,12 +111,12 @@ public class ARPGPlayer extends Player {
                 move(5);
             }
         }
-        // display animation if player is moving
+        // display animation if player is moving or has any state other than Idle
         else if (isDisplacementOccurs() || state != PlayerStates.IDLE) {
-            animations[currentAnimation][currentAnimationIndex].update(deltaTime);
-            if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationIndex].isCompleted()) {
+            animations[currentAnimation][currentAnimationDirection].update(deltaTime);
+            if (state != PlayerStates.IDLE && animations[currentAnimation][currentAnimationDirection].isCompleted()) {
                 state = PlayerStates.IDLE;
-                animations[currentAnimation][currentAnimationIndex].reset();
+                animations[currentAnimation][currentAnimationDirection].reset();
                 setAnimationByOrientation(getOrientation());
             }
         }
@@ -120,7 +129,7 @@ public class ARPGPlayer extends Player {
         // mouseWheelInput can be either 0 (no movement) or 1 / -1 (movement)
         int mouseWheelInput = mouse.getMouseWheelInput();
 
-        wantsInteraction = false;
+        wantsViewInteraction = false;
 
 
         for (PlayerInput input : PlayerInput.values()) {
@@ -147,7 +156,7 @@ public class ARPGPlayer extends Player {
     private void reactToInput(PlayerInput input) {
         switch (input) {
             case INTERACT:
-                wantsInteraction = true;
+                wantsViewInteraction = true;
                 break;
             case SHOW_INV:
                 inventory.toggleDisplay();
@@ -189,7 +198,7 @@ public class ARPGPlayer extends Player {
                 }
                 break;
             case SWORD:
-                wantsInteraction = true;
+                wantsViewInteraction = true;
                 state = PlayerStates.ATTACKING_SWORD;
                 currentAnimation = 1;
                 break;
@@ -224,7 +233,7 @@ public class ARPGPlayer extends Player {
             dashAnimation.setAnchor(dashStartingPos.sub(getCurrentCells().get(0).toVector()));
             dashAnimation.draw(canvas);
         }
-        animations[currentAnimation][currentAnimationIndex].draw(canvas);
+        animations[currentAnimation][currentAnimationDirection].draw(canvas);
     }
 
     /**
@@ -254,19 +263,19 @@ public class ARPGPlayer extends Player {
     public void setAnimationByOrientation(Orientation orientation) {
         switch (orientation) {
             case UP:
-                currentAnimationIndex = 0;
+                currentAnimationDirection = 0;
                 break;
             case DOWN:
-                currentAnimationIndex = 2;
+                currentAnimationDirection = 2;
                 break;
             case LEFT:
-                currentAnimationIndex = 3;
+                currentAnimationDirection = 3;
                 break;
             case RIGHT:
-                currentAnimationIndex = 1;
+                currentAnimationDirection = 1;
                 break;
         }
-        animations[currentAnimation][currentAnimationIndex].reset();
+        animations[currentAnimation][currentAnimationDirection].reset();
     }
 
 
@@ -312,7 +321,7 @@ public class ARPGPlayer extends Player {
 
     @Override
     public boolean wantsViewInteraction() {
-        return wantsInteraction;
+        return wantsViewInteraction;
     }
 
 

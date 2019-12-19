@@ -1,4 +1,4 @@
-# Game
+Game
 ## Movement
 #### Dash
 [PRESS A] : the player makes a dash (moves quickly and forward by a couple of cells)
@@ -21,6 +21,7 @@ A little image is shown above the monster when dealing a crits
 
 # Multiplayer
 ## General architecture
+![General Architecture](architecture.png)
     
 ## Game thread
 Both the server and the client have their own game thread that runs the runnable ThreadedPlay, this is so that we 
