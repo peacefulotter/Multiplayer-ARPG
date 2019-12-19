@@ -45,12 +45,6 @@ public class Bomb extends AreaEntity implements Interactor {
         handler = new BombHandler();
     }
 
-    // getter used by NetworkBomb
-    public ARPGInteractionVisitor getHandler()
-    {
-        return handler;
-    }
-
     @Override
     public void draw(Canvas canvas)
     {

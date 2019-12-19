@@ -1,9 +1,15 @@
 # MP2
 EPFL - Mini-Project 2 
+##### By Koppelmaa Albert and Maire Nathan
 
-### todo list
- - [fix] Bomb multiple placement (canHoldDowm - mve to arpgItem)
- - [fix] Player go in both directions 
+## Inputs
+ - `[ARROW KEY]` Move the player
+ - `[E]` Interact
+ - `[SPACE]` Use equipped item
+ - `[TAB / MOUSE WHEEL]` Switch equipped item
+ - `[A]` Dash
+ - `[U / I / O / P]` In multiplayer mode, select the upgrade of the bow or arrows
+ - `[Y]` In multiplayer mode, send a message to everyone "J'aime ce jeu!"
  
  # Multiplayer
  ## Server
