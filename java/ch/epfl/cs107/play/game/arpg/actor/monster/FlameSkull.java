@@ -15,16 +15,19 @@ import java.util.List;
 
 public class FlameSkull extends Monster implements FlyableEntity
 {
+    // the flame skull can live a certain time between these constants
     private final float MIN_LIFE_TIME = 6f;
     private final float MAX_LIFE_TIME = 15f;
     private final flameSkullHandler handler;
+
     private float lifeTime;
 
     public FlameSkull( Area area, DiscreteCoordinates coords )
     {
         super(area, coords, new Orientation[]{Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT},
-                "FlameSkull", "zelda/flameSkull",
-                3f, 1f, 3, new Vector( -0.5f, 0 ), Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
+                "zelda/flameSkull", 3f, 1f, 3,
+                new Vector( -0.5f, 0 ), Vulnerabilities.LONG_RANGE, Vulnerabilities.MAGIC );
+        // initialise the time the flameskull will live
         lifeTime = (float) (MIN_LIFE_TIME + Math.random() * (MAX_LIFE_TIME - MIN_LIFE_TIME));
         handler = new flameSkullHandler();
     }
@@ -35,6 +38,7 @@ public class FlameSkull extends Monster implements FlyableEntity
     {
         super.update(deltaTime);
         lifeTime -= deltaTime;
+        // if its lifetime is 0 then it is considered dead
         if ( lifeTime <= 0 )
         {
             super.isDead = true;
@@ -50,7 +54,7 @@ public class FlameSkull extends Monster implements FlyableEntity
     @Override
     public boolean isCellInteractable()
     {
-        return (!isDead && !hasAttacked);
+        return !isDead;
     }
 
     @Override
@@ -95,8 +99,11 @@ public class FlameSkull extends Monster implements FlyableEntity
         @Override
         public void interactWith( ARPGPlayer player )
         {
-            player.giveDamage( getDamage() );
-            hasAttacked = true;
+            if ( !hasAttacked )
+            {
+                player.giveDamage( getDamage() );
+                hasAttacked = true;
+            }
         }
 
         @Override
@@ -108,7 +115,7 @@ public class FlameSkull extends Monster implements FlyableEntity
         @Override
         public void interactWith( Monster monster )
         {
-            if ( monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
+            if ( !hasAttacked && monster.getVulnerabilities().contains( Vulnerabilities.FIRE ) )
             {
                 monster.giveDamage( getDamage() );
                 hasAttacked = true;

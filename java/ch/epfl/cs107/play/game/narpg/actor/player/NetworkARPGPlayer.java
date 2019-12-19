@@ -149,14 +149,14 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
                 {
                     if ( keyboard.get( Keyboard.U ).isPressed() )
                     {
-                        arrowRange = increaseArrowStat( arrowRange, 1, MAX_ARROW_RANGE, "range" );
+                        arrowRange = increaseArrowStat( arrowRange, 1, MAX_ARROW_RANGE, "Range" );
                     } else if ( keyboard.get( Keyboard.I ).isPressed() )
                     {
                         reduceBowAnimationDuration();
                     }
                     else if ( keyboard.get( Keyboard.O ).isPressed() )
                     {
-                        arrowDamage = increaseArrowStat( arrowDamage, 0.5f, MAX_ARROW_DAMAGE, "damage" );
+                        arrowDamage = increaseArrowStat( arrowDamage, 0.5f, MAX_ARROW_DAMAGE, "Damage" );
                     }
                     else if ( keyboard.get( Keyboard.P ).isPressed() ) {
                         arrowSpeed = increaseArrowSpeed();
@@ -314,7 +314,7 @@ public class NetworkARPGPlayer extends ARPGPlayer implements MovableNetworkEntit
             privateMessage( name + " already fully upgraded" );
         } else
         {
-            privateMessage( "Upgraded arrow" + name + " to " + stat );
+            privateMessage( "Upgraded Arrow " + name + " to " + stat );
             showUpgrades = false;
         }
         return stat;

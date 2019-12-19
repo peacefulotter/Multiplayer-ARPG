@@ -20,37 +20,46 @@ import java.util.Random;
 
 public class LogMonster extends Monster
 {
+    // the logmonster can sleep for a certain amount of time
     private static final float MIN_SLEEPING_DURATION = 2;
     private static final float MAX_SLEEPING_DURATION = 3;
+    // it cannot attack immediately after an attack
     private static final float MAX_TIME_ATTACK = 2;
     private static final int MAX_HP = 4;
     private static final Random random = new Random();
 
     private final logMonsterHandler handler;
+    // the log monster has states that are defined in the enum LogMonsterState
     private LogMonsterState state;
 
+    // check if the logmonster dropped a coin after his death (used to avoid dropping multiple coins)
     private boolean hasDroppedCoin;
+    // time since it felt asleep
     private float sleepingTime;
+    // maximum time he can sleep (random each time he falls asleep)
     private float sleepingTimeBound;
+    // time it attacks
     private float timeAttack;
 
     private Animation sleepingAnimation;
     private Animation wakingAnimation;
 
-
+    // the log monster states
     private enum LogMonsterState {
         IS_IDLE( true, true ),
         IS_SLEEPING( false, false ),
         IS_WAKING( false, false ),
         IS_ATTACKING( false, true );
 
+        // the log monster can reorientate
         public final boolean allowReorientation;
-        public final boolean drawPlayer;
+        // do we need to draw monster default animation
+        public final boolean drawMonster;
 
-        LogMonsterState( boolean allowReorientation, boolean drawPlayer )
+        LogMonsterState( boolean allowReorientation, boolean drawMonster )
         {
             this.allowReorientation = allowReorientation;
-            this.drawPlayer = drawPlayer;
+            this.drawMonster = drawMonster;
         }
     }
 
@@ -58,14 +67,16 @@ public class LogMonster extends Monster
     public LogMonster(Area area, DiscreteCoordinates coords )
     {
         super(area, coords, new Orientation[]{Orientation.DOWN, Orientation.UP, Orientation.RIGHT, Orientation.LEFT},
-                "LogMonster", "zelda/logMonster",
-                MAX_HP, 1f, 4, new Vector( -0.5f, 0 ), Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
+                "zelda/logMonster", MAX_HP, 1f, 4,
+                new Vector( -0.5f, 0 ), Vulnerabilities.CLOSE_RANGE, Vulnerabilities.FIRE);
+        // Sleeping animation
         Sprite[] sleepingAnimationSprites = new Sprite[4];
         for ( int i = 0; i < 4; i++ ) {
             sleepingAnimationSprites[i] = new Sprite("zelda/logMonster.sleeping", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), new Vector( -0.5f, 0 ), 1, -1000 );
         }
         sleepingAnimation = new Animation(10, sleepingAnimationSprites, true);
 
+        // Waking animation
         Sprite[] wakingAnimationSprites = new Sprite[3];
         for ( int i = 0; i < 3; i++ ) {
             wakingAnimationSprites[i] = new Sprite("zelda/logMonster.wakingUp", 2f, 2f, this, new RegionOfInterest(0, i * 32, 32, 32), new Vector( -0.5f, 0 ), 1, -1000 );
@@ -73,6 +84,7 @@ public class LogMonster extends Monster
         wakingAnimation = new Animation(10, wakingAnimationSprites, false);
 
         handler = new logMonsterHandler();
+        // the log monster is IDLE at the beginning
         state = LogMonsterState.IS_IDLE;
         timeAttack = 0;
         hasDroppedCoin = false;
@@ -84,6 +96,7 @@ public class LogMonster extends Monster
         switch( state )
         {
             case IS_IDLE:
+                // when IDLE, it has a certain chance to fall asleep
                 if ( random.nextFloat() < 0.005 )
                 {
                     setSleeping();
@@ -91,68 +104,87 @@ public class LogMonster extends Monster
                 break;
 
             case IS_SLEEPING:
+                // when sleeping, update the animation
                 sleepingAnimation.update( deltaTime );
                 sleepingTime += deltaTime;
+                // if finished sleeping
                 if ( sleepingTime >= sleepingTimeBound )
                 {
+                    // then it is waking
                     state = LogMonsterState.IS_WAKING;
+                    // and the animation must be reset (in case it has not finished)
                     sleepingAnimation.reset();
                 }
                 break;
 
             case IS_WAKING:
+                // if it finished waking up
                 if ( wakingAnimation.isCompleted() )
                 {
+                    // then it goes back to idle
                     state = LogMonsterState.IS_IDLE;
+                    // and once again we need to reset the animation
                     wakingAnimation.reset();
                 }
+                // or it still is not finished to wake up
                 else
                 {
+                    // so we update the animation
                     wakingAnimation.update( deltaTime );
                 }
                 break;
 
             case IS_ATTACKING:
+                // when attacking, the monster only move straight-forward and fast
                 super.move( 13 );
+                // if it did not reached its target
                 if ( timeAttack >= MAX_TIME_ATTACK )
                 {
+                    // Reset the attack
                     resetAttack();
                 }
                 timeAttack += deltaTime;
                 break;
         }
 
-        if ( isDead && !hasDroppedCoin )
+        // drop a coin when the logmonster is dead
+        if ( isDead && !hasDroppedCoin && deathAnimation.isCompleted() )
         {
-            if ( deathAnimation.isCompleted() )
-            {
-                hasDroppedCoin = true;
-                getOwnerArea().registerActor(
-                        new Coin( getOwnerArea(), getCurrentCells().get(0), 50 ) );
-            }
+            hasDroppedCoin = true;
+            getOwnerArea().registerActor(
+                    new Coin( getOwnerArea(), getCurrentCells().get(0), 50 ) );
         }
-
+        // update but can only change orientation if the state allows to
         super.update( deltaTime, state.allowReorientation );
     }
 
     @Override
     public void draw(Canvas canvas)
     {
+        // while it is not dead
         if ( !isDead )
         {
             switch( state )
             {
+                // either it is waking up
                 case IS_WAKING:
                     wakingAnimation.draw( canvas );
                     break;
+                 // or sleeping
                 case IS_SLEEPING:
                     sleepingAnimation.draw( canvas );
                     break;
             }
         }
-        super.draw( canvas, state.drawPlayer );
+        // or we draw only either the default animation or the death animation
+        // we let the super.draw handle this since it is common to all monsters
+        super.draw( canvas, state.allowReorientation );
     }
 
+    /**
+     * Change the logMonster to the state Sleeping
+     *  and redefine a new sleeping time bound based on randomness
+     */
     public void setSleeping()
     {
         state = LogMonsterState.IS_SLEEPING;
@@ -160,6 +192,10 @@ public class LogMonster extends Monster
         sleepingTimeBound = MIN_SLEEPING_DURATION + random.nextFloat() * (MAX_SLEEPING_DURATION-MIN_SLEEPING_DURATION);
     }
 
+    /**
+     * After an attack, the logMonster falls asleep
+     *  and his time it attacked resets to 0
+     */
     public void resetAttack()
     {
         setSleeping();
@@ -190,6 +226,10 @@ public class LogMonster extends Monster
         ((ARPGInteractionVisitor) v).interactWith(this);
     }
 
+    /**
+     * It's field of view is either 10 cells in front of him if it is IDLE (to spot a player even far away)
+     * or 1 cell when attacking to deal damage to the player if it encounters one only in front of him
+     */
     @Override
     public List<DiscreteCoordinates> getFieldOfViewCells()
     {

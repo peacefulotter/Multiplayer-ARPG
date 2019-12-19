@@ -80,7 +80,7 @@ public class DarkLord extends Monster
     public DarkLord( Area area, DiscreteCoordinates position )
     {
         super(area, position, new Orientation[] {Orientation.UP, Orientation.LEFT, Orientation.DOWN, Orientation.RIGHT},
-                "DarkLord", "zelda/darkLord", 10, 1.2f, 3, new Vector( -0.5f, 0.25f ),
+                "zelda/darkLord", 10, 1.2f, 3, new Vector( -0.5f, 0.25f ),
                 Vulnerabilities.MAGIC );
         // create the handler
         this.handler = new DarkLordHandler();

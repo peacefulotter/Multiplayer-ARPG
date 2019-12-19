@@ -20,10 +20,13 @@ import java.util.List;
 
 public class FireSpell extends AreaEntity implements Interactor
 {
+    // the firespell can live between Min life time and Max life time
     private static final float MIN_LIFE_TIME = 3f;
     private static final float MAX_LIFE_TIME = 5f;
+    // the time it takes to propagate
     private static final float PROPAGATION_TIME_SPELL = 0.5f;
-    private static final float ATTACK_COUNTDOWN = 1f;
+    // the time it takes to deal damage again
+    private static final float ATTACK_COOLDOWN = 1f;
 
     private final float damage;
     private final float lifeTime;
@@ -33,10 +36,14 @@ public class FireSpell extends AreaEntity implements Interactor
     private final FireSpellHandler handler;
 
     private Animation fireSpellAnimation;
+    // time since the fire spell is alive
     private float fireTimeAlive;
+    // time since the fire spell dealt damage
     private float timeAttack;
+    // check whether the fire spell already propagated
     private boolean hasPropagated;
-    public boolean hasAttacked;
+    // check if the fire spell just attacked
+    private boolean hasAttacked;
 
     /**
      * Default AreaEntity constructor
@@ -51,6 +58,7 @@ public class FireSpell extends AreaEntity implements Interactor
         this.orientation = orientation;
         this.damage = damage;
         this.force = force;
+        // initialise the fire spell lifetime with a random number
         lifeTime = MIN_LIFE_TIME + RandomGenerator.getInstance().nextFloat() * (MAX_LIFE_TIME-MIN_LIFE_TIME);
         currentCell = new ArrayList<>();
         currentCell.add( position );
@@ -69,22 +77,30 @@ public class FireSpell extends AreaEntity implements Interactor
     @Override
     public void update(float deltaTime)
     {
+        // if the fire spell just attacked
         if ( hasAttacked )
         {
-            if ( timeAttack > ATTACK_COUNTDOWN )
+            // then we check if the cooldown is over
+            if ( timeAttack > ATTACK_COOLDOWN )
             {
+                // reset the attack and the time since last attack
                 hasAttacked = false;
                 timeAttack = 0;
             }
+            // increase the tile since last attack
             timeAttack += deltaTime;
         }
+        // if the fire spell can propagate (force>0) and the time it is alive is enough (equals or more to PROPAGATION_TIME_SPELL)
         if ( force > 0 && !hasPropagated && fireTimeAlive >= PROPAGATION_TIME_SPELL )
         {
+            // then it genereates a new fire spell
             generateFireSpell();
         }
+        // or if the fire spell has reached his death time
         else if ( fireTimeAlive >= lifeTime )
         {
-            getOwnerArea().unregisterActor( this );
+            // then it gets unregistered
+            blow();
         }
         fireSpellAnimation.update( deltaTime );
         fireTimeAlive += deltaTime;
@@ -97,21 +113,30 @@ public class FireSpell extends AreaEntity implements Interactor
         fireSpellAnimation.draw( canvas );
     }
 
+    /**
+     * Create a new fire spell in front on it
+     */
     private void generateFireSpell()
     {
+        // the fire spell has propagated even though it cannot create a new one in front of him
         hasPropagated = true;
-
-        if ( damage-0.1f <= 0 ) { return; }
-
+        // get the coordinates of the cell in front of him
         DiscreteCoordinates newPosition = getFieldOfViewCells().get( 0 );
+        // create an instance of FireSpell with a force that is -1
         FireSpell fireSpell = new FireSpell( getOwnerArea(), orientation, newPosition, damage, force-1 );
+        // check if it is possible to spawn it
         boolean canSpawn = getOwnerArea().canEnterAreaCells( fireSpell, Collections.singletonList( newPosition ) );
         if ( canSpawn )
         {
+            // register the new fire spell in the area
             getOwnerArea().registerActor( fireSpell );
         }
     }
 
+
+    /**
+     * Unregister the fire spell from the area
+     */
     public void blow()
     {
         getOwnerArea().unregisterActor( this );
@@ -123,6 +148,9 @@ public class FireSpell extends AreaEntity implements Interactor
         return currentCell;
     }
 
+    /**
+     * The fire spell field of view is only the cell located in front of him
+     */
     @Override
     public List<DiscreteCoordinates> getFieldOfViewCells()
     {
@@ -204,6 +232,10 @@ public class FireSpell extends AreaEntity implements Interactor
             grass.cutGrass();
         }
 
+
+        /*
+            Arrows and MagicProjectile can blow the fire spell
+         */
         @Override
         public void interactWith( Arrow arrow )
         {

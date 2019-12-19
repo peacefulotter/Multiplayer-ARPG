@@ -15,20 +15,23 @@ import java.util.List;
 
 public abstract class Monster extends MovableAreaEntity implements Interactor
 {
+    // Minimimum countdown between two attacks
     private static final float ATTACK_COUNTDOWN = 2f;
+    // default animation duration
     private static final int ANIMATION_DURATION = 10;
+    // the player has a certain chance to deal crits
     private static final double CRITS_PERCENTAGE = 0.2;
 
+    // the sprite of the critical shot
     private final Sprite critsSprite;
-    private final String name;
-    private final float maxHealth;
-
-    private List<DiscreteCoordinates> currentCells;
+    // List of all the vulnerabilities the monster has
     private List<Vulnerabilities> vulnerabilities;
     private Animation[] movementAnimation;
+    // how many damage the monster can deal
     private final float inflictDamage;
     private float currentHealth;
     private float timeAttack;
+    // did the monster has received a critical hit
     private boolean dealtCrits;
     public boolean hasAttacked;
 
@@ -38,15 +41,11 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 
     public Monster(
             Area area, DiscreteCoordinates position, Orientation[] orientations,
-            String name, String spriteName, float maxHealth, float damage, int nbFrames,
+            String spriteName, float maxHealth, float damage, int nbFrames,
             Vector spriteOffset, Vulnerabilities... vulnerabilities)
     {
         super( area, Orientation.DOWN, position );
-        this.name = name;
-        this.maxHealth = maxHealth;
         currentHealth = maxHealth;
-        currentCells = new ArrayList<>();
-        currentCells.add( position );
         isDead = false;
         inflictDamage = damage;
         timeAttack = 0;
@@ -65,6 +64,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
                 this, 32, 32, spriteOffset, orientations);
         movementAnimation = RPGSprite.createAnimations(ANIMATION_DURATION, sprites);
 
+        // the sprite to show when a critical hit is dealt
         critsSprite = new Sprite( "custom/crits", 1.5f, 1.5f, this, new RegionOfInterest( 0, 0, 541, 541 ), new Vector( -0.25f, 0.75f ), 1, 1000 );
         dealtCrits = false;
     }
@@ -75,6 +75,7 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         return vulnerabilities;
     }
 
+    // by default the monster is allowed to reorientate
     @Override
     public void update( float deltaTime )
     {
@@ -87,8 +88,10 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         {
             if ( hasAttacked )
             {
+                // the monster cannot attack for a certain time
                 if ( timeAttack > ATTACK_COUNTDOWN )
                 {
+                    // after that time, it can attack again
                     hasAttacked = false;
                     timeAttack = 0;
                 }
@@ -96,31 +99,41 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
             }
             if ( allowReorientation )
             {
+                // get a random orientation
                 Orientation newOrientation = getRandomOrientation();
                 if ( Math.random() < 0.01 )
                 {
+                    // try to reorientate
                     boolean orientationSuccessful = orientate( newOrientation );
                     if ( orientationSuccessful )
                     {
+                        // and change the animationIndex accordingly
                         changeAnimationIndex( newOrientation );
                     }
+                    // finally, move the monster
                     move( ANIMATION_DURATION );
                 }
             }
             movementAnimation[currentAnimationIndex].update(deltaTime);
         }
+        // if the monster is dead, but the deathanimation is not finished
         else if ( !deathAnimation.isCompleted() )
         {
             deathAnimation.update( deltaTime );
+        // if the monster is dead and the deathAnimation is finished
         } else {
             getOwnerArea().unregisterActor( this );
         }
 
+        // if it received crits
         if ( dealtCrits )
         {
+            // then fade out progressively the sprite
             critsSprite.setAlpha( critsSprite.getAlpha() - 0.01f );
+            // and when it is not visible
             if ( critsSprite.getAlpha() <= 0 )
             {
+                // reset the alpha to 1 for the next use and dealtCrits to false
                 critsSprite.setAlpha( 1 );
                 dealtCrits = false;
             }
@@ -129,17 +142,18 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         super.update( deltaTime );
     }
 
+    // by default we draw the monster
     @Override
     public void draw( Canvas canvas )
     {
         draw( canvas, true );
     }
 
-    public void draw( Canvas canvas, boolean drawPlayer )
+    public void draw( Canvas canvas, boolean drawMonster )
     {
         if ( !isDead )
         {
-            if ( drawPlayer )
+            if ( drawMonster )
             {
                 movementAnimation[ currentAnimationIndex ].draw( canvas );
             }
@@ -154,7 +168,10 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
         }
     }
 
-
+    /**
+     * Change the currentAnimationIndex according to the monster orientation
+     * @param newOrientation : the monster new orientation
+     */
     private void changeAnimationIndex( Orientation newOrientation )
     {
         switch ( newOrientation )
@@ -175,27 +192,39 @@ public abstract class Monster extends MovableAreaEntity implements Interactor
 
     }
 
+    /**
+     * Get a random orientation
+     * @return Orientation
+     */
     protected Orientation getRandomOrientation()
     {
         int random = RandomGenerator.getInstance().nextInt( 4 );
         return Orientation.fromInt( random );
     }
 
+    // getter for the damage the monster can deal
     public float getDamage()
     {
         return inflictDamage;
     }
 
-
+    /**
+     * Deal damage to the monster by a certain amout
+     * @param damage : the amount of damage to deal
+     */
     public void giveDamage( float damage )
     {
+        // crits is either 1 (deal no crits) or 2 (deal crits)
         float crits = 1;
+        // check if the player dealt crits
         if ( Math.random() < CRITS_PERCENTAGE )
         {
             crits = 2;
             dealtCrits = true;
         }
+        // reduce the monster health
         currentHealth -= damage * crits;
+        // and set him dead if his health is less than 0
         if ( currentHealth <= 0 )
         {
             resetMotion();

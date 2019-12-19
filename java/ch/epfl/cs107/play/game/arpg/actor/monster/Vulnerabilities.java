@@ -1,5 +1,10 @@
 package ch.epfl.cs107.play.game.arpg.actor.monster;
 
+/**
+ * Monster Vulnerabilities
+ * Each Monster has their own Vulnerabilities
+ * and each ARPGItem has also their own Vulnerabilities
+ */
 public enum Vulnerabilities
 {
     FIRE( "Fire", true ),

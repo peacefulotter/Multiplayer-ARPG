@@ -19,42 +19,54 @@ import java.util.List;
 public class Bomb extends AreaEntity implements Interactor {
 
     private Sprite[] bombSprite;
-    private int bombRadius=3;
+    // the bomb range
+    private int bombDiameter = 3;
+    // The tie it will take to the bomb to explode
     private float fuseTime;
     private Animation animation;
-    private boolean exploded=false;
+    private boolean exploded = false;
     private static final float BOMB_DAMAGE = .5f;
-    // type ArpgInteractionVisitor not final and protected because its overwritten by NetworkBomb
-    protected ARPGInteractionVisitor handler;
+    // type ArpgInteractionVisitor and  not final because its overwritten by NetworkBomb
+    private ARPGInteractionVisitor handler;
 
     public Bomb(Area area, Orientation orientation, DiscreteCoordinates position) {
-        super(area,orientation,position);
-        fuseTime=3f;
+        super( area, orientation, position );
+        fuseTime = 3f;
         bombSprite = new Sprite[2];
         bombSprite[0]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(0,0,16,16), new Vector( 0, 0.25f ),1f,-100);
         bombSprite[1]= new Sprite("zelda/bomb",1,1f,this, new RegionOfInterest(16,0,16,16), new Vector( 0, 0.25f ),1f,-100);
         Sprite[] animationSprites= new Sprite[7];
         for(int i=0; i<7;i++){
-            animationSprites[i] = new Sprite("zelda/explosion", bombRadius,bombRadius,this, new RegionOfInterest(i*32,0,32,32), new Vector(-bombRadius/2,-bombRadius/2));
+            animationSprites[i] = new Sprite("zelda/explosion", bombDiameter,bombDiameter,this, new RegionOfInterest(i*32,0,32,32), new Vector(-bombDiameter/2,-bombDiameter/2));
         }
         animation = new Animation(4,animationSprites, false);
         handler = new BombHandler();
     }
 
-    @Override
-    public void draw(Canvas canvas) {
-        if(fuseTime>0){
-            if(Math.cos(20/(fuseTime))>0){
-                bombSprite[0].draw(canvas);
-            }else{
-                bombSprite[1].draw(canvas);
-            }
-        }
-        else if(!animation.isCompleted())
-            animation.draw(canvas);
+    // getter used by NetworkBomb
+    public ARPGInteractionVisitor getHandler()
+    {
+        return handler;
     }
 
+    @Override
+    public void draw(Canvas canvas)
+    {
+        // draw the bomb if it did not explode
+        if (fuseTime > 0) {
+            // change between the first and second sprite faster as time goes
+            if (Math.cos(20 / (fuseTime)) > 0) {
+                bombSprite[0].draw(canvas);
+            } else {
+                bombSprite[1].draw(canvas);
+            }
+        } else if (!animation.isCompleted())
+        {
+            animation.draw(canvas);
+        }
+    }
 
+    // force the explosion
     public void explode()
     {
         fuseTime = 0;
@@ -63,10 +75,13 @@ public class Bomb extends AreaEntity implements Interactor {
 
     @Override
     public void update(float deltaTime) {
-        fuseTime-=deltaTime;
-        if(animation.isCompleted()) {
+        // update the fuse time
+        fuseTime -= deltaTime;
+        // unregister the bomb if the animation is finished
+        if (animation.isCompleted()) {
             getOwnerArea().unregisterActor(this);
-        }else if(fuseTime<0){
+        // or update the animation
+        } else if (fuseTime < 0) {
             animation.update(deltaTime);
         }
     }
@@ -96,15 +111,21 @@ public class Bomb extends AreaEntity implements Interactor {
         ((ARPGInteractionVisitor)v).interactWith(this);
     }
 
+    /**
+     * Get the cells around the bomb by a certain radius
+     * This radius can be easily changed to make different kind of bombs :
+     *  some more powerful than others
+     * @return
+     */
     @Override
     public List<DiscreteCoordinates> getFieldOfViewCells() {
-        List<DiscreteCoordinates> fieldOfViewCells= new ArrayList<DiscreteCoordinates>();
+        List<DiscreteCoordinates> fieldOfViewCells = new ArrayList<>();
         DiscreteCoordinates mainCell = getCurrentCells().get(0);
-        int offsetFromMainCell= (bombRadius-1)/2;
-        for(int i=mainCell.x-offsetFromMainCell; i<mainCell.x+offsetFromMainCell+1;i++){
-
-            for(int j=mainCell.y-offsetFromMainCell; j<mainCell.y+offsetFromMainCell+1;j++){
-                if(i>=0 && j>=0){
+        int offsetFromMainCell = (bombDiameter-1) / 2;
+        for (int i = mainCell.x - offsetFromMainCell; i < mainCell.x + offsetFromMainCell + 1; i++) {
+            for (int j = mainCell.y - offsetFromMainCell; j < mainCell.y + offsetFromMainCell + 1; j++) {
+                // ensure the coordinates are in the area
+                if ( i >= 0 && j >= 0) {
                    fieldOfViewCells.add(new DiscreteCoordinates(i,j));
                 }
 
