@@ -60,3 +60,9 @@ To connect to your own local server use the following program arguments:
 localhost <your_chosen_port> <your_chosen_username>
 ```
 ## Multiplayer gameplay
+shoot arrows at other players to damage them and destroy your enemies. For each
+enemy slain, you may upgrade your mighty bow by selecting an upgrade:
+- Press U for arrow range
+- Press O to deal more damage
+- Press I to improve reload speed
+- Press P for faster arrows
